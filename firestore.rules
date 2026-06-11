@@ -1,0 +1,86 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Helpers ----------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    function isAdmin() {
+      // Rôle porté par users/{uid}.role. Option durcissement : request.auth.token.admin == true
+      return isSignedIn() && userDoc().role == 'admin';
+    }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // ---------- users ----------
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      // À l'inscription : on ne peut créer QUE son propre doc, role forcé à 'customer'
+      allow create: if isOwner(uid)
+        && incoming().role == 'customer'
+        && incoming().email is string;
+      // L'utilisateur met à jour son profil sans toucher à son rôle ; l'admin peut tout
+      allow update: if (isOwner(uid) && incoming().role == existing().role) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ---------- categories ----------
+    match /categories/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---------- products ----------
+    match /products/{id} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && incoming().price is number && incoming().price >= 0
+        && incoming().stock is int && incoming().stock >= 0
+        && incoming().name is string && incoming().name.size() > 0;
+      allow delete: if isAdmin();
+    }
+
+    // ---------- carts (privés au propriétaire) ----------
+    match /carts/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ---------- favorites (privés au propriétaire) ----------
+    match /favorites/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ---------- orders ----------
+    match /orders/{id} {
+      allow read: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      // Le client crée SA commande, statut imposé à 'pending', total numérique
+      allow create: if isOwner(incoming().userId)
+        && incoming().status == 'pending'
+        && incoming().total is number && incoming().total >= 0
+        && incoming().items is list;
+      // Seul l'admin fait évoluer le statut / gère la commande
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    // ---------- promos / codes promo ----------
+    match /promos/{id} {
+      // Lisible par un utilisateur connecté (validation d'un code au checkout) ; écriture admin
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ---------- refus par défaut ----------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

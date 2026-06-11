@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "aquilas-ecommerce"
+  },
+  "targets": {
+    "aquilas-ecommerce": {
+      "hosting": {
+        "client": ["aquilas-ecommerce-client"],
+        "admin": ["aquilas-ecommerce-admin"]
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+# Fichiers de configuration locale (contiennent des chemins absolus spécifiques à chaque dev)
+.claude/settings.local.json
+.gemini/settings.local.json
+.codex/settings.local.json
+
+# Variables d'environnement
+.env
+.env.local
+.env.*.local
+
+# Dépendances
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+vendor/
+
+# Builds
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+**/node_modules/
+**/dist/
+
+# Service account keys — NE JAMAIS COMMITTER
+*serviceAccount*.json
+*service-account*.json

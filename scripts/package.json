@@ -1,0 +1,13 @@
+{
+  "name": "aquilas-scripts",
+  "private": true,
+  "type": "module",
+  "description": "Scripts Admin SDK (seed, set-admin) — à exécuter contre l'émulateur ou la prod",
+  "scripts": {
+    "seed": "node seed.mjs",
+    "set-admin": "node set-admin.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.6.0"
+  }
+}

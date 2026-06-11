@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    @apply bg-paper text-ink font-sans;
+  }
+  h1, h2, h3 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .brand-logo {
+    @apply font-serif font-bold tracking-tight;
+  }
+  .container-app {
+    @apply mx-auto w-full max-w-6xl px-4;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-paper hover:bg-black;
+  }
+  .btn-outline {
+    @apply btn border border-ink bg-transparent text-ink hover:bg-ink hover:text-paper;
+  }
+  .input {
+    @apply w-full rounded-md border border-line bg-paper px-4 py-3 text-sm outline-none focus:border-ink;
+  }
+  .badge {
+    @apply inline-block bg-gray-100 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-ink;
+  }
+}
+
+/* Masquer la scrollbar des carrousels horizontaux */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
