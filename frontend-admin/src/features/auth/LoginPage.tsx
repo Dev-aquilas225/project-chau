@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FirebaseError } from 'firebase/app';
 import { toast } from 'sonner';
-import { adminLogin } from './AuthProvider';
+import { adminLogin, useAuth } from './AuthProvider';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { refresh } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -15,11 +15,10 @@ export function LoginPage() {
     setBusy(true);
     try {
       await adminLogin(email, password);
+      await refresh();
       navigate('/');
-    } catch (err) {
-      const code = err instanceof FirebaseError ? err.code : '';
-      toast.error(code.includes('invalid') || code.includes('wrong') || code.includes('not-found')
-        ? 'Identifiants incorrects.' : 'Connexion impossible.');
+    } catch {
+      toast.error('Identifiants incorrects ou accès non autorisé.');
     } finally {
       setBusy(false);
     }

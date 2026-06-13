@@ -2,7 +2,7 @@ export type Role = 'customer' | 'admin';
 export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
 
 export interface UserProfile {
-  uid: string;
+  id: string;
   email: string;
   displayName: string;
   role: Role;

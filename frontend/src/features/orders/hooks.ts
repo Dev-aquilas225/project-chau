@@ -4,7 +4,7 @@ import { getMyOrders, createOrder, type NewOrder } from './api';
 export const useMyOrders = (userId?: string) =>
   useQuery({
     queryKey: ['orders', userId],
-    queryFn: () => getMyOrders(userId!),
+    queryFn: () => getMyOrders(),
     enabled: !!userId,
   });
 
@@ -12,7 +12,7 @@ export function useCreateOrder() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: NewOrder) => createOrder(input),
-    onSuccess: (_id, vars) => qc.invalidateQueries({ queryKey: ['orders', vars.userId] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['orders'] }),
   });
 }
 

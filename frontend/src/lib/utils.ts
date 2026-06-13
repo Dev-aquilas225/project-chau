@@ -14,17 +14,14 @@ export function formatDate(date?: Date | null): string {
   return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }).format(date);
 }
 
-/** Mappe un code d'erreur FirebaseError vers un message FR lisible. */
-export function firebaseErrorMessage(code?: string): string {
-  const map: Record<string, string> = {
-    'auth/invalid-credential': 'Email ou mot de passe incorrect.',
-    'auth/invalid-email': 'Adresse email invalide.',
-    'auth/user-not-found': 'Email ou mot de passe incorrect.',
-    'auth/wrong-password': 'Email ou mot de passe incorrect.',
-    'auth/email-already-in-use': 'Cette adresse email est déjà utilisée.',
-    'auth/weak-password': 'Le mot de passe doit contenir au moins 6 caractères.',
-    'auth/popup-closed-by-user': 'Connexion Google annulée.',
-    'permission-denied': "Vous n'avez pas les droits pour cette action.",
-  };
-  return map[code ?? ''] ?? "Une erreur est survenue. Réessayez.";
+/** Mappe une erreur API (ApiError) vers un message FR lisible. */
+export function apiErrorMessage(err: unknown): string {
+  if (err instanceof Error) {
+    const status = (err as { status?: number }).status;
+    if (status === 401) return 'Email ou mot de passe incorrect.';
+    if (status === 403) return "Vous n'avez pas les droits pour cette action.";
+    if (status === 409) return 'Cette adresse email est déjà utilisée.';
+    if (err.message) return err.message;
+  }
+  return 'Une erreur est survenue. Réessayez.';
 }

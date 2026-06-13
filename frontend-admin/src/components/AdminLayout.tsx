@@ -43,7 +43,7 @@ export function AdminLayout() {
       </nav>
       <div className="border-t border-white/10 p-3">
         <p className="px-3 py-1 text-xs text-white/50">{profile?.email}</p>
-        <button onClick={() => adminLogout()} className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5">
+        <button onClick={() => adminLogout().then(() => window.location.assign('/login'))} className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5">
           <LogOut className="h-4 w-4" /> Déconnexion
         </button>
       </div>

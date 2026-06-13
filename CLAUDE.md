@@ -1,43 +1,72 @@
-# Aquilas E-commerce — React + Firebase
+# Aquilas E-commerce — React + NestJS + PostgreSQL
 
-> Plateforme e-commerce composée de **deux interfaces SPA React** partageant le même backend Firebase :
+> Plateforme e-commerce composée de **deux interfaces SPA React** partageant la même API REST :
 > - `frontend/` — **boutique client** (catalogue, panier, commande, compte)
 > - `frontend-admin/` — **back-office admin** (gestion produits, commandes, stock, utilisateurs)
+> - `backend/` — **API REST NestJS** + PostgreSQL (TypeORM)
 >
 > Ce fichier est lu par tous les agents Claude au démarrage. Il définit le stack et les conventions qui font autorité.
+>
+> ⚠️ **Migration Firebase → NestJS/PostgreSQL effectuée.** Les fichiers `firestore.rules`, `storage.rules`, `firebase.json`, `firestore.indexes.json` sont **obsolètes/legacy** (conservés temporairement pour référence, seront supprimés dans un commit de nettoyage séparé). Ne plus s'appuyer sur le SDK Firebase ni sur les Security Rules : la sécurité est désormais portée par les **Guards NestJS** (`JwtAuthGuard`, `RolesGuard`).
 
 ## Stack technique
-- **Backend / Serveur**: Firebase (BaaS) — **Firestore** (NoSQL temps réel), **Firebase Auth**, **Cloud Storage**. Pas de serveur applicatif custom ni de Cloud Functions : la logique sensible est garantie par les **Firestore Security Rules**.
+- **Backend / Serveur**: **NestJS** (Node.js/TypeScript) — API REST modulaire, exposée sous le préfixe `/api`. Pas de BaaS : la logique métier et la sécurité vivent dans les modules NestJS (services + guards + DTOs).
 - **Frontend**: React 18 + TypeScript + **Vite** — deux applications (`frontend/` client, `frontend-admin/` admin)
-- **Base de données**: Cloud Firestore (mode natif, NoSQL orienté documents)
-- **Auth**: Firebase Authentication (email/password + Google). Rôle admin via champ `users/{uid}.role` protégé par les Security Rules (option durcissement : custom claims posés par un script Admin SDK)
-- **State / données**: **Zustand** (état UI/panier local) + **TanStack Query (React Query)** (cache des données Firestore, mutations, invalidation)
+- **Base de données**: **PostgreSQL** via **TypeORM** (entités, migrations, `synchronize: false`)
+- **Auth**: JWT (`@nestjs/jwt` + `@nestjs/passport` + `passport-jwt`). Mot de passe hashé avec **bcrypt**. Rôle admin via champ `users.role` (`customer`|`admin`), vérifié par `RolesGuard` + décorateur `@Roles('admin')`
+- **State / données**: **Zustand** (état UI/panier local) + **TanStack Query (React Query)** (cache des données API REST, mutations, invalidation)
 - **UI**: **Tailwind CSS** + **shadcn/ui** (composants headless Radix)
-- **Conteneurs**: aucun (Firebase Hosting / Emulator Suite en local)
-- **CI/CD**: GitHub Actions (lint → test → build → deploy Firebase)
+- **Conteneurs**: Docker / docker-compose (services `postgres`, `backend`, `frontend`, `frontend-admin`)
+- **CI/CD**: GitHub Actions (lint → test → build → deploy)
 
 ## Structure du projet
 ```
-aquilas-ecomerce-firebase/
+project-chau/
+├── backend/                # API REST NestJS + TypeORM + PostgreSQL
+│   └── src/
+│       ├── main.ts                # bootstrap (CORS, ValidationPipe, préfixe /api, static /uploads)
+│       ├── app.module.ts          # TypeOrmModule + imports des modules métier
+│       ├── data-source.ts         # DataSource CLI (migrations)
+│       ├── auth/                  # AuthModule : register/login/me, JwtStrategy, guards, decorators
+│       ├── users/                 # UsersModule : profil, gestion rôles (admin)
+│       ├── categories/            # CategoriesModule : CRUD catégories
+│       ├── products/              # ProductsModule : CRUD produits, filtres, recherche
+│       ├── orders/                # OrdersModule : commandes (création, suivi statut)
+│       ├── uploads/                # UploadsModule : upload images produit (admin, Multer)
+│       └── migrations/            # migrations TypeORM
 ├── frontend/               # SPA client React+Vite (boutique)
 │   └── src/
-│       ├── lib/firebase.ts        # init Firebase (app, auth, db, storage)
-│       ├── features/              # par domaine : catalog, cart, checkout, account
+│       ├── lib/http.ts             # client HTTP (apiFetch, ApiError, token JWT)
+│       ├── features/              # par domaine : catalog, cart, checkout, account, auth, orders
 │       ├── components/            # composants partagés (shadcn/ui dans ui/)
 │       ├── hooks/                 # hooks React Query (useProducts, useOrder…)
-│       ├── stores/                # stores Zustand (cart, ui)
+│       ├── stores/                # stores Zustand (cart, ui, favorites)
 │       └── routes/                # pages + routing
 ├── frontend-admin/         # SPA admin React+Vite (back-office)
 │   └── src/                # même structure ; features : products, orders, stock, users
 ├── shared/                 # types TS partagés (Product, Order, User…) — OPTIONNEL
-├── firestore.rules         # Security Rules Firestore (source de sécurité principale)
-├── storage.rules           # Security Rules Cloud Storage
-├── firestore.indexes.json  # index composites Firestore
-├── firebase.json           # config Firebase (hosting, emulators, rules)
+├── docker-compose.yaml     # services postgres + backend + frontend + frontend-admin
+├── firestore.rules         # ⚠️ OBSOLÈTE (legacy Firebase, à supprimer plus tard)
+├── storage.rules           # ⚠️ OBSOLÈTE (legacy Firebase, à supprimer plus tard)
+├── firestore.indexes.json  # ⚠️ OBSOLÈTE (legacy Firebase, à supprimer plus tard)
+├── firebase.json           # ⚠️ OBSOLÈTE (legacy Firebase, à supprimer plus tard)
 └── docs/                   # ADR, architecture, modèle de données
 ```
 
 ## Commandes essentielles
+
+### Backend (`backend/`)
+```bash
+npm run start:dev                # NestJS en mode watch
+npm run build                    # build production (tsc)
+npm run test                     # tests unitaires (Jest)
+npm run test:e2e                 # tests e2e (Jest + Supertest, nécessite Postgres)
+npm run test:cov                 # couverture
+npm run lint                     # ESLint
+npm run migration:generate -- src/migrations/NomMigration
+npm run migration:run
+npm run migration:revert
+```
 
 ### Frontend client (`frontend/`)
 ```bash
@@ -58,28 +87,25 @@ npm run test
 npm run e2e
 ```
 
-### Firebase
+### Docker / local
 ```bash
-firebase emulators:start         # Firestore + Auth + Storage en local
-firebase deploy --only firestore:rules    # déployer les Security Rules
-firebase deploy --only storage             # déployer les rules Storage
-firebase deploy --only firestore:indexes   # déployer les index composites
-firebase deploy --only hosting             # déployer les SPA
-firebase deploy                            # tout déployer
+docker compose up -d postgres    # PostgreSQL local
+docker compose up --build        # tous les services (backend + 2 SPA + postgres)
 ```
 
-## Architecture Backend (Firebase)
+## Architecture Backend (NestJS + PostgreSQL)
 
-> Il n'y a pas d'API REST ni de couche serveur : le frontend parle **directement** à Firestore/Auth/Storage via le SDK. La sécurité n'est donc **jamais** côté client — elle est entièrement portée par `firestore.rules` et `storage.rules`. Toute règle métier qui doit être inviolable s'écrit dans les Security Rules.
+> Le frontend parle à l'API REST NestJS via `apiFetch` (`lib/http.ts`). La sécurité n'est **jamais** côté client — elle est portée par les **guards NestJS** (`JwtAuthGuard`, `RolesGuard`) et la validation des DTOs (`class-validator`, `ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true })`).
 
-### Collections / Domaines principaux
-- **Auth** — Firebase Auth (email/password, Google). Document miroir `users/{uid}` créé à l'inscription (rôle, profil)
-- **users** — `users/{uid}` : profil, `role` (`customer` | `admin`), adresses, créé à l'inscription
-- **products** — catalogue : nom, description, prix, images (URLs Storage), `categoryId`, `stock`, `active`
-- **categories** — arborescence de catégories produit
-- **carts** — `carts/{uid}` : panier persistant de l'utilisateur (souvent aussi en local Zustand)
-- **orders** — commandes : `userId`, lignes, total, `status` (`pending`→`paid`→`shipped`→`delivered`/`cancelled`), `createdAt`
-- **reviews** — avis produits : `productId`, `userId`, note, commentaire
+### Modules / Domaines principaux
+- **AuthModule** — `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`. JWT signé via `@nestjs/jwt`, payload `{ sub, email, role }`. Mots de passe hashés avec bcrypt (`passwordHash`, colonne `select: false`).
+- **UsersModule** — `users` : profil (`email`, `displayName`, `role`, `addresses[]` jsonb, `createdAt`). `GET/PATCH /api/users/me` (self), `GET /api/users`, `GET /api/users/:id`, `PATCH /api/users/:id/role` (admin uniquement, `RolesGuard`).
+- **CategoriesModule** — `categories` : arborescence (`name`, `slug`, `parentId`). Lecture publique, écriture admin uniquement.
+- **ProductsModule** — `products` : catalogue (`name`, `brand`, `description`, `price`, `images[]` jsonb, `categoryId`, `stock`, `active`, `weLove`, `condition`, `size`, `location`). Lecture publique avec filtres (`category`, `minPrice`/`maxPrice`, `search`, `sort`), écriture admin uniquement (`RolesGuard`).
+- **OrdersModule** — `orders` : `userId`, `items[]` (jsonb, dénormalisé : `productName`/`unitPrice`/`qty`/`image` figés à la commande), `subtotal`/`discount`/`total`, `promoCode`, `status` (`pending`→`paid`→`shipped`→`delivered`/`cancelled`), `shippingAddress` (jsonb), `paymentMethod`, `createdAt`/`updatedAt`. Client crée/lit ses propres commandes (`POST /api/orders`, `GET /api/orders/mine`) ; admin gère le statut (`GET /api/orders`, `PATCH /api/orders/:id/status`).
+- **UploadsModule** — `POST /api/uploads/product-image` (admin uniquement) : upload Multer vers `./uploads/products`, servi statiquement sous `/uploads/`.
+
+> Hors scope v1 (non migrés) : **carts** (panier persistant serveur — reste en local Zustand) et **reviews/promos** (stubs côté frontend avec TODO).
 
 ### Conventions de nommage
 - Fichiers composants: `PascalCase.tsx` (ex: `ProductCard.tsx`)
@@ -87,40 +113,43 @@ firebase deploy                            # tout déployer
 - Composants & types: PascalCase (`ProductCard`, `OrderStatus`)
 - Variables/fonctions: camelCase
 - Constantes: UPPER_SNAKE_CASE
-- Collections Firestore: camelCase pluriel (`products`, `orderItems`)
-- Champs de documents: camelCase (`createdAt`, `categoryId`, `unitPrice`)
+- Modules NestJS par domaine : `*.module.ts`, `*.controller.ts`, `*.service.ts`, `entities/`, `dto/`
+- Tables PostgreSQL: camelCase pluriel (`products`, `orders`)
+- Colonnes: camelCase (`createdAt`, `categoryId`, `unitPrice`)
 
 ### Pattern d'accès aux données
-Accès Firestore encapsulé dans une **couche `features/<domaine>/api.ts`** (fonctions typées : `getProducts`, `createOrder`…) consommée par des **hooks React Query** (`useProducts`, `useCreateOrder`). Jamais d'appel Firestore brut directement dans un composant. Typage strict via `FirestoreDataConverter<T>` pour mapper documents ⇄ types TS.
+Frontend : accès API encapsulé dans une **couche `features/<domaine>/api.ts`** (fonctions typées : `getProducts`, `createOrder`…) consommée par des **hooks React Query** (`useProducts`, `useCreateOrder`). Jamais d'appel `fetch` brut dans un composant — toujours via `apiFetch<T>()` (`lib/http.ts`).
+Backend : chaque module a un `service` qui encapsule l'accès TypeORM (repository pattern), un `controller` qui expose les routes REST avec guards/DTOs, et des `entities/` typées.
 
 ### Validation des inputs
-**Zod** pour valider tous les formulaires (react-hook-form + `@hookform/resolvers/zod`) ET les données lues depuis Firestore avant usage. Un schéma Zod par entité, dérivé en type TS via `z.infer`. La validation côté client est de l'UX — la validation **de sécurité** vit dans les Security Rules.
+**Frontend** : **Zod** pour valider tous les formulaires (react-hook-form + `@hookform/resolvers/zod`). Validation côté client = UX.
+**Backend** : **class-validator**/**class-transformer** sur les DTOs (`CreateProductDto`, `CreateOrderDto`, etc.), appliqués globalement via `ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true })`. La validation **de sécurité** vit dans les DTOs + guards NestJS, jamais uniquement côté React.
 
 ### Gestion des erreurs
-Erreurs Firebase (`FirebaseError.code`) mappées vers des messages utilisateur via un helper centralisé. React Query gère les états `isError`/`error` ; affichage via toast (shadcn/ui `sonner`). Error boundary React au niveau racine.
+Le backend renvoie des erreurs HTTP standard NestJS (`ConflictException`, `UnauthorizedException`, `ForbiddenException`, `NotFoundException`, erreurs 400 de validation). Le frontend capture ces erreurs via `ApiError` (`status`, `code`, `message` — `lib/http.ts`) et les mappe vers des messages utilisateur via `apiErrorMessage()` (`lib/utils.ts`). React Query gère les états `isError`/`error` ; affichage via toast (shadcn/ui `sonner`). Error boundary React au niveau racine.
 
 ## Architecture Frontend
 
 ### Structure des modules (identique pour `frontend/` et `frontend-admin/`)
 ```
 src/
-├── lib/firebase.ts       # init SDK (initializeApp, getAuth, getFirestore, getStorage)
+├── lib/http.ts            # client HTTP (apiFetch<T>, ApiError, getToken/setToken JWT)
 ├── features/<domaine>/
-│   ├── api.ts            # accès Firestore typé (converters)
+│   ├── api.ts            # accès API REST typé (apiFetch)
 │   ├── hooks.ts          # hooks React Query (queries + mutations)
 │   ├── schemas.ts        # schémas Zod + types
 │   └── components/       # composants spécifiques au domaine
 ├── components/ui/        # shadcn/ui (button, dialog, input…)
 ├── components/           # composants partagés transverses
 ├── hooks/                # hooks transverses (useAuth, useDebounce…)
-├── stores/               # stores Zustand (cartStore, uiStore)
-└── routes/               # pages + configuration du routing
+├── stores/                # stores Zustand (cartStore, uiStore, favoritesStore)
+└── routes/                # pages + configuration du routing
 ```
 
 ### State management
-- **Zustand** : état UI local et panier (`cartStore`) — léger, sans boilerplate
-- **TanStack Query (React Query)** : toute donnée serveur (Firestore). `queryKey` namespacée (`['products', filters]`), invalidation après mutation, `staleTime` adapté. Pour le temps réel, `onSnapshot` synchronisé dans le cache React Query si nécessaire.
-- Auth exposée via un `AuthProvider` + hook `useAuth()` (écoute `onAuthStateChanged`)
+- **Zustand** : état UI local et panier (`cartStore`), favoris (`favoritesStore`, persisté localement) — léger, sans boilerplate
+- **TanStack Query (React Query)** : toute donnée serveur (API REST). `queryKey` namespacée (`['products', filters]`), invalidation après mutation, `staleTime` adapté.
+- Auth exposée via un `AuthProvider` + hook `useAuth()` : au montage, lit le JWT stocké (`localStorage`, clé `auth_token`) et appelle `GET /api/auth/me` pour récupérer le profil/rôle. `refresh()` permet de recharger le profil après login/update.
 
 ### Conventions
 - Composants fonctionnels + hooks. `React.memo` sur les éléments de liste coûteux.
@@ -129,55 +158,61 @@ src/
 - `data-testid` sur tous les éléments interactifs testés.
 - Tailwind pour le style ; pas de CSS inline arbitraire ; tokens de design centralisés (`tailwind.config`).
 
-## Base de données (Firestore)
+## Base de données (PostgreSQL via TypeORM)
 
-### Variables d'environnement (`frontend/.env` et `frontend-admin/.env`)
+### Variables d'environnement
+
+`backend/.env` :
 ```
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-VITE_USE_EMULATORS=false        # true en dev local pour brancher l'Emulator Suite
+PORT=3000
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=
+DB_PASSWORD=
+DB_NAME=
+JWT_SECRET=
+JWT_EXPIRES_IN=7d
 ```
-> ⚠️ La config Firebase web (`apiKey`…) **n'est pas un secret** : elle est publique côté client. La sécurité repose sur les Security Rules, pas sur la confidentialité de ces clés. Ne jamais mettre de clé Admin SDK ou de secret de paiement dans le frontend.
 
-### Schéma principal (collections Firestore)
-- `users/{uid}` — `email`, `displayName`, `role` (`customer`|`admin`), `addresses[]`, `createdAt`
-- `products/{productId}` — `name`, `description`, `price`, `images[]`, `categoryId`, `stock`, `active`, `createdAt`
-- `categories/{categoryId}` — `name`, `slug`, `parentId?`
-- `carts/{uid}` — `items[]` (`{productId, qty, unitPrice}`), `updatedAt`
-- `orders/{orderId}` — `userId`, `items[]`, `total`, `status`, `shippingAddress`, `createdAt`
-- `reviews/{reviewId}` — `productId`, `userId`, `rating`, `comment`, `createdAt`
+`frontend/.env` et `frontend-admin/.env` :
+```
+VITE_API_URL=http://localhost:3000/api
+```
+> ⚠️ Ne jamais mettre `JWT_SECRET`, les credentials DB, ni aucun secret backend dans le frontend. Seule `VITE_API_URL` (URL publique de l'API) est exposée côté client.
 
-### Modélisation NoSQL
-- **Dénormaliser pour la lecture** : copier `productName`/`unitPrice` dans les lignes de commande (une commande est un instantané immuable).
-- **Index composites** déclarés dans `firestore.indexes.json` pour toute requête multi-champs (ex: `where('categoryId').orderBy('price')`).
-- **Pas de jointures** : structurer les collections selon les écrans à servir.
+### Schéma principal (tables PostgreSQL)
+- `users` — `id` (uuid), `email` (unique), `displayName`, `passwordHash` (`select: false`), `role` (`customer`|`admin`, défaut `customer`), `addresses` (jsonb[]), `createdAt`
+- `categories` — `id` (uuid), `name`, `slug` (unique), `parentId` (auto-référence)
+- `products` — `id` (uuid), `name`, `brand`, `description`, `price` (numeric 10,2), `images` (jsonb), `categoryId` (FK nullable), `stock`, `condition`/`size`/`location` (nullable), `active` (défaut true), `weLove` (défaut false), `createdAt`/`updatedAt`
+- `orders` — `id` (uuid), `userId` (FK), `items` (jsonb — lignes dénormalisées `{productId, productName, unitPrice, qty, image}`), `subtotal`/`discount`/`total` (numeric 10,2), `promoCode` (nullable), `status` (`pending`|`paid`|`shipped`|`delivered`|`cancelled`, défaut `pending`), `shippingAddress` (jsonb), `paymentMethod`, `createdAt`/`updatedAt`
 
-## Sécurité (OWASP + spécifique Firebase)
-- **Security Rules = ligne de défense principale.** Chaque collection a des règles `read`/`write` explicites. Refus par défaut (`allow read, write: if false`).
-- **Contrôle d'accès** : un utilisateur ne lit/écrit que ses propres `orders`/`carts` (`request.auth.uid == resource.data.userId`). Les écritures admin (`products`, `categories`, modification de `status` de commande) exigent `isAdmin()`.
-- **Rôle admin vérifié dans les rules** : `get(/databases/$(db)/documents/users/$(request.auth.uid)).data.role == 'admin'` (ou custom claim `request.auth.token.admin == true`). Jamais de contrôle de rôle uniquement côté React.
-- **Validation des écritures dans les rules** : types, bornes, champs autorisés (`request.resource.data.keys().hasOnly([...])`), empêcher un client de fixer `role`, `total`, `status` arbitrairement.
-- **Storage rules** : upload d'images produit réservé aux admins ; taille et `contentType` (`image/*`) contraints.
-- **Validation des inputs** côté client via Zod (UX) + **revalidation dans les Security Rules** (sécurité).
-- **Pas de secret côté client** : aucune clé privée, secret de paiement, ni Admin SDK dans le frontend.
-- **Auth** : sessions gérées par le SDK Firebase (tokens rafraîchis automatiquement, stockés par le SDK). Forcer la vérification d'email sur les actions sensibles si requis.
-- **Énumération** : ne pas exposer via les rules/messages d'erreur l'existence de comptes.
+### Modélisation
+- **Dénormaliser pour la lecture** : `items[]` d'une commande copie `productName`/`unitPrice`/`image` au moment de la création (instantané immuable, indépendant des modifications ultérieures du produit).
+- **Index** déclarés dans les migrations TypeORM : `IDX_products_active_createdAt`, `IDX_products_categoryId`, `IDX_orders_userId`, `IDX_orders_status`.
+- **Migrations** : toute évolution de schéma passe par `npm run migration:generate` / `migration:run` — jamais de `synchronize: true` en production.
+
+## Sécurité (OWASP + NestJS)
+- **Guards NestJS = ligne de défense principale.** `JwtAuthGuard` (authentification, vérifie le JWT), `RolesGuard` + `@Roles('admin')` (autorisation par rôle). Refus par défaut sur les routes sensibles.
+- **Contrôle d'accès** : un utilisateur ne lit/écrit que ses propres `orders` (`userId` extrait du JWT via `@CurrentUser()`, jamais accepté depuis le body client). Les écritures admin (`products`, `categories`, modification de `status` de commande, gestion des rôles `users`) exigent `RolesGuard` + `@Roles('admin')`.
+- **Rôle admin vérifié côté serveur** : `RolesGuard` lit `request.user.role` (issu du JWT signé serveur). Jamais de contrôle de rôle uniquement côté React.
+- **Validation des écritures via DTOs** : `class-validator` + `ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true })` — rejette tout champ non déclaré, empêche un client de fixer `role`, `total`, `status`, `userId` arbitrairement (ces champs sont forcés/dérivés côté service).
+- **Uploads** : `POST /api/uploads/product-image` réservé aux admins (`RolesGuard`) ; taille (5 Mo max) et MIME (`image/jpeg`, `image/png`, `image/webp`, `image/gif`) contraints par Multer.
+- **Validation des inputs** côté client via Zod (UX) + **revalidation via DTOs NestJS** (sécurité).
+- **Pas de secret côté client** : aucune clé privée, `JWT_SECRET`, credentials DB, ni secret de paiement dans le frontend.
+- **Auth** : JWT stocké côté client (`localStorage`, clé `auth_token`), attaché via header `Authorization: Bearer <token>` (`lib/http.ts`). Mots de passe hashés avec bcrypt (cost factor 10), jamais stockés/retournés en clair (`passwordHash` exclu des réponses).
+- **Énumération** : messages d'erreur génériques sur login/register pour ne pas révéler l'existence d'un compte.
+- **SQL Injection** : toutes les requêtes passent par TypeORM (repository/queryBuilder paramétré) — jamais de SQL concaténé avec une entrée utilisateur.
 
 ## Tests
-- **Unitaires / composants**: **Vitest** + **React Testing Library**
-- **Security Rules**: **`@firebase/rules-unit-testing`** contre l'Emulator Suite (test des règles read/write par rôle) — **obligatoire** pour toute modification de `firestore.rules`
-- **E2E**: **Playwright** (parcours client : ajout panier → checkout ; parcours admin : création produit)
-- **Mocks Firebase**: Emulator Suite (Firestore/Auth/Storage) pour les tests d'intégration, pas de mock manuel du SDK quand l'émulateur suffit
-- **Couverture minimale**: 80% sur les hooks/api/logique métier
+- **Backend** : **Jest** — tests unitaires des services/guards (`*.spec.ts`) + tests e2e (`test/*.e2e-spec.ts`, Supertest) contre une vraie instance PostgreSQL (auth, guards, CRUD products/orders).
+- **Unitaires / composants frontend**: **Vitest** + **React Testing Library** (jsdom), setup dans `src/test/setup.ts`
+- **E2E**: **Playwright** (parcours client : ajout panier → checkout ; parcours admin : création produit) — contre une API NestJS + Postgres de test
+- **Couverture minimale**: 80% (lines/functions/branches/statements) sur hooks/api/logique métier (frontend) et services/guards (backend)
 - **Fixtures**: `@faker-js/faker` pour générer produits/commandes de test
 
 ## Qualité de code
-- **ESLint + Prettier** (config partagée entre les deux apps)
-- **TypeScript strict** (`strict: true`, pas de `any` implicite)
+- **ESLint + Prettier** (config partagée entre les deux apps frontend ; config NestJS dédiée pour `backend/`)
+- **TypeScript strict** (`strict: true`, pas de `any` implicite ; `strictPropertyInitialization: false` côté `backend/` pour compatibilité TypeORM)
 - Pre-commit hooks: **Husky + lint-staged**
 - Convention de commits: **Conventional Commits**
 
@@ -185,7 +220,9 @@ VITE_USE_EMULATORS=false        # true en dev local pour brancher l'Emulator Sui
 
 ## Agents disponibles (`.claude/agents/`)
 
-Les agents sont des sous-agents spécialisés invocables via le tool `Agent`. Chaque fichier `.md` dans `.claude/agents/` définit un rôle, ses responsabilités et ses règles de travail. **Tous les agents lisent `CLAUDE.md` au démarrage** pour connaître le stack (React+Firebase) et les conventions du projet.
+Les agents sont des sous-agents spécialisés invocables via le tool `Agent`. Chaque fichier `.md` dans `.claude/agents/` définit un rôle, ses responsabilités et ses règles de travail. **Tous les agents lisent `CLAUDE.md` au démarrage** pour connaître le stack (React + NestJS + PostgreSQL) et les conventions du projet.
+
+> Note : les rôles "Spécialiste Firebase" / Security Rules / DBA Firestore listés ci-dessous s'appliquent désormais au backend NestJS/TypeORM (modules, guards, entités, migrations) — les fichiers `.claude/agents/*.md` seront renommés/adaptés dans une itération ultérieure de documentation.
 
 ### Quand et comment les utiliser
 

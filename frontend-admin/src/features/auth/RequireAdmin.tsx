@@ -16,14 +16,14 @@ export function RequireAdmin({ children }: { children: React.ReactNode }) {
 
   if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
 
-  // ⚠️ Ce garde est de l'UX. La vraie protection vit dans firestore.rules (isAdmin()).
+  // ⚠️ Ce garde est de l'UX. La vraie protection vit dans les guards NestJS (RolesGuard('admin')).
   if (role !== 'admin') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
         <ShieldAlert className="h-12 w-12 text-sale" />
         <h1 className="text-xl">Accès réservé aux administrateurs</h1>
         <p className="text-muted">Votre compte n'a pas le rôle admin.</p>
-        <button className="btn-outline" onClick={() => adminLogout()}>Se déconnecter</button>
+        <button className="btn-outline" onClick={() => adminLogout().then(() => window.location.assign('/login'))}>Se déconnecter</button>
       </div>
     );
   }

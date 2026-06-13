@@ -52,7 +52,6 @@ export function CheckoutPage() {
       // Paiement simulé (la monétique réelle nécessite un backend/Cloud Function + PSP)
       await new Promise((r) => setTimeout(r, 600));
       const orderId = await createOrder.mutateAsync({
-        userId: user.uid,
         items: items.map((i) => ({ productId: i.productId, name: i.name, brand: i.brand, image: i.image, unitPrice: i.unitPrice, qty: i.qty })),
         subtotal: sub,
         discount,

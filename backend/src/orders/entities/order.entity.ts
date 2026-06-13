@@ -1,0 +1,64 @@
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
+
+export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+
+export interface OrderItem {
+  productId: string;
+  name: string;
+  brand: string;
+  image: string;
+  unitPrice: number;
+  qty: number;
+}
+
+export interface Address {
+  fullName: string;
+  line1: string;
+  city: string;
+  zip: string;
+  country: string;
+}
+
+@Entity('orders')
+export class Order {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => User, (user) => user.orders, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column()
+  userId: string;
+
+  @Column({ type: 'jsonb' })
+  items: OrderItem[];
+
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
+  subtotal: number;
+
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
+  discount: number;
+
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
+  total: number;
+
+  @Column({ nullable: true })
+  promoCode: string;
+
+  @Column({ type: 'varchar', default: 'pending' })
+  status: OrderStatus;
+
+  @Column({ type: 'jsonb' })
+  shippingAddress: Address;
+
+  @Column({ default: '' })
+  paymentMethod: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}

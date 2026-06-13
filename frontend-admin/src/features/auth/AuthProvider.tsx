@@ -1,45 +1,61 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { getMe, adminLogin, adminLogout } from './api';
+import { getToken, setToken } from '@/lib/http';
 import type { UserProfile } from '@/types';
 
 interface AuthState {
-  user: User | null;
+  user: UserProfile | null;
   profile: UserProfile | null;
   role: 'customer' | 'admin' | null;
   loading: boolean;
+  refresh: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthState>({ user: null, profile: null, role: null, loading: true });
+const AuthContext = createContext<AuthState>({
+  user: null,
+  profile: null,
+  role: null,
+  loading: true,
+  refresh: async () => {},
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const load = async () => {
+    if (!getToken()) {
+      setProfile(null);
+      setLoading(false);
+      return;
+    }
+    try {
+      const me = await getMe();
+      if (me.role !== 'admin') {
+        setToken(null);
+        setProfile(null);
+      } else {
+        setProfile(me);
+      }
+    } catch {
+      setToken(null);
+      setProfile(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let unsubProfile: (() => void) | undefined;
-    const unsub = onAuthStateChanged(auth, (u) => {
-      unsubProfile?.();
-      setUser(u);
-      if (!u) { setProfile(null); setLoading(false); return; }
-      unsubProfile = onSnapshot(
-        doc(db, 'users', u.uid),
-        (snap) => { setProfile(snap.exists() ? ({ uid: u.uid, ...snap.data() } as UserProfile) : null); setLoading(false); },
-        () => setLoading(false),
-      );
-    });
-    return () => { unsubProfile?.(); unsub(); };
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, profile, role: profile?.role ?? null, loading }}>
+    <AuthContext.Provider value={{ user: profile, profile, role: profile?.role ?? null, loading, refresh: load }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export const useAuth = () => useContext(AuthContext);
-export const adminLogin = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
-export const adminLogout = () => signOut(auth);
+export { adminLogin, adminLogout };

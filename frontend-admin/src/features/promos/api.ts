@@ -1,20 +1,19 @@
-import { collection, doc, getDocs, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import type { Promo } from '@/types';
 
+/**
+ * TODO : module `promos` non encore migré côté backend NestJS (hors scope v1, voir CLAUDE.md).
+ * Ces fonctions sont des stubs pour ne pas casser le build de l'UI existante.
+ */
 export async function listPromos(): Promise<Promo[]> {
-  const snap = await getDocs(collection(db, 'promos'));
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Promo, 'id'>) }));
+  return [];
 }
 
 export type PromoInput = Omit<Promo, 'id' | 'usedCount'>;
 
-/** Le code sert d'ID de document (unique). */
-export async function upsertPromo(input: PromoInput) {
-  const code = input.code.toUpperCase();
-  return setDoc(doc(db, 'promos', code), { ...input, code, usedCount: 0, createdAt: serverTimestamp() }, { merge: true });
+export async function upsertPromo(_input: PromoInput): Promise<void> {
+  throw new Error('Module promos non disponible.');
 }
 
-export async function deletePromo(id: string) {
-  return deleteDoc(doc(db, 'promos', id));
+export async function deletePromo(_id: string): Promise<void> {
+  throw new Error('Module promos non disponible.');
 }

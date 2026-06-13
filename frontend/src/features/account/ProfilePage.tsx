@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { toast } from 'sonner';
 import { LogOut, MapPin, User as UserIcon } from 'lucide-react';
-import { db } from '@/lib/firebase';
+import { apiFetch } from '@/lib/http';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { logout } from '@/features/auth/api';
-import type { Address } from '@/types';
+import type { Address, UserProfile } from '@/types';
 
 export function ProfilePage() {
-  const { user, profile } = useAuth();
+  const { user, profile, refresh } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState(profile?.displayName ?? '');
   const [addr, setAddr] = useState<Address>({ fullName: '', line1: '', city: '', zip: '', country: 'France' });
@@ -20,7 +19,8 @@ export function ProfilePage() {
   const saveName = async () => {
     setSaving(true);
     try {
-      await updateDoc(doc(db, 'users', user.uid), { displayName: name });
+      await apiFetch<UserProfile>('/users/me', { method: 'PATCH', body: { displayName: name } });
+      await refresh();
       toast.success('Profil mis à jour');
     } catch { toast.error('Erreur lors de la mise à jour'); }
     finally { setSaving(false); }
@@ -29,7 +29,9 @@ export function ProfilePage() {
   const addAddress = async () => {
     if (!addr.line1 || !addr.city) { toast.error('Adresse incomplète'); return; }
     try {
-      await updateDoc(doc(db, 'users', user.uid), { addresses: arrayUnion(addr) });
+      const addresses = [...(profile.addresses ?? []), addr];
+      await apiFetch<UserProfile>('/users/me', { method: 'PATCH', body: { addresses } });
+      await refresh();
       setAddr({ fullName: '', line1: '', city: '', zip: '', country: 'France' });
       toast.success('Adresse ajoutée');
     } catch { toast.error('Erreur'); }

@@ -1,10 +1,5 @@
-import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { productConverter, categoryConverter } from './converters';
-import type { Product } from '@/types';
-
-const productsCol = collection(db, 'products').withConverter(productConverter);
-const categoriesCol = collection(db, 'categories').withConverter(categoryConverter);
+import { apiFetch } from '@/lib/http';
+import type { Product, Category } from '@/types';
 
 export interface ProductFilters {
   category?: string;
@@ -14,39 +9,27 @@ export interface ProductFilters {
   sort?: 'recent' | 'price-asc' | 'price-desc';
 }
 
-/**
- * Récupère les produits actifs (index active+createdAt) puis applique
- * catégorie / prix / recherche / tri côté client (Firestore n'a pas de full-text).
- */
+// L'API renvoie categoryId ; on le mappe sur le champ `category` attendu par le frontend.
+function mapProduct(p: Product & { categoryId?: string | null }): Product {
+  return { ...p, category: p.categoryId ?? p.category ?? '' };
+}
+
 export async function getProducts(filters: ProductFilters = {}): Promise<Product[]> {
-  const q = query(productsCol, where('active', '==', true), orderBy('createdAt', 'desc'));
-  let items = (await getDocs(q)).docs.map((d) => d.data());
-
-  if (filters.category) items = items.filter((p) => p.category === filters.category);
-  if (filters.minPrice != null) items = items.filter((p) => p.price >= filters.minPrice!);
-  if (filters.maxPrice != null) items = items.filter((p) => p.price <= filters.maxPrice!);
-  if (filters.search) {
-    const s = filters.search.toLowerCase();
-    items = items.filter((p) => `${p.brand} ${p.name}`.toLowerCase().includes(s));
-  }
-  if (filters.sort === 'price-asc') items.sort((a, b) => a.price - b.price);
-  else if (filters.sort === 'price-desc') items.sort((a, b) => b.price - a.price);
-
-  return items;
+  const items = await apiFetch<Product[]>('/products', { query: { ...filters } });
+  return items.map(mapProduct);
 }
 
 export async function getProduct(id: string): Promise<Product> {
-  const snap = await getDoc(doc(db, 'products', id).withConverter(productConverter));
-  if (!snap.exists()) throw new Error('Produit introuvable');
-  return snap.data();
+  const item = await apiFetch<Product>(`/products/${id}`);
+  return mapProduct(item);
 }
 
 export async function getProductsByIds(ids: string[]): Promise<Product[]> {
   if (ids.length === 0) return [];
-  const snaps = await Promise.all(ids.map((id) => getDoc(doc(db, 'products', id).withConverter(productConverter))));
-  return snaps.filter((s) => s.exists()).map((s) => s.data());
+  const items = await apiFetch<Product[]>('/products/by-ids', { query: { ids: ids.join(',') } });
+  return items.map(mapProduct);
 }
 
-export async function getCategories() {
-  return (await getDocs(categoriesCol)).docs.map((d) => d.data());
+export async function getCategories(): Promise<Category[]> {
+  return apiFetch<Category[]>('/categories');
 }

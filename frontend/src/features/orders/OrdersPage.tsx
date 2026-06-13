@@ -18,7 +18,7 @@ const statusColor: Record<OrderStatus, string> = {
 
 export function OrdersPage() {
   const { user } = useAuth();
-  const { data: orders, isLoading } = useMyOrders(user?.uid);
+  const { data: orders, isLoading } = useMyOrders(user?.id);
   const [params] = useSearchParams();
   const last = params.get('last');
 

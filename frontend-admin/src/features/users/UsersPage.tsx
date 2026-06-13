@@ -21,8 +21,7 @@ export function UsersPage() {
     try {
       await mut.mutateAsync({ uid, role: next });
       toast.success('Rôle mis à jour');
-      if (next === 'admin') toast.info('Pensez à poser le custom claim via scripts/set-admin.mjs.');
-    } catch { toast.error('Modification impossible'); }
+      } catch { toast.error('Modification impossible'); }
   };
 
   return (
@@ -35,7 +34,7 @@ export function UsersPage() {
           </thead>
           <tbody className="divide-y divide-line">
             {isLoading ? <tr><td className="td" colSpan={5}>Chargement…</td></tr> : users.map((u) => (
-              <tr key={u.uid}>
+              <tr key={u.id}>
                 <td className="td font-medium">{u.displayName}</td>
                 <td className="td text-muted">{u.email}</td>
                 <td className="td">
@@ -45,10 +44,10 @@ export function UsersPage() {
                 </td>
                 <td className="td text-muted">{formatDate(u.createdAt)}</td>
                 <td className="td text-right">
-                  {u.uid === current?.uid ? (
+                  {u.id === current?.id ? (
                     <span className="text-xs text-muted">vous</span>
                   ) : (
-                    <button className="btn-outline px-3 py-1.5 text-xs" onClick={() => toggle(u.uid, u.role)}>
+                    <button className="btn-outline px-3 py-1.5 text-xs" onClick={() => toggle(u.id, u.role)}>
                       {u.role === 'admin' ? <><ShieldOff className="h-3 w-3" /> Rétrograder</> : <><Shield className="h-3 w-3" /> Promouvoir admin</>}
                     </button>
                   )}

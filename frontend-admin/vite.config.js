@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
 export default defineConfig({
@@ -7,4 +7,13 @@ export default defineConfig({
         alias: { '@': path.resolve(__dirname, './src') },
     },
     server: { port: 5174 },
+    test: {
+        environment: 'jsdom',
+        globals: true,
+        setupFiles: ['./src/test/setup.ts'],
+        coverage: {
+            provider: 'v8',
+            thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 },
+        },
+    },
 });
