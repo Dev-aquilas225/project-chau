@@ -15,6 +15,15 @@ export default {
         sale: '#b71c1c',
         admin: '#1f2937',
       },
+      keyframes: {
+        'page-in': {
+          '0%': { opacity: '0', transform: 'translateY(6px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        'page-in': 'page-in 200ms ease-out',
+      },
     },
   },
   plugins: [],
