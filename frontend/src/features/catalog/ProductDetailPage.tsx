@@ -85,7 +85,7 @@ export function ProductDetailPage() {
             <p className="flex items-center gap-2 font-semibold"><ShieldCheck className="h-5 w-5" /> Information importante</p>
             <p className="mt-2 text-sm leading-relaxed text-muted">
               Tous les services de vérification d'authenticité et les contrôles qualité sont effectués de manière
-              indépendante par Aquilas Collective. Les achats d'articles non authentiques sont remboursés intégralement.
+              indépendante par Occasion de luxe PJ international. Les achats d'articles non authentiques sont remboursés intégralement.
             </p>
           </div>
 

@@ -23,7 +23,7 @@ export function AdminLayout() {
   const SidebarContent = (
     <>
       <div className="px-6 py-5">
-        <p className="brand-logo text-xl text-paper">Aquilas</p>
+        <p className="brand-logo text-xl text-paper">Occasion de luxe PJ international</p>
         <p className="text-xs text-white/50">Back-office</p>
       </div>
       <nav className="flex-1 space-y-1 px-3">
@@ -66,7 +66,7 @@ export function AdminLayout() {
       <div className="flex flex-1 flex-col">
         <header className="flex items-center gap-3 border-b border-line bg-paper px-4 py-3 md:hidden">
           <button onClick={() => setOpen(true)} aria-label="Menu"><Menu /></button>
-          <span className="brand-logo">Aquilas Admin</span>
+          <span className="brand-logo">Occasion de luxe PJ international</span>
         </header>
         <main className="flex-1 p-4 md:p-8">
           <Outlet />

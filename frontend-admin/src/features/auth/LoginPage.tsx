@@ -27,7 +27,7 @@ export function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-admin p-4">
       <form onSubmit={submit} className="w-full max-w-sm rounded-lg bg-paper p-8 shadow-xl">
-        <h1 className="brand-logo mb-1 text-center text-2xl">Aquilas</h1>
+        <h1 className="brand-logo mb-1 text-center text-2xl">Occasion de luxe PJ international</h1>
         <p className="mb-6 text-center text-sm text-muted">Back-office administrateur</p>
         <label className="label">Email</label>
         <input className="input mb-4" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required data-testid="admin-email" />

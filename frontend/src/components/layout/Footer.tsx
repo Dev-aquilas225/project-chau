@@ -1,7 +1,15 @@
 import { LegalNotice } from '@/components/LegalNotice';
 
-const sections = ['Nos services', 'Acheter', 'Vendre', 'Aide', 'Aquilas'];
-const payments = ['PayPal', 'VISA', 'AMEX', 'Mastercard', 'UnionPay', 'Klarna'];
+const sections = ['Nos services', 'Acheter', 'Vendre', 'Aide', 'Occasion de luxe PJ international'];
+
+const payments = [
+  { name: 'PayPal', slug: 'paypal' },
+  { name: 'Visa', slug: 'visa' },
+  { name: 'American Express', slug: 'americanexpress' },
+  { name: 'Mastercard', slug: 'mastercard' },
+  { name: 'UnionPay', slug: 'unionpay' },
+  { name: 'Klarna', slug: 'klarna' },
+];
 
 export function Footer() {
   return (
@@ -17,7 +25,15 @@ export function Footer() {
 
         <div className="mt-8 flex flex-wrap gap-2">
           {payments.map((p) => (
-            <span key={p} className="rounded bg-white px-2 py-1 text-[11px] font-bold text-ink">{p}</span>
+            <span key={p.slug} className="flex h-7 items-center rounded bg-white px-2">
+              <img
+                src={`https://cdn.simpleicons.org/${p.slug}`}
+                alt={p.name}
+                title={p.name}
+                className="h-4 w-auto"
+                loading="lazy"
+              />
+            </span>
           ))}
         </div>
 

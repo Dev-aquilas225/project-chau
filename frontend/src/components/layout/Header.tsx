@@ -23,7 +23,7 @@ export function Header() {
         <button className="md:hidden" aria-label="Menu" onClick={() => setOpen((v) => !v)}>
           {open ? <X /> : <Menu />}
         </button>
-        <Link to="/" className="brand-logo text-xl md:text-2xl">Aquilas</Link>
+        <Link to="/" className="brand-logo text-xl md:text-2xl">Occasion de luxe PJ international</Link>
 
         <form onSubmit={submitSearch} className="hidden flex-1 md:block">
           <div className="relative mx-auto max-w-md">
