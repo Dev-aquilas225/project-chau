@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Package } from 'lucide-react';
+import { Package, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useMyOrders, ORDER_STATUS_LABEL } from './hooks';
+import { useMyOrders, useOrder, ORDER_STATUS_LABEL } from './hooks';
+import { OrderTimeline } from './components/OrderTimeline';
 import { Spinner } from '@/components/ui/Spinner';
 import { cn, formatPrice, formatDate } from '@/lib/utils';
 import type { OrderStatus } from '@/types';
@@ -21,6 +23,7 @@ export function OrdersPage() {
   const { data: orders, isLoading } = useMyOrders(user?.id);
   const [params] = useSearchParams();
   const last = params.get('last');
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   if (isLoading) return <div className="flex justify-center py-16"><Spinner /></div>;
 
@@ -78,10 +81,33 @@ export function OrdersPage() {
                 <span className="text-muted">{o.items.reduce((n, i) => n + i.qty, 0)} article(s)</span>
                 <span className="font-semibold">{formatPrice(o.total)}</span>
               </div>
+
+              <button
+                type="button"
+                data-testid={`toggle-timeline-${o.id}`}
+                onClick={() => setExpanded(expanded === o.id ? null : o.id)}
+                className="mt-3 flex w-full items-center justify-center gap-1 border-t border-line pt-3 text-sm text-muted hover:text-ink"
+              >
+                {expanded === o.id ? <>Masquer le suivi <ChevronUp className="h-4 w-4" /></> : <>Voir le suivi <ChevronDown className="h-4 w-4" /></>}
+              </button>
+
+              {expanded === o.id && <OrderTimelineSection orderId={o.id} fallbackStatus={o.status} />}
             </article>
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function OrderTimelineSection({ orderId, fallbackStatus }: { orderId: string; fallbackStatus: OrderStatus }) {
+  const { data: order, isLoading } = useOrder(orderId);
+
+  if (isLoading) return <div className="flex justify-center py-4"><Spinner /></div>;
+
+  return (
+    <div className="mt-4 border-t border-line pt-4">
+      <OrderTimeline status={order?.status ?? fallbackStatus} statusHistory={order?.statusHistory} />
     </div>
   );
 }

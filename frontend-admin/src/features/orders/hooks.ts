@@ -1,15 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { listOrders, updateOrderStatus } from './api';
+import { listOrders, getOrder, updateOrderStatus } from './api';
 import type { OrderStatus } from '@/types';
 
 export const useAdminOrders = (status?: OrderStatus) =>
   useQuery({ queryKey: ['admin-orders', status ?? 'all'], queryFn: () => listOrders(status) });
 
+export const useAdminOrder = (id?: string) =>
+  useQuery({
+    queryKey: ['admin-orders', 'detail', id],
+    queryFn: () => getOrder(id as string),
+    enabled: !!id,
+  });
+
 export function useUpdateOrderStatus() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: OrderStatus }) => updateOrderStatus(id, status),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-orders'] }),
+    mutationFn: ({ id, status, note }: { id: string; status: OrderStatus; note?: string }) => updateOrderStatus(id, status, note),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ['admin-orders'] });
+      qc.invalidateQueries({ queryKey: ['admin-orders', 'detail', vars.id] });
+    },
   });
 }
 

@@ -45,4 +45,6 @@ export class CreateOrderDto {
 export class UpdateOrderStatusDto {
   @IsIn(['pending', 'paid', 'shipped', 'delivered', 'cancelled'])
   status: OrderStatus;
+
+  @IsOptional() @IsString() note?: string;
 }

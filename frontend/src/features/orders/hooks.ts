@@ -1,11 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getMyOrders, createOrder, type NewOrder } from './api';
+import { getMyOrders, getOrder, createOrder, type NewOrder } from './api';
 
 export const useMyOrders = (userId?: string) =>
   useQuery({
     queryKey: ['orders', userId],
     queryFn: () => getMyOrders(),
     enabled: !!userId,
+  });
+
+export const useOrder = (id?: string) =>
+  useQuery({
+    queryKey: ['orders', 'detail', id],
+    queryFn: () => getOrder(id as string),
+    enabled: !!id,
   });
 
 export function useCreateOrder() {

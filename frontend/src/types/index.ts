@@ -63,6 +63,14 @@ export interface OrderItem {
   qty: number;
 }
 
+export interface OrderStatusHistoryEntry {
+  id: string;
+  orderId: string;
+  status: OrderStatus;
+  note: string | null;
+  createdAt: Date;
+}
+
 export interface Order {
   id: string;
   userId: string;
@@ -75,6 +83,7 @@ export interface Order {
   shippingAddress: Address;
   paymentMethod: string;
   createdAt?: Date;
+  statusHistory?: OrderStatusHistoryEntry[];
 }
 
 export interface Promo {

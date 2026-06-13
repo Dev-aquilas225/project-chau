@@ -1,7 +1,8 @@
 import { useState, Fragment } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAdminOrders, useUpdateOrderStatus, ORDER_STATUS_LABEL, ORDER_STATUSES } from './hooks';
+import { useAdminOrders, useAdminOrder, useUpdateOrderStatus, ORDER_STATUS_LABEL, ORDER_STATUSES } from './hooks';
+import { OrderTimeline } from './components/OrderTimeline';
 import { formatPrice, formatDate, cn } from '@/lib/utils';
 import type { OrderStatus } from '@/types';
 
@@ -15,9 +16,11 @@ export function OrdersPage() {
   const { data: orders = [], isLoading } = useAdminOrders(filter || undefined);
   const updateStatus = useUpdateOrderStatus();
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<{ id: string; status: OrderStatus } | null>(null);
+  const [note, setNote] = useState('');
 
-  const change = async (id: string, status: OrderStatus) => {
-    try { await updateStatus.mutateAsync({ id, status }); toast.success('Statut mis à jour'); }
+  const change = async (id: string, status: OrderStatus, noteValue?: string) => {
+    try { await updateStatus.mutateAsync({ id, status, note: noteValue }); toast.success('Statut mis à jour'); setPendingStatus(null); setNote(''); }
     catch { toast.error('Mise à jour impossible'); }
   };
 
@@ -49,11 +52,38 @@ export function OrdersPage() {
                   <td className="td">
                     <select
                       value={o.status}
-                      onChange={(e) => change(o.id, e.target.value as OrderStatus)}
+                      onChange={(e) => setPendingStatus({ id: o.id, status: e.target.value as OrderStatus })}
                       className={cn('rounded-full border-0 px-2 py-1 text-xs font-medium', statusColor[o.status])}
                     >
                       {ORDER_STATUSES.map((s) => <option key={s} value={s}>{ORDER_STATUS_LABEL[s]}</option>)}
                     </select>
+                    {pendingStatus?.id === o.id && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <input
+                          type="text"
+                          placeholder="Note (optionnel)"
+                          value={note}
+                          onChange={(e) => setNote(e.target.value)}
+                          className="input h-8 max-w-[180px] text-xs"
+                          data-testid={`status-note-${o.id}`}
+                        />
+                        <button
+                          type="button"
+                          className="rounded bg-ink px-2 py-1 text-xs font-medium text-white"
+                          onClick={() => change(pendingStatus.id, pendingStatus.status, note || undefined)}
+                          data-testid={`confirm-status-${o.id}`}
+                        >
+                          Valider
+                        </button>
+                        <button
+                          type="button"
+                          className="text-xs text-muted"
+                          onClick={() => { setPendingStatus(null); setNote(''); }}
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    )}
                   </td>
                   <td className="td">
                     <button onClick={() => setExpanded(expanded === o.id ? null : o.id)} aria-label="Détails">
@@ -64,7 +94,7 @@ export function OrdersPage() {
                 {expanded === o.id && (
                   <tr className="bg-gray-50">
                     <td className="td" colSpan={6}>
-                      <div className="grid gap-4 md:grid-cols-2">
+                      <div className="grid gap-4 md:grid-cols-3">
                         <div>
                           <p className="mb-1 text-xs font-semibold uppercase text-muted">Articles</p>
                           <ul className="space-y-1 text-sm">
@@ -83,6 +113,10 @@ export function OrdersPage() {
                           )}
                           <p className="mt-2 text-sm text-muted">Paiement : {o.paymentMethod}</p>
                         </div>
+                        <div>
+                          <p className="mb-1 text-xs font-semibold uppercase text-muted">Suivi</p>
+                          <OrderTimelineSection orderId={o.id} fallbackStatus={o.status} />
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -94,4 +128,12 @@ export function OrdersPage() {
       </div>
     </div>
   );
+}
+
+function OrderTimelineSection({ orderId, fallbackStatus }: { orderId: string; fallbackStatus: OrderStatus }) {
+  const { data: order, isLoading } = useAdminOrder(orderId);
+
+  if (isLoading) return <p className="text-sm text-muted">Chargement…</p>;
+
+  return <OrderTimeline status={order?.status ?? fallbackStatus} statusHistory={order?.statusHistory} />;
 }

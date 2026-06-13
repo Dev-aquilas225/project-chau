@@ -21,6 +21,10 @@ export async function getMyOrders(): Promise<Order[]> {
   return apiFetch<Order[]>('/orders/mine');
 }
 
+export async function getOrder(id: string): Promise<Order> {
+  return apiFetch<Order>(`/orders/${id}`);
+}
+
 /** Valide un code promo côté serveur et renvoie la remise calculée (source de vérité backend). */
 export async function validatePromo(code: string, subtotal: number): Promise<PromoValidationResult> {
   return apiFetch<PromoValidationResult>('/promo-codes/validate', { method: 'POST', body: { code, subtotal } });

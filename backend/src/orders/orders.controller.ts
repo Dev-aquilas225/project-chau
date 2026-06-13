@@ -41,6 +41,6 @@ export class OrdersController {
   @Roles('admin')
   @Patch(':id/status')
   updateStatus(@Param('id') id: string, @Body() dto: UpdateOrderStatusDto) {
-    return this.ordersService.updateStatus(id, dto.status);
+    return this.ordersService.updateStatus(id, dto.status, dto.note);
   }
 }

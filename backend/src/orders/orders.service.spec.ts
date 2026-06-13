@@ -4,6 +4,7 @@ import { OrdersService } from './orders.service';
 describe('OrdersService', () => {
   let service: OrdersService;
   let repo: { create: jest.Mock; save: jest.Mock; find: jest.Mock; findOne: jest.Mock };
+  let historyRepo: { create: jest.Mock; save: jest.Mock; find: jest.Mock };
 
   beforeEach(() => {
     repo = {
@@ -12,10 +13,15 @@ describe('OrdersService', () => {
       find: jest.fn(),
       findOne: jest.fn(),
     };
-    service = new OrdersService(repo as never);
+    historyRepo = {
+      create: jest.fn((dto) => dto),
+      save: jest.fn(async (o) => ({ id: 'hist-1', ...o })),
+      find: jest.fn(async () => []),
+    };
+    service = new OrdersService(repo as never, historyRepo as never);
   });
 
-  it("crée une commande avec status 'pending' et le userId du token", async () => {
+  it("crée une commande avec status 'pending' et le userId du token, et insère l'historique", async () => {
     const dto = {
       items: [{ productId: 'p1', name: 'Produit', brand: '', image: '', unitPrice: 10, qty: 1 }],
       subtotal: 10,
@@ -29,6 +35,8 @@ describe('OrdersService', () => {
     expect(result.userId).toBe('user-1');
     expect(result.status).toBe('pending');
     expect(result.discount).toBe(0);
+    expect(historyRepo.create).toHaveBeenCalledWith({ orderId: 'order-1', status: 'pending' });
+    expect(historyRepo.save).toHaveBeenCalled();
   });
 
   it('findOne lève NotFoundException si absent', async () => {
@@ -36,9 +44,29 @@ describe('OrdersService', () => {
     await expect(service.findOne('missing')).rejects.toThrow(NotFoundException);
   });
 
-  it('updateStatus change le statut', async () => {
+  it('findOne retourne statusHistory trié', async () => {
+    repo.findOne.mockResolvedValue({ id: 'order-1', status: 'paid' });
+    const history = [{ id: 'h1', status: 'pending' }, { id: 'h2', status: 'paid' }];
+    historyRepo.find.mockResolvedValue(history);
+
+    const result = await service.findOne('order-1');
+
+    expect(result.statusHistory).toEqual(history);
+    expect(historyRepo.find).toHaveBeenCalledWith({
+      where: { orderId: 'order-1' },
+      order: { createdAt: 'ASC' },
+    });
+  });
+
+  it('updateStatus change le statut et ajoute une entrée d\'historique avec note', async () => {
     repo.findOne.mockResolvedValue({ id: 'order-1', status: 'pending' });
-    const result = await service.updateStatus('order-1', 'paid');
-    expect(result.status).toBe('paid');
+    const result = await service.updateStatus('order-1', 'shipped', 'Expédié via Colissimo');
+    expect(result.status).toBe('shipped');
+    expect(historyRepo.create).toHaveBeenCalledWith({ orderId: 'order-1', status: 'shipped', note: 'Expédié via Colissimo' });
+  });
+
+  it('updateStatus lève NotFoundException si absent', async () => {
+    repo.findOne.mockResolvedValue(null);
+    await expect(service.updateStatus('missing', 'paid')).rejects.toThrow(NotFoundException);
   });
 });
