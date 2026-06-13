@@ -7,10 +7,18 @@ import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
 import { OrdersModule } from './orders/orders.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { FavoritesModule } from './favorites/favorites.module';
+import { PromoCodesModule } from './promo-codes/promo-codes.module';
+import { AdminDashboardModule } from './admin/admin-dashboard.module';
+import { SeedModule } from './seed/seed.module';
 import { User } from './users/entities/user.entity';
 import { Product } from './products/entities/product.entity';
 import { Category } from './categories/entities/category.entity';
 import { Order } from './orders/entities/order.entity';
+import { Review } from './reviews/entities/review.entity';
+import { Favorite } from './favorites/entities/favorite.entity';
+import { PromoCode } from './promo-codes/entities/promo-code.entity';
 
 @Module({
   imports: [
@@ -25,7 +33,7 @@ import { Order } from './orders/entities/order.entity';
         username: config.get<string>('DB_USERNAME', 'postgres'),
         password: config.get<string>('DB_PASSWORD', 'postgres'),
         database: config.get<string>('DB_NAME', 'aquilas'),
-        entities: [User, Product, Category, Order],
+        entities: [User, Product, Category, Order, Review, Favorite, PromoCode],
         synchronize: false,
         autoLoadEntities: true,
       }),
@@ -36,6 +44,11 @@ import { Order } from './orders/entities/order.entity';
     CategoriesModule,
     OrdersModule,
     UploadsModule,
+    ReviewsModule,
+    FavoritesModule,
+    PromoCodesModule,
+    AdminDashboardModule,
+    SeedModule,
   ],
 })
 export class AppModule {}

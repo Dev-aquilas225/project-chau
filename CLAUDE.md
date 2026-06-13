@@ -66,6 +66,7 @@ npm run lint                     # ESLint
 npm run migration:generate -- src/migrations/NomMigration
 npm run migration:run
 npm run migration:revert
+npm run seed                     # crée l'admin par défaut (admin@gmail.com / admin1234) si absent — idempotent
 ```
 
 ### Frontend client (`frontend/`)
@@ -104,8 +105,13 @@ docker compose up --build        # tous les services (backend + 2 SPA + postgres
 - **ProductsModule** — `products` : catalogue (`name`, `brand`, `description`, `price`, `images[]` jsonb, `categoryId`, `stock`, `active`, `weLove`, `condition`, `size`, `location`). Lecture publique avec filtres (`category`, `minPrice`/`maxPrice`, `search`, `sort`), écriture admin uniquement (`RolesGuard`).
 - **OrdersModule** — `orders` : `userId`, `items[]` (jsonb, dénormalisé : `productName`/`unitPrice`/`qty`/`image` figés à la commande), `subtotal`/`discount`/`total`, `promoCode`, `status` (`pending`→`paid`→`shipped`→`delivered`/`cancelled`), `shippingAddress` (jsonb), `paymentMethod`, `createdAt`/`updatedAt`. Client crée/lit ses propres commandes (`POST /api/orders`, `GET /api/orders/mine`) ; admin gère le statut (`GET /api/orders`, `PATCH /api/orders/:id/status`).
 - **UploadsModule** — `POST /api/uploads/product-image` (admin uniquement) : upload Multer vers `./uploads/products`, servi statiquement sous `/uploads/`.
+- **ReviewsModule** — `reviews` : `userId`, `productId`, `rating` (1-5), `comment`, `createdAt`. `GET /api/products/:id/reviews` (lecture publique, renvoie `{ items, average, count }`), `POST /api/products/:id/reviews` (utilisateur authentifié, `JwtAuthGuard`).
+- **FavoritesModule** — `favorites` : `userId`, `productId` (unique par paire). `GET /api/favorites` (mes favoris), `POST /api/favorites` (`{ productId }`), `DELETE /api/favorites/:productId` — toutes les routes exigent `JwtAuthGuard` (un user ne voit/modifie que ses propres favoris).
+- **PromoCodesModule** — `promo_codes` : `code` (unique), `discountType` (`percentage`|`fixed`), `discountValue`, `minAmount`, `expiresAt`, `active`. `POST /api/promo-codes/validate` (public, `{ code, subtotal }` → `{ discount, total, ... }`, source de vérité pour le calcul de remise au checkout). CRUD admin (`GET/POST/PATCH/DELETE /api/promo-codes`, `RolesGuard` + `@Roles('admin')`).
+- **AdminDashboardModule** — `GET /api/admin/dashboard/stats` (admin uniquement) : chiffre d'affaires (commandes `paid`+`shipped`+`delivered`), nombre de commandes par statut, produits en rupture de stock (`stock = 0`), 5 dernières commandes.
+- **SeedModule** — `SeedService` exécuté au démarrage (`OnModuleInit`) : crée un utilisateur admin par défaut (`admin@gmail.com` / `admin1234`, rôle `admin`) si absent (idempotent). Exécutable aussi en standalone via `npm run seed`.
 
-> Hors scope v1 (non migrés) : **carts** (panier persistant serveur — reste en local Zustand) et **reviews/promos** (stubs côté frontend avec TODO).
+> Hors scope v1 (non migré) : **carts** (panier persistant serveur — reste en local Zustand ; les favoris, eux, sont synchronisés via `favorites`).
 
 ### Conventions de nommage
 - Fichiers composants: `PascalCase.tsx` (ex: `ProductCard.tsx`)
@@ -185,6 +191,9 @@ VITE_API_URL=http://localhost:3000/api
 - `categories` — `id` (uuid), `name`, `slug` (unique), `parentId` (auto-référence)
 - `products` — `id` (uuid), `name`, `brand`, `description`, `price` (numeric 10,2), `images` (jsonb), `categoryId` (FK nullable), `stock`, `condition`/`size`/`location` (nullable), `active` (défaut true), `weLove` (défaut false), `createdAt`/`updatedAt`
 - `orders` — `id` (uuid), `userId` (FK), `items` (jsonb — lignes dénormalisées `{productId, productName, unitPrice, qty, image}`), `subtotal`/`discount`/`total` (numeric 10,2), `promoCode` (nullable), `status` (`pending`|`paid`|`shipped`|`delivered`|`cancelled`, défaut `pending`), `shippingAddress` (jsonb), `paymentMethod`, `createdAt`/`updatedAt`
+- `reviews` — `id` (uuid), `userId` (FK → users, cascade), `productId` (FK → products, cascade), `rating` (int 1-5), `comment` (text), `createdAt`
+- `favorites` — `id` (uuid), `userId` (FK → users, cascade), `productId` (FK → products, cascade), contrainte unique `(userId, productId)`, `createdAt`
+- `promo_codes` — `id` (uuid), `code` (unique), `discountType` (`percentage`|`fixed`), `discountValue` (numeric 10,2), `minAmount` (numeric 10,2, défaut 0), `expiresAt` (nullable), `active` (défaut true), `createdAt`
 
 ### Modélisation
 - **Dénormaliser pour la lecture** : `items[]` d'une commande copie `productName`/`unitPrice`/`image` au moment de la création (instantané immuable, indépendant des modifications ultérieures du produit).

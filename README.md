@@ -151,6 +151,7 @@ Les champs sont annotés `[REQUIS]` ou `[OPTIONNEL]` :
   cd backend && npm run test:e2e     # tests end-to-end
   cd backend && npm run migration:run
   cd backend && npm run migration:revert
+  cd backend && npm run seed         # crée l'admin par défaut (admin@gmail.com / admin1234) si absent
 
 ## Tests
 - **Unitaires**: Jest

@@ -1,5 +1,5 @@
 import { apiFetch } from '@/lib/http';
-import type { Order, Promo } from '@/types';
+import type { Order, PromoValidationResult } from '@/types';
 
 export interface NewOrder {
   items: Order['items'];
@@ -21,15 +21,7 @@ export async function getMyOrders(): Promise<Order[]> {
   return apiFetch<Order[]>('/orders/mine');
 }
 
-/**
- * TODO: module `promos` non encore migré côté backend NestJS (hors scope v1).
- * En attendant, tout code promo est refusé côté client.
- */
-export async function validatePromo(_code: string, _subtotal: number): Promise<Promo> {
-  throw new Error('Les codes promo ne sont pas encore disponibles.');
-}
-
-export function computeDiscount(promo: Promo, subtotal: number): number {
-  const raw = promo.type === 'percentage' ? (subtotal * promo.value) / 100 : promo.value;
-  return Math.min(raw, subtotal);
+/** Valide un code promo côté serveur et renvoie la remise calculée (source de vérité backend). */
+export async function validatePromo(code: string, subtotal: number): Promise<PromoValidationResult> {
+  return apiFetch<PromoValidationResult>('/promo-codes/validate', { method: 'POST', body: { code, subtotal } });
 }

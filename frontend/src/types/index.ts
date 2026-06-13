@@ -87,3 +87,27 @@ export interface Promo {
   usageLimit?: number;
   usedCount?: number;
 }
+
+export interface PromoValidationResult {
+  code: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  discount: number;
+  total: number;
+}
+
+export interface Review {
+  id: string;
+  userId: string;
+  userName: string;
+  productId: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
+export interface ProductReviews {
+  items: Review[];
+  average: number;
+  count: number;
+}

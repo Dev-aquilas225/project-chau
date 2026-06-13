@@ -6,9 +6,10 @@ import { CreditCard, Tag } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useCartStore } from '@/stores/cartStore';
 import { useCreateOrder } from '@/features/orders/hooks';
-import { validatePromo, computeDiscount } from '@/features/orders/api';
-import type { Promo } from '@/types';
+import { validatePromo } from '@/features/orders/api';
+import type { PromoValidationResult } from '@/types';
 import { formatPrice } from '@/lib/utils';
+import { LegalNotice } from '@/components/LegalNotice';
 
 interface AddressForm {
   fullName: string; line1: string; city: string; zip: string; country: string;
@@ -23,13 +24,13 @@ export function CheckoutPage() {
     defaultValues: { fullName: profile?.displayName, country: 'France' },
   });
 
-  const [promo, setPromo] = useState<Promo | null>(null);
+  const [promo, setPromo] = useState<PromoValidationResult | null>(null);
   const [code, setCode] = useState('');
   const [payment, setPayment] = useState('card');
 
   const sub = subtotal();
-  const discount = promo ? computeDiscount(promo, sub) : 0;
-  const total = Math.max(0, sub - discount);
+  const discount = promo?.discount ?? 0;
+  const total = promo?.total ?? Math.max(0, sub - discount);
 
   if (items.length === 0) {
     return <div className="container-app py-16 text-center text-muted">Votre panier est vide.</div>;
@@ -103,6 +104,8 @@ export function CheckoutPage() {
             </div>
             <p className="mt-2 text-xs text-muted">Paiement simulé en démonstration. En production, intégrer un PSP (Stripe…) via une Cloud Function — aucun secret de paiement côté client.</p>
           </section>
+
+          <LegalNotice />
         </div>
 
         {/* Récap */}

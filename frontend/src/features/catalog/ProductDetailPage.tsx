@@ -7,6 +7,7 @@ import { FullPageSpinner } from '@/components/ui/Spinner';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cartStore';
 import { useFavoritesStore } from '@/stores/favoritesStore';
+import { ProductReviews } from '@/features/reviews/ProductReviews';
 
 export function ProductDetailPage() {
   const { id = '' } = useParams();
@@ -91,6 +92,8 @@ export function ProductDetailPage() {
           <Link to="/catalogue" className="mt-6 inline-block text-sm underline">← Retour au catalogue</Link>
         </div>
       </div>
+
+      <ProductReviews productId={product.id} />
     </div>
   );
 }

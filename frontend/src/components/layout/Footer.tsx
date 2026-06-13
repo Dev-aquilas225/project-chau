@@ -1,3 +1,5 @@
+import { LegalNotice } from '@/components/LegalNotice';
+
 const sections = ['Nos services', 'Acheter', 'Vendre', 'Aide', 'Aquilas'];
 const payments = ['PayPal', 'VISA', 'AMEX', 'Mastercard', 'UnionPay', 'Klarna'];
 
@@ -19,7 +21,11 @@ export function Footer() {
           ))}
         </div>
 
-        <p className="mt-8 text-center text-xs text-white/50">©{new Date().getFullYear()} Aquilas Collective</p>
+        <div className="mt-8">
+          <LegalNotice className="border-amber-300/40 bg-white/5 text-white/70" />
+        </div>
+
+        <p className="mt-8 text-center text-xs text-white/50">©{new Date().getFullYear()} Occasion de luxe PJ international</p>
       </div>
     </footer>
   );
