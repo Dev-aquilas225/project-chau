@@ -19,6 +19,7 @@ vendor/
 dist/
 build/
 *.egg-info/
+*.tsbuildinfo
 
 # Logs
 *.log
