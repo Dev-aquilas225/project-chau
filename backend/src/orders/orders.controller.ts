@@ -3,6 +3,7 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto, UpdateOrderStatusDto } from './dto/order.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { SellerGuard } from '../auth/guards/seller.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { JwtPayload } from '../auth/strategies/jwt.strategy';
@@ -23,6 +24,12 @@ export class OrdersController {
     return this.ordersService.findMine(user.sub);
   }
 
+  @UseGuards(SellerGuard)
+  @Get('seller')
+  findSeller(@CurrentUser() user: JwtPayload) {
+    return this.ordersService.findSeller(user.sub);
+  }
+
   @Roles('admin')
   @Get()
   findAll(@Query('status') status?: OrderStatus) {
@@ -32,7 +39,7 @@ export class OrdersController {
   @Get(':id')
   async findOne(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
     const order = await this.ordersService.findOne(id);
-    if (order.userId !== user.sub && user.role !== 'admin') {
+    if (order.userId !== user.sub && order.sellerId !== user.sub && user.role !== 'admin') {
       throw new ForbiddenException();
     }
     return order;

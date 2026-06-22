@@ -2,6 +2,13 @@ import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } f
 import { Order } from '../../orders/entities/order.entity';
 
 export type Role = 'customer' | 'admin';
+export type SellerStatus = 'none' | 'pending' | 'approved' | 'rejected';
+
+export interface SellerProfile {
+  storeName?: string;
+  bio?: string;
+  iban?: string;
+}
 
 @Entity('users')
 export class User {
@@ -19,6 +26,12 @@ export class User {
 
   @Column({ type: 'varchar', default: 'customer' })
   role: Role;
+
+  @Column({ type: 'varchar', default: 'none' })
+  sellerStatus: SellerStatus;
+
+  @Column({ type: 'jsonb', default: {} })
+  sellerProfile: SellerProfile;
 
   @Column({ type: 'jsonb', default: [] })
   addresses: Record<string, unknown>[];

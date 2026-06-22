@@ -7,6 +7,7 @@ interface AuthState {
   user: UserProfile | null;
   profile: UserProfile | null;
   role: 'customer' | 'admin' | null;
+  sellerStatus: import('@/types').SellerStatus | null;
   loading: boolean;
   refresh: () => Promise<void>;
 }
@@ -15,6 +16,7 @@ const AuthContext = createContext<AuthState>({
   user: null,
   profile: null,
   role: null,
+  sellerStatus: null,
   loading: true,
   refresh: async () => {},
 });
@@ -46,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user: profile, profile, role: profile?.role ?? null, loading, refresh: load }}>
+    <AuthContext.Provider value={{ user: profile, profile, role: profile?.role ?? null, sellerStatus: profile?.sellerStatus ?? null, loading, refresh: load }}>
       {children}
     </AuthContext.Provider>
   );

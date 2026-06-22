@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGenerat
 import { User } from '../../users/entities/user.entity';
 
 export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+export type PayoutStatus = 'pending' | 'processing' | 'paid';
 
 export interface OrderItem {
   productId: string;
@@ -32,6 +33,13 @@ export class Order {
   @Column()
   userId: string;
 
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'sellerId' })
+  seller: User | null;
+
+  @Column({ nullable: true })
+  sellerId: string | null;
+
   @Column({ type: 'jsonb' })
   items: OrderItem[];
 
@@ -43,6 +51,15 @@ export class Order {
 
   @Column({ type: 'numeric', precision: 10, scale: 2 })
   total: number;
+
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
+  platformFee: number;
+
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
+  sellerPayout: number;
+
+  @Column({ type: 'varchar', default: 'pending' })
+  payoutStatus: PayoutStatus;
 
   @Column({ nullable: true })
   promoCode: string;

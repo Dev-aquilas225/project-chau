@@ -12,6 +12,8 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { PromoCodesModule } from './promo-codes/promo-codes.module';
 import { AdminDashboardModule } from './admin/admin-dashboard.module';
 import { SeedModule } from './seed/seed.module';
+import { SellersModule } from './sellers/sellers.module';
+import { PlatformConfigModule } from './platform-config/platform-config.module';
 import { User } from './users/entities/user.entity';
 import { Product } from './products/entities/product.entity';
 import { Category } from './categories/entities/category.entity';
@@ -19,6 +21,7 @@ import { Order } from './orders/entities/order.entity';
 import { Review } from './reviews/entities/review.entity';
 import { Favorite } from './favorites/entities/favorite.entity';
 import { PromoCode } from './promo-codes/entities/promo-code.entity';
+import { PlatformConfig } from './platform-config/entities/platform-config.entity';
 
 @Module({
   imports: [
@@ -33,7 +36,7 @@ import { PromoCode } from './promo-codes/entities/promo-code.entity';
         username: config.get<string>('DB_USERNAME', 'postgres'),
         password: config.get<string>('DB_PASSWORD', 'postgres'),
         database: config.get<string>('DB_NAME', 'aquilas'),
-        entities: [User, Product, Category, Order, Review, Favorite, PromoCode],
+        entities: [User, Product, Category, Order, Review, Favorite, PromoCode, PlatformConfig],
         synchronize: false,
         autoLoadEntities: true,
       }),
@@ -49,6 +52,8 @@ import { PromoCode } from './promo-codes/entities/promo-code.entity';
     PromoCodesModule,
     AdminDashboardModule,
     SeedModule,
+    SellersModule,
+    PlatformConfigModule,
   ],
 })
 export class AppModule {}

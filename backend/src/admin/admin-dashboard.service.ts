@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order, OrderStatus } from '../orders/entities/order.entity';
 import { Product } from '../products/entities/product.entity';
+import { User } from '../users/entities/user.entity';
 
 const PAID_STATUSES: OrderStatus[] = ['paid', 'shipped', 'delivered'];
 const ALL_STATUSES: OrderStatus[] = ['pending', 'paid', 'shipped', 'delivered', 'cancelled'];
@@ -12,10 +13,11 @@ export class AdminDashboardService {
   constructor(
     @InjectRepository(Order) private ordersRepo: Repository<Order>,
     @InjectRepository(Product) private productsRepo: Repository<Product>,
+    @InjectRepository(User) private usersRepo: Repository<User>,
   ) {}
 
   async getStats() {
-    const [revenueRow, countsRaw, outOfStockCount, recentOrders] = await Promise.all([
+    const [revenueRow, countsRaw, outOfStockCount, recentOrders, pendingSellerCount] = await Promise.all([
       this.ordersRepo
         .createQueryBuilder('order')
         .select('COALESCE(SUM(order.total), 0)', 'sum')
@@ -29,6 +31,7 @@ export class AdminDashboardService {
         .getRawMany<{ status: OrderStatus; count: string }>(),
       this.productsRepo.count({ where: { stock: 0 } }),
       this.ordersRepo.find({ order: { createdAt: 'DESC' }, take: 5 }),
+      this.usersRepo.count({ where: { sellerStatus: 'pending' } }),
     ]);
 
     const countsByStatus = Object.fromEntries(ALL_STATUSES.map((s) => [s, 0])) as Record<OrderStatus, number>;
@@ -42,6 +45,7 @@ export class AdminDashboardService {
       totalOrders: Object.values(countsByStatus).reduce((s, n) => s + n, 0),
       outOfStockProducts: outOfStockCount,
       recentOrders,
+      pendingSellerCount,
     };
   }
 }

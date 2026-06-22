@@ -1,15 +1,14 @@
-import { Controller, Post, UploadedFile, UseGuards, UseInterceptors, BadRequestException } from '@nestjs/common';
+import { Controller, ForbiddenException, Post, UploadedFile, UseGuards, UseInterceptors, BadRequestException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { JwtPayload } from '../auth/strategies/jwt.strategy';
 
 const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('admin')
+@UseGuards(JwtAuthGuard)
 @Controller('uploads')
 export class UploadsController {
   @Post('product-image')
@@ -32,7 +31,10 @@ export class UploadsController {
       },
     }),
   )
-  uploadProductImage(@UploadedFile() file: Express.Multer.File) {
+  uploadProductImage(@CurrentUser() user: JwtPayload, @UploadedFile() file: Express.Multer.File) {
+    if (user.role !== 'admin' && user.sellerStatus !== 'approved') {
+      throw new ForbiddenException('Compte vendeur approuvé ou rôle admin requis');
+    }
     return { url: `/uploads/products/${file.filename}` };
   }
 }

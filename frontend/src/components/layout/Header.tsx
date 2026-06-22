@@ -3,13 +3,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingBag, Menu, X } from 'lucide-react';
 import { useCartStore } from '@/stores/cartStore';
 import { useCategories } from '@/features/catalog/hooks';
+import { useAuth } from '@/features/auth/AuthProvider';
 
 export function Header() {
   const navigate = useNavigate();
   const count = useCartStore((s) => s.totalQty());
   const { data: categories } = useCategories();
+  const { sellerStatus } = useAuth();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
+
+  const sellerLink = sellerStatus === 'approved' ? '/espace-vendeur' : '/devenir-vendeur';
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +42,9 @@ export function Header() {
           </div>
         </form>
 
+        <Link to={sellerLink} className="hidden text-sm font-medium hover:underline md:block">
+          Vendre
+        </Link>
         <Link to="/panier" className="relative" aria-label="Panier" data-testid="cart-link">
           <ShoppingBag />
           {count > 0 && (

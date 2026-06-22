@@ -72,6 +72,10 @@ export class ProductFiltersDto {
   category?: string;
 
   @IsOptional()
+  @IsString()
+  sellerId?: string;
+
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   minPrice?: number;

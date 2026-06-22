@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
-import { DollarSign, ShoppingCart, Package, AlertTriangle, TrendingUp } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { DollarSign, ShoppingCart, Package, AlertTriangle, TrendingUp, UserCheck } from 'lucide-react';
 import { useAdminOrders, ORDER_STATUS_LABEL } from '@/features/orders/hooks';
 import { useAdminProducts } from '@/features/products/hooks';
+import { listSellers } from '@/features/sellers/api';
 import { formatPrice, formatDate, cn } from '@/lib/utils';
 import type { Order } from '@/types';
 
@@ -22,6 +24,7 @@ function StatCard({ icon: Icon, label, value, accent }: { icon: any; label: stri
 export function DashboardPage() {
   const { data: orders = [], isLoading } = useAdminOrders();
   const { data: products = [] } = useAdminProducts();
+  const { data: pendingSellers = [] } = useQuery({ queryKey: ['admin-sellers', 'pending'], queryFn: () => listSellers('pending') });
 
   const revenue = orders.filter((o) => PAID_STATUSES.includes(o.status)).reduce((s, o) => s + o.total, 0);
   const itemsSold = orders.filter((o) => PAID_STATUSES.includes(o.status)).reduce((s, o) => s + o.items.reduce((n, i) => n + i.qty, 0), 0);
@@ -47,6 +50,14 @@ export function DashboardPage() {
         <StatCard icon={TrendingUp} label="Articles vendus" value={String(itemsSold)} accent="bg-indigo-100" />
         <StatCard icon={Package} label="Produits actifs" value={String(products.filter((p) => p.active).length)} />
       </div>
+
+      {pendingSellers.length > 0 && (
+        <Link to="/vendeurs" className="mt-4 flex items-center gap-3 rounded-lg border border-blue-300 bg-blue-50 p-4 text-sm text-blue-800">
+          <UserCheck className="h-5 w-5" />
+          <span><b>{pendingSellers.length}</b> candidature(s) vendeur en attente de validation.</span>
+          <span className="ml-auto underline">Gérer les vendeurs →</span>
+        </Link>
+      )}
 
       {(lowStock > 0 || outOfStock > 0) && (
         <Link to="/stock" className="mt-4 flex items-center gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-800">

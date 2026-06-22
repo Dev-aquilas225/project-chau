@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, Package, Boxes, ShoppingCart, Users, Tag, CreditCard, LogOut, X,
+  LayoutDashboard, Package, Boxes, ShoppingCart, Users, Tag, CreditCard, LogOut, X, UserCheck, Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth, adminLogout } from '@/features/auth/AuthProvider';
@@ -13,9 +13,11 @@ const nav = [
   { to: '/produits', label: 'Produits', icon: Package },
   { to: '/stock', label: 'Stock', icon: Boxes },
   { to: '/commandes', label: 'Commandes', icon: ShoppingCart },
+  { to: '/vendeurs', label: 'Vendeurs', icon: UserCheck },
   { to: '/utilisateurs', label: 'Utilisateurs', icon: Users },
   { to: '/promotions', label: 'Promotions', icon: Tag },
   { to: '/paiements', label: 'Paiements', icon: CreditCard },
+  { to: '/configuration', label: 'Configuration', icon: Settings },
 ];
 
 // Items déjà présents dans la bottom nav mobile (cf. BottomNav.tsx) — masqués du panneau "Plus"

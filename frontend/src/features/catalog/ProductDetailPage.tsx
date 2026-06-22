@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Heart, Leaf, ShieldCheck } from 'lucide-react';
+import { Heart, Leaf, ShieldCheck, Store } from 'lucide-react';
 import { toast } from 'sonner';
 import { useProduct } from './hooks';
 import { FullPageSpinner } from '@/components/ui/Spinner';
@@ -88,6 +88,22 @@ export function ProductDetailPage() {
               indépendante par Occasion de luxe PJ international. Les achats d'articles non authentiques sont remboursés intégralement.
             </p>
           </div>
+
+          {/* Carte vendeur */}
+          {product.seller && (
+            <div className="mt-6 flex items-center gap-3 rounded-lg border border-line p-4">
+              <Store className="h-5 w-5 shrink-0 text-muted" />
+              <div>
+                <p className="font-medium">{product.seller.sellerProfile?.storeName ?? product.seller.displayName}</p>
+                <Link
+                  to={`/catalogue?sellerId=${product.seller.id}`}
+                  className="text-xs text-muted underline"
+                >
+                  Voir toutes ses annonces
+                </Link>
+              </div>
+            </div>
+          )}
 
           <Link to="/catalogue" className="mt-6 inline-block text-sm underline">← Retour au catalogue</Link>
         </div>

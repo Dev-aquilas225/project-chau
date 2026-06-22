@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { ProtectedRoute } from './ProtectedRoute';
+import { SellerProtectedRoute } from '@/features/seller/SellerProtectedRoute';
 import { HomePage } from '@/features/catalog/HomePage';
 import { CatalogPage } from '@/features/catalog/CatalogPage';
 import { ProductDetailPage } from '@/features/catalog/ProductDetailPage';
@@ -11,6 +12,12 @@ import { OrdersPage } from '@/features/orders/OrdersPage';
 import { ProfilePage } from '@/features/account/ProfilePage';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { RegisterPage } from '@/features/auth/RegisterPage';
+import { BecomeSellerPage } from '@/features/seller/BecomeSellerPage';
+import { SellerDashboardPage } from '@/features/seller/SellerDashboardPage';
+import { MyListingsPage } from '@/features/seller/MyListingsPage';
+import { CreateListingPage } from '@/features/seller/CreateListingPage';
+import { EditListingPage } from '@/features/seller/EditListingPage';
+import { SellerOrdersPage } from '@/features/seller/SellerOrdersPage';
 
 export function AppRoutes() {
   return (
@@ -26,6 +33,15 @@ export function AppRoutes() {
         <Route path="checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
         <Route path="commandes" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
         <Route path="compte" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+
+        {/* Seller routes */}
+        <Route path="devenir-vendeur" element={<ProtectedRoute><BecomeSellerPage /></ProtectedRoute>} />
+        <Route path="espace-vendeur" element={<SellerProtectedRoute><SellerDashboardPage /></SellerProtectedRoute>} />
+        <Route path="espace-vendeur/annonces" element={<SellerProtectedRoute><MyListingsPage /></SellerProtectedRoute>} />
+        <Route path="espace-vendeur/annonces/creer" element={<SellerProtectedRoute><CreateListingPage /></SellerProtectedRoute>} />
+        <Route path="espace-vendeur/annonces/:id/modifier" element={<SellerProtectedRoute><EditListingPage /></SellerProtectedRoute>} />
+        <Route path="espace-vendeur/commandes" element={<SellerProtectedRoute><SellerOrdersPage /></SellerProtectedRoute>} />
+
         <Route path="*" element={<div className="container-app py-20 text-center text-muted">Page introuvable.</div>} />
       </Route>
     </Routes>

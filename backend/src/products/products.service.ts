@@ -1,18 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto, ProductFiltersDto, UpdateProductDto } from './dto/product.dto';
+import type { JwtPayload } from '../auth/strategies/jwt.strategy';
 
 @Injectable()
 export class ProductsService {
   constructor(@InjectRepository(Product) private productsRepo: Repository<Product>) {}
 
   async findAll(filters: ProductFiltersDto = {}): Promise<Product[]> {
-    const qb = this.productsRepo.createQueryBuilder('product').where('product.active = :active', { active: true });
+    const qb = this.productsRepo
+      .createQueryBuilder('product')
+      .where('product.active = :active', { active: true })
+      .andWhere("product.listingStatus = 'active'");
 
     if (filters.category) {
       qb.andWhere('product.categoryId = :categoryId', { categoryId: filters.category });
+    }
+    if (filters.sellerId) {
+      qb.andWhere('product.sellerId = :sellerId', { sellerId: filters.sellerId });
     }
     if (filters.minPrice != null) {
       qb.andWhere('product.price >= :minPrice', { minPrice: filters.minPrice });
@@ -33,13 +40,22 @@ export class ProductsService {
     return qb.getMany();
   }
 
-  /** Tous les produits (actifs ou non) — usage admin. */
   listAll(): Promise<Product[]> {
-    return this.productsRepo.find({ order: { createdAt: 'DESC' } });
+    return this.productsRepo.find({
+      order: { createdAt: 'DESC' },
+      relations: ['seller'],
+    });
+  }
+
+  findMine(sellerId: string): Promise<Product[]> {
+    return this.productsRepo.find({
+      where: { sellerId },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findOne(id: string): Promise<Product> {
-    const product = await this.productsRepo.findOne({ where: { id } });
+    const product = await this.productsRepo.findOne({ where: { id }, relations: ['seller'] });
     if (!product) throw new NotFoundException('Produit introuvable');
     return product;
   }
@@ -49,20 +65,39 @@ export class ProductsService {
     return this.productsRepo.find({ where: { id: In(ids) } });
   }
 
-  create(dto: CreateProductDto) {
-    const product = this.productsRepo.create({ ...dto, categoryId: dto.categoryId ?? null });
+  create(dto: CreateProductDto, caller: JwtPayload) {
+    const isAdmin = caller.role === 'admin';
+    const product = this.productsRepo.create({
+      ...dto,
+      categoryId: dto.categoryId ?? null,
+      sellerId: isAdmin ? null : caller.sub,
+      listingStatus: isAdmin ? 'active' : 'active',
+    });
     return this.productsRepo.save(product);
   }
 
-  async update(id: string, dto: UpdateProductDto) {
+  async update(id: string, dto: UpdateProductDto, caller: JwtPayload) {
     const product = await this.findOne(id);
+    this.assertOwnerOrAdmin(product, caller);
     Object.assign(product, dto);
     return this.productsRepo.save(product);
   }
 
-  async remove(id: string) {
+  async remove(id: string, caller: JwtPayload) {
     const product = await this.findOne(id);
-    await this.productsRepo.remove(product);
-    return { deleted: true };
+    this.assertOwnerOrAdmin(product, caller);
+    if (caller.role === 'admin') {
+      await this.productsRepo.remove(product);
+      return { deleted: true };
+    }
+    // Sellers archive instead of hard delete
+    product.listingStatus = 'archived';
+    await this.productsRepo.save(product);
+    return { archived: true };
+  }
+
+  private assertOwnerOrAdmin(product: Product, caller: JwtPayload) {
+    if (caller.role === 'admin') return;
+    if (product.sellerId !== caller.sub) throw new ForbiddenException('Accès refusé');
   }
 }

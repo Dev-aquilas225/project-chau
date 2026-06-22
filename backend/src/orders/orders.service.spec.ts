@@ -5,6 +5,8 @@ describe('OrdersService', () => {
   let service: OrdersService;
   let repo: { create: jest.Mock; save: jest.Mock; find: jest.Mock; findOne: jest.Mock };
   let historyRepo: { create: jest.Mock; save: jest.Mock; find: jest.Mock };
+  let productsRepo: { findOne: jest.Mock };
+  let platformConfig: { getValue: jest.Mock };
 
   beforeEach(() => {
     repo = {
@@ -18,7 +20,9 @@ describe('OrdersService', () => {
       save: jest.fn(async (o) => ({ id: 'hist-1', ...o })),
       find: jest.fn(async () => []),
     };
-    service = new OrdersService(repo as never, historyRepo as never);
+    productsRepo = { findOne: jest.fn().mockResolvedValue({ sellerId: null }) };
+    platformConfig = { getValue: jest.fn().mockResolvedValue(10) };
+    service = new OrdersService(repo as never, historyRepo as never, productsRepo as never, platformConfig as never);
   });
 
   it("crée une commande avec status 'pending' et le userId du token, et insère l'historique", async () => {

@@ -1,12 +1,27 @@
 export type Role = 'customer' | 'admin';
 export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+export type SellerStatus = 'none' | 'pending' | 'approved' | 'rejected';
+export type PayoutStatus = 'pending' | 'processing' | 'paid';
+
+export interface SellerProfile {
+  storeName?: string;
+  bio?: string;
+  iban?: string;
+}
 
 export interface UserProfile {
   id: string;
   email: string;
   displayName: string;
   role: Role;
+  sellerStatus?: SellerStatus;
+  sellerProfile?: SellerProfile;
   createdAt?: Date;
+}
+
+export interface PlatformConfig {
+  commissionRate: number;
+  sellerRegistrationEnabled: boolean;
 }
 
 export interface Product {
@@ -43,10 +58,14 @@ export interface OrderStatusHistoryEntry {
 export interface Order {
   id: string;
   userId: string;
+  sellerId?: string | null;
   items: OrderItem[];
   subtotal: number;
   discount: number;
   total: number;
+  platformFee?: number;
+  sellerPayout?: number;
+  payoutStatus?: PayoutStatus;
   promoCode?: string;
   status: OrderStatus;
   shippingAddress?: { fullName: string; line1: string; city: string; zip: string; country: string };

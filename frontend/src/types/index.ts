@@ -1,4 +1,11 @@
 export type Role = 'customer' | 'admin';
+export type SellerStatus = 'none' | 'pending' | 'approved' | 'rejected';
+
+export interface SellerProfile {
+  storeName?: string;
+  bio?: string;
+  iban?: string;
+}
 
 export interface Address {
   fullName: string;
@@ -14,6 +21,8 @@ export interface UserProfile {
   displayName: string;
   photoURL?: string;
   role: Role;
+  sellerStatus: SellerStatus;
+  sellerProfile: SellerProfile;
   addresses: Address[];
   createdAt?: Date;
 }
@@ -39,6 +48,9 @@ export interface Product {
   location?: string;
   active: boolean;
   weLove?: boolean;
+  sellerId?: string | null;
+  listingStatus?: string;
+  seller?: Pick<UserProfile, 'id' | 'displayName' | 'sellerProfile' | 'createdAt'> | null;
   createdAt?: Date;
 }
 
@@ -74,10 +86,13 @@ export interface OrderStatusHistoryEntry {
 export interface Order {
   id: string;
   userId: string;
+  sellerId?: string | null;
   items: OrderItem[];
   subtotal: number;
   discount: number;
   total: number;
+  platformFee?: number;
+  sellerPayout?: number;
   promoCode?: string;
   status: OrderStatus;
   shippingAddress: Address;

@@ -4,11 +4,13 @@ describe('AdminDashboardService', () => {
   let service: AdminDashboardService;
   let ordersRepo: { createQueryBuilder: jest.Mock; find: jest.Mock };
   let productsRepo: { count: jest.Mock };
+  let usersRepo: { count: jest.Mock };
 
   beforeEach(() => {
     ordersRepo = { createQueryBuilder: jest.fn(), find: jest.fn() };
     productsRepo = { count: jest.fn() };
-    service = new AdminDashboardService(ordersRepo as never, productsRepo as never);
+    usersRepo = { count: jest.fn() };
+    service = new AdminDashboardService(ordersRepo as never, productsRepo as never, usersRepo as never);
   });
 
   it('agrège chiffre d\'affaires, commandes par statut, rupture de stock et commandes récentes', async () => {
@@ -22,6 +24,7 @@ describe('AdminDashboardService', () => {
     ordersRepo.createQueryBuilder.mockReturnValueOnce(revenueQb).mockReturnValueOnce(statusQb);
     productsRepo.count.mockResolvedValue(2);
     ordersRepo.find.mockResolvedValue([{ id: 'o1' }]);
+    usersRepo.count.mockResolvedValue(0);
 
     const result = await service.getStats();
 

@@ -20,13 +20,20 @@ export class AuthService {
       email: user.email,
       displayName: user.displayName,
       role: user.role,
+      sellerStatus: user.sellerStatus,
+      sellerProfile: user.sellerProfile,
       addresses: user.addresses,
       createdAt: user.createdAt,
     };
   }
 
   private signToken(user: User) {
-    return this.jwtService.sign({ sub: user.id, email: user.email, role: user.role });
+    return this.jwtService.sign({
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      sellerStatus: user.sellerStatus,
+    });
   }
 
   async register(dto: RegisterDto) {

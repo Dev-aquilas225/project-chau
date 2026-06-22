@@ -15,6 +15,8 @@ export class UsersService {
       email: user.email,
       displayName: user.displayName,
       role: user.role,
+      sellerStatus: user.sellerStatus,
+      sellerProfile: user.sellerProfile,
       addresses: user.addresses,
       createdAt: user.createdAt,
     };

@@ -1,5 +1,8 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
+import { User } from '../../users/entities/user.entity';
+
+export type ListingStatus = 'draft' | 'active' | 'archived';
 
 @Entity('products')
 export class Product {
@@ -24,6 +27,16 @@ export class Product {
 
   @Column({ nullable: true })
   categoryId: string | null;
+
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'sellerId' })
+  seller: User | null;
+
+  @Column({ nullable: true })
+  sellerId: string | null;
+
+  @Column({ type: 'varchar', default: 'active' })
+  listingStatus: ListingStatus;
 
   @Column({ type: 'jsonb', default: [] })
   images: string[];
