@@ -2,6 +2,8 @@ export type Role = 'customer' | 'admin';
 export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
 export type SellerStatus = 'none' | 'pending' | 'approved' | 'rejected';
 export type PayoutStatus = 'pending' | 'processing' | 'paid';
+export type ListingStatus = 'draft' | 'active' | 'archived';
+export type DiscountType = 'percentage' | 'fixed';
 
 export interface SellerProfile {
   storeName?: string;
@@ -28,7 +30,8 @@ export interface UserProfile {
   sellerStatus?: SellerStatus;
   sellerProfile?: SellerProfile;
   identityVerified?: boolean;
-  createdAt?: Date;
+  photoURL?: string;
+  createdAt?: string;
 }
 
 export interface PlatformConfig {
@@ -41,8 +44,11 @@ export interface Product {
   name: string;
   brand: string;
   description: string;
-  price: number;
-  category: string;
+  price: number | string;
+  categoryId: string | null;
+  seller?: UserProfile | null;
+  sellerId: string | null;
+  listingStatus: ListingStatus;
   images: string[];
   stock: number;
   condition?: string;
@@ -50,13 +56,23 @@ export interface Product {
   location?: string;
   active: boolean;
   weLove?: boolean;
-  createdAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface Category { id: string; name: string; slug: string; }
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
 
 export interface OrderItem {
-  productId: string; name: string; brand: string; image: string; unitPrice: number; qty: number;
+  productId: string;
+  name: string;
+  brand: string;
+  image: string;
+  unitPrice: number;
+  qty: number;
 }
 
 export interface OrderStatusHistoryEntry {
@@ -64,7 +80,7 @@ export interface OrderStatusHistoryEntry {
   orderId: string;
   status: OrderStatus;
   note: string | null;
-  createdAt: Date;
+  createdAt: string;
 }
 
 export interface Order {
@@ -78,21 +94,22 @@ export interface Order {
   platformFee?: number;
   sellerPayout?: number;
   payoutStatus?: PayoutStatus;
-  promoCode?: string;
+  promoCode?: string | null;
   status: OrderStatus;
   shippingAddress?: { fullName: string; line1: string; city: string; zip: string; country: string };
   paymentMethod: string;
-  createdAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
   statusHistory?: OrderStatusHistoryEntry[];
 }
 
-export interface Promo {
+export interface PromoCode {
   id: string;
   code: string;
-  type: 'percentage' | 'fixed';
-  value: number;
+  discountType: DiscountType;
+  discountValue: number;
+  minAmount: number;
+  expiresAt: string | null;
   active: boolean;
-  minAmount?: number;
-  usageLimit?: number;
-  usedCount?: number;
+  createdAt?: string;
 }
