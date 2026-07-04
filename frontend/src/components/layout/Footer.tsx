@@ -1,5 +1,10 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ChevronDown } from 'lucide-react';
 import { LegalNotice } from '@/components/LegalNotice';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { cn } from '@/lib/utils';
 
 const payments = [
   { name: 'PayPal', slug: 'paypal' },
@@ -12,17 +17,59 @@ const payments = [
 
 export function Footer() {
   const { t } = useTranslation('common');
-  const sections = t('footer.sections', { returnObjects: true }) as string[];
+  const { sellerStatus } = useAuth();
+  const sectionTitles = t('footer.sections', { returnObjects: true }) as string[];
+  const [expanded, setExpanded] = useState<number | null>(null);
+  const sellerLink = sellerStatus === 'approved' ? '/espace-vendeur' : '/devenir-vendeur';
+
+  // Sous-liens par section, mappés sur les pages réellement disponibles dans l'appli
+  // (index aligné sur footer.sections ; les sections sans entrée ici restent statiques).
+  const sectionLinks: { to: string; label: string }[][] = [
+    [
+      { to: '/catalogue', label: t('header.all') },
+      { to: '/favoris', label: t('header.favorites') },
+    ],
+    [
+      { to: '/panier', label: t('header.cart') },
+      { to: '/commandes', label: t('accountMenu.myOrders') },
+    ],
+    [{ to: sellerLink, label: t('header.sell') }],
+  ];
 
   return (
     <footer className="mt-12 bg-ink text-paper">
       <div className="container-app py-8">
         <ul className="divide-y divide-white/10">
-          {sections.map((s) => (
-            <li key={s} className="flex items-center justify-between py-4 text-sm font-semibold uppercase tracking-wide">
-              {s} <span className="text-white/50">+</span>
-            </li>
-          ))}
+          {sectionTitles.map((title, i) => {
+            const links = sectionLinks[i];
+            const isExpandable = !!links?.length;
+            const isOpen = expanded === i;
+            return (
+              <li key={title}>
+                {isExpandable ? (
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between py-4 text-left text-sm font-semibold uppercase tracking-wide"
+                    onClick={() => setExpanded(isOpen ? null : i)}
+                  >
+                    {title}
+                    <ChevronDown className={cn('h-4 w-4 text-white/50 transition-transform', isOpen && 'rotate-180')} />
+                  </button>
+                ) : (
+                  <div className="py-4 text-sm font-semibold uppercase tracking-wide">{title}</div>
+                )}
+                {isExpandable && isOpen && (
+                  <div className="pb-4">
+                    {links!.map((l) => (
+                      <Link key={l.to} to={l.to} className="block py-2 text-sm text-white/70 hover:text-white">
+                        {l.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
 
         <div className="mt-8 flex flex-wrap gap-2">
