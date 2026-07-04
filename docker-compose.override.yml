@@ -1,0 +1,16 @@
+# Overrides locales de dev, fusionnées automatiquement avec docker-compose.yaml par
+# `docker compose up` (jamais utilisé par Coolify en production, qui ne lit que
+# docker-compose.yaml). Publie des ports fixes sur l'hôte pour un accès prévisible
+# depuis le navigateur.
+services:
+  backend:
+    ports:
+      - "3000:3000"
+
+  frontend:
+    ports:
+      - "5175:80"
+
+  frontend-admin:
+    ports:
+      - "5176:80"
