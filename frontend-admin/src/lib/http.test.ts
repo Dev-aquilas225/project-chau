@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { apiFetch, ApiError, getToken, setToken } from './http';
+import { apiFetch, apiFetchBlob, ApiError, getToken, setToken } from './http';
 
 describe('http client', () => {
   const originalFetch = global.fetch;
@@ -47,5 +47,28 @@ describe('http client', () => {
 
     await expect(apiFetch('/users')).rejects.toMatchObject({ status: 403, message: 'Accès refusé' });
     await expect(apiFetch('/users')).rejects.toBeInstanceOf(ApiError);
+  });
+
+  describe('apiFetchBlob', () => {
+    it('attaches Authorization header and returns a Blob', async () => {
+      setToken('my-token');
+      const blob = new Blob(['fake-image-bytes']);
+      const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200, blob: async () => blob });
+      global.fetch = fetchMock as unknown as typeof fetch;
+
+      const result = await apiFetchBlob('/uploads/identity/user-1-id-document-123.jpg');
+
+      const [, options] = fetchMock.mock.calls[0];
+      expect(options.headers.Authorization).toBe('Bearer my-token');
+      expect(result).toBe(blob);
+    });
+
+    it('throws ApiError on non-2xx response', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 404, statusText: 'Not Found' });
+      global.fetch = fetchMock as unknown as typeof fetch;
+
+      await expect(apiFetchBlob('/uploads/identity/missing.jpg')).rejects.toBeInstanceOf(ApiError);
+      await expect(apiFetchBlob('/uploads/identity/missing.jpg')).rejects.toMatchObject({ status: 404 });
+    });
   });
 });

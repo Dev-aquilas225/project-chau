@@ -40,3 +40,6 @@ ui-debug.log
 # Service account keys — NE JAMAIS COMMITTER
 *serviceAccount*.json
 *service-account*.json
+
+# Documents d'identité vendeurs — jamais commités
+backend/uploads-private/

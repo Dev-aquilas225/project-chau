@@ -23,11 +23,15 @@ export class AuthService {
       sellerStatus: user.sellerStatus,
       sellerProfile: user.sellerProfile,
       addresses: user.addresses,
+      photoURL: user.photoURL,
+      bio: user.bio,
+      country: user.country,
+      city: user.city,
       createdAt: user.createdAt,
     };
   }
 
-  private signToken(user: User) {
+  signToken(user: User) {
     return this.jwtService.sign({
       sub: user.id,
       email: user.email,

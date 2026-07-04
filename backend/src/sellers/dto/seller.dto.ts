@@ -1,5 +1,5 @@
-import { IsIn, IsOptional, IsString, MaxLength } from 'class-validator';
-import type { SellerStatus } from '../../users/entities/user.entity';
+import { IsDateString, IsIn, IsOptional, IsString, Length, MaxLength, ValidateIf } from 'class-validator';
+import type { IdType, SellerStatus } from '../../users/entities/user.entity';
 
 export class ApplySellerDto {
   @IsString()
@@ -10,6 +10,34 @@ export class ApplySellerDto {
   @IsString()
   @MaxLength(500)
   bio?: string;
+
+  @IsIn(['national_id', 'passport'])
+  idType: IdType;
+
+  @IsString()
+  @MaxLength(50)
+  idNumber: string;
+
+  @IsString()
+  @Length(2, 2)
+  idCountry: string;
+
+  @IsString()
+  @MaxLength(150)
+  fullNameOnId: string;
+
+  @IsDateString()
+  dateOfBirth: string;
+
+  @IsString()
+  idDocumentRef: string;
+
+  @ValidateIf((o) => o.idType === 'national_id')
+  @IsString()
+  idDocumentBackRef?: string;
+
+  @IsString()
+  profilePhotoRef: string;
 }
 
 export class UpdateSellerProfileDto {

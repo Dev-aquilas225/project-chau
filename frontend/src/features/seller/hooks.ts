@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { setToken } from '@/lib/http';
 import {
   applyAsSeller, getMySellerProfile, updateMySellerProfile,
   getMyListings, createListing, updateListing, deleteListing,
@@ -13,7 +14,10 @@ export function useApplyAsSeller() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: ApplySellerInput) => applyAsSeller(input),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['seller-profile'] }),
+    onSuccess: (data) => {
+      setToken(data.accessToken);
+      qc.invalidateQueries({ queryKey: ['seller-profile'] });
+    },
   });
 }
 

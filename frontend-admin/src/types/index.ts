@@ -7,6 +7,17 @@ export interface SellerProfile {
   storeName?: string;
   bio?: string;
   iban?: string;
+  idType?: 'national_id' | 'passport';
+  idNumber?: string;
+  idCountry?: string;
+  fullNameOnId?: string;
+  dateOfBirth?: string;
+  idDocumentRef?: string;
+  idDocumentBackRef?: string;
+  profilePhotoRef?: string;
+  submittedAt?: string;
+  reviewNote?: string;
+  reviewedAt?: string;
 }
 
 export interface UserProfile {
@@ -16,6 +27,7 @@ export interface UserProfile {
   role: Role;
   sellerStatus?: SellerStatus;
   sellerProfile?: SellerProfile;
+  identityVerified?: boolean;
   createdAt?: Date;
 }
 

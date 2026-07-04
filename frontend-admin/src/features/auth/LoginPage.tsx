@@ -36,7 +36,7 @@ export function LoginPage() {
         <button className="btn-primary w-full" disabled={busy} data-testid="admin-login">
           {busy ? 'Connexion…' : 'Se connecter'}
         </button>
-        <p className="mt-4 text-center text-xs text-muted">Démo : admin@aquilas.com / admin1234</p>
+        <p className="mt-4 text-center text-xs text-muted">Démo : admin@gmail.com / admin1234</p>
       </form>
     </div>
   );

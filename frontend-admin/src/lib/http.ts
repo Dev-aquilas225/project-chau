@@ -63,3 +63,17 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
+
+export async function apiFetchBlob(path: string): Promise<Blob> {
+  const token = getToken();
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const res = await fetch(`${API_URL}${path}`, { headers });
+
+  if (!res.ok) {
+    throw new ApiError(res.status, res.statusText);
+  }
+
+  return res.blob();
+}

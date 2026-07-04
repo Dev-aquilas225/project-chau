@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, FileSearch } from 'lucide-react';
 import { toast } from 'sonner';
 import { listSellers, updateSellerStatus } from './api';
+import { IdentityImage } from './IdentityImage';
 import { formatDate, cn } from '@/lib/utils';
 import type { SellerStatus, UserProfile } from '@/types';
 
@@ -20,6 +21,11 @@ const STATUS_COLOR: Record<SellerStatus, string> = {
   rejected: 'bg-red-100 text-red-700',
 };
 
+const ID_TYPE_LABEL: Record<string, string> = {
+  national_id: "Carte nationale d'identité",
+  passport: 'Passeport',
+};
+
 type FilterTab = 'pending' | 'approved' | 'rejected';
 
 export function SellersPage() {
@@ -27,6 +33,7 @@ export function SellersPage() {
   const [filter, setFilter] = useState<FilterTab>('pending');
   const [noteModal, setNoteModal] = useState<{ user: UserProfile; action: 'approved' | 'rejected' } | null>(null);
   const [note, setNote] = useState('');
+  const [detailUser, setDetailUser] = useState<UserProfile | null>(null);
 
   const { data: sellers = [], isLoading } = useQuery({
     queryKey: ['admin-sellers', filter],
@@ -108,6 +115,12 @@ export function SellersPage() {
                 <td className="td text-muted">{formatDate(u.createdAt)}</td>
                 <td className="td text-right">
                   <div className="flex justify-end gap-2">
+                    <button
+                      className="btn-outline flex items-center gap-1 px-3 py-1.5 text-xs"
+                      onClick={() => setDetailUser(u)}
+                    >
+                      <FileSearch className="h-3 w-3" /> Détails
+                    </button>
                     {u.sellerStatus !== 'approved' && (
                       <button
                         className="btn-outline flex items-center gap-1 px-3 py-1.5 text-xs text-green-700 border-green-300"
@@ -134,8 +147,8 @@ export function SellersPage() {
 
       {/* Confirmation modal */}
       {noteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="card w-full max-w-md space-y-4 p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="card max-h-[90vh] w-full max-w-md space-y-4 overflow-y-auto p-6">
             <h2 className="text-lg font-semibold">
               {noteModal.action === 'approved' ? 'Approuver' : 'Rejeter'} — {noteModal.user.displayName}
             </h2>
@@ -158,6 +171,74 @@ export function SellersPage() {
               >
                 Confirmer
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Detail modal */}
+      {detailUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="card max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto p-6">
+            <h2 className="text-lg font-semibold">
+              Vérification d'identité — {detailUser.displayName}
+            </h2>
+
+            <div className="grid gap-3 text-sm sm:grid-cols-2">
+              <div>
+                <p className="text-xs text-muted">Type de pièce</p>
+                <p className="font-medium">
+                  {detailUser.sellerProfile?.idType ? ID_TYPE_LABEL[detailUser.sellerProfile.idType] : '—'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted">Numéro</p>
+                <p className="font-medium">{detailUser.sellerProfile?.idNumber ?? '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted">Pays de délivrance</p>
+                <p className="font-medium">{detailUser.sellerProfile?.idCountry ?? '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted">Date de naissance</p>
+                <p className="font-medium">
+                  {detailUser.sellerProfile?.dateOfBirth ? formatDate(detailUser.sellerProfile.dateOfBirth) : '—'}
+                </p>
+              </div>
+              <div className="sm:col-span-2">
+                <p className="text-xs text-muted">Nom complet (tel qu'indiqué sur la pièce)</p>
+                <p className="font-medium">{detailUser.sellerProfile?.fullNameOnId ?? '—'}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-4">
+              <div>
+                <p className="mb-1 text-xs text-muted">
+                  {detailUser.sellerProfile?.idType === 'national_id' ? "Pièce d'identité (recto)" : "Pièce d'identité"}
+                </p>
+                <IdentityImage filename={detailUser.sellerProfile?.idDocumentRef} alt="Pièce d'identité" />
+              </div>
+              {detailUser.sellerProfile?.idType === 'national_id' && (
+                <div>
+                  <p className="mb-1 text-xs text-muted">Pièce d'identité (verso)</p>
+                  <IdentityImage filename={detailUser.sellerProfile?.idDocumentBackRef} alt="Pièce d'identité (verso)" />
+                </div>
+              )}
+              <div>
+                <p className="mb-1 text-xs text-muted">Photo de profil</p>
+                <IdentityImage filename={detailUser.sellerProfile?.profilePhotoRef} alt="Photo de profil" />
+              </div>
+            </div>
+
+            {detailUser.sellerProfile?.reviewNote && (
+              <div className={cn('rounded-lg p-3 text-sm', detailUser.sellerStatus === 'rejected' ? 'bg-red-50 text-red-700' : 'bg-gray-50 text-ink')}>
+                <p className="font-medium">Motif ({formatDate(detailUser.sellerProfile.reviewedAt)})</p>
+                <p className="mt-1">{detailUser.sellerProfile.reviewNote}</p>
+              </div>
+            )}
+
+            <div className="flex justify-end">
+              <button className="btn-outline" onClick={() => setDetailUser(null)}>Fermer</button>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { IsArray, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsArray, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class UpdateProfileDto {
   @IsOptional()
@@ -9,4 +9,24 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsArray()
   addresses?: Record<string, unknown>[];
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2048)
+  photoURL?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  bio?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  country?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  city?: string;
 }
