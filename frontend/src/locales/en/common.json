@@ -1,12 +1,14 @@
 {
   "header": {
     "menu": "Menu",
+    "close": "Close",
     "searchPlaceholder": "Search for a brand, an item…",
-    "searchPlaceholderMobile": "Search…",
+    "searchPlaceholderMobile": "Search for a brand, an item…",
     "sell": "Sell",
     "favorites": "Favorites",
     "cart": "Cart",
-    "all": "All"
+    "all": "All",
+    "viewAllIn": "View all: {{name}}"
   },
   "footer": {
     "sections": ["Our services", "Buy", "Sell", "Help", "Occasion de luxe PJ international"],
@@ -15,8 +17,8 @@
   "bottomNav": {
     "home": "Home",
     "favorites": "Favorites",
-    "cart": "Cart",
-    "orders": "Orders",
+    "sell": "Sell",
+    "notifications": "Notifications",
     "me": "Me"
   },
   "accountMenu": {

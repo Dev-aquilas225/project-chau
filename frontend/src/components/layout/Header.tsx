@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, Menu, X } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCartStore } from '@/stores/cartStore';
 import { useFavoritesStore } from '@/stores/favoritesStore';
 import { useCategories } from '@/features/catalog/hooks';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { NotificationsBell } from '@/features/notifications/NotificationsBell';
+import { cn } from '@/lib/utils';
 import { AccountMenu } from './AccountMenu';
 import { LanguageSelector } from './LanguageSelector';
 
@@ -19,13 +20,26 @@ export function Header() {
   const { sellerStatus } = useAuth();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
+  const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
 
   const sellerLink = sellerStatus === 'approved' ? '/espace-vendeur' : '/devenir-vendeur';
+  const topCategories = categories?.filter((c) => !c.parentId) ?? [];
+  const childrenOf = (id: string) => categories?.filter((c) => c.parentId === id) ?? [];
+
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
+
+  const closeMenu = () => {
+    setOpen(false);
+    setExpandedCategoryId(null);
+  };
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     navigate(`/catalogue?search=${encodeURIComponent(q)}`);
-    setOpen(false);
+    closeMenu();
   };
 
   return (
@@ -87,18 +101,71 @@ export function Header() {
         </div>
       </nav>
 
-      {/* Menu mobile */}
+      {/* Menu mobile plein écran */}
       {open && (
-        <div className="border-t border-line p-4 md:hidden">
-          <form onSubmit={submitSearch} className="mb-3">
-            <input className="input" placeholder={t('header.searchPlaceholderMobile')} value={q} onChange={(e) => setQ(e.target.value)} />
-          </form>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <Link to="/catalogue" onClick={() => setOpen(false)}>{t('header.all')}</Link>
-            {categories?.map((c) => (
-              <Link key={c.id} to={`/catalogue?category=${c.id}`} onClick={() => setOpen(false)}>{c.name}</Link>
-            ))}
+        <div className="fixed inset-0 z-50 flex flex-col bg-paper md:hidden">
+          <div className="flex items-center justify-between border-b border-line p-4">
+            <span className="brand-logo text-xl">Occasion de luxe PJ international</span>
+            <button type="button" aria-label={t('header.close')} onClick={closeMenu}>
+              <X />
+            </button>
           </div>
+
+          <form onSubmit={submitSearch} className="p-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+              <input
+                className="w-full rounded-lg bg-gray-100 py-3 pl-9 pr-3 text-sm outline-none"
+                placeholder={t('header.searchPlaceholderMobile')}
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+              />
+            </div>
+          </form>
+
+          <nav className="flex-1 overflow-y-auto">
+            <Link
+              to="/catalogue"
+              onClick={closeMenu}
+              className="flex items-center justify-between border-b border-line px-4 py-4 text-base"
+            >
+              {t('header.all')}
+            </Link>
+            {topCategories.map((c) => {
+              const children = childrenOf(c.id);
+              const isExpanded = expandedCategoryId === c.id;
+              return (
+                <div key={c.id} className="border-b border-line">
+                  {children.length > 0 ? (
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between px-4 py-4 text-left text-base"
+                      onClick={() => setExpandedCategoryId(isExpanded ? null : c.id)}
+                    >
+                      {c.name}
+                      <ChevronDown className={cn('h-4 w-4 text-muted transition-transform', isExpanded && 'rotate-180')} />
+                    </button>
+                  ) : (
+                    <Link to={`/catalogue?category=${c.id}`} onClick={closeMenu} className="flex items-center justify-between px-4 py-4 text-base">
+                      {c.name}
+                    </Link>
+                  )}
+                  {isExpanded && (
+                    <div className="bg-gray-50 pb-2">
+                      <Link to={`/catalogue?category=${c.id}`} onClick={closeMenu} className="block px-8 py-2 text-sm font-medium">
+                        {t('header.viewAllIn', { name: c.name })}
+                      </Link>
+                      {children.map((child) => (
+                        <Link key={child.id} to={`/catalogue?category=${child.id}`} onClick={closeMenu} className="block px-8 py-2 text-sm">
+                          {child.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </nav>
         </div>
       )}
     </header>

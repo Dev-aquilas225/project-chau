@@ -4,10 +4,16 @@ import { Bell } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useClickOutside } from '@/hooks/useClickOutside';
-import { formatDate } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 import { useNotifications, useUnreadCount, useMarkAsRead, useMarkAllAsRead } from './hooks';
 
-export function NotificationsBell() {
+interface NotificationsBellProps {
+  /** 'header' (default) ouvre le panneau vers le bas ; 'bottomNav' l'ouvre vers le haut et affiche un libellé sous l'icône. */
+  variant?: 'header' | 'bottomNav';
+  label?: string;
+}
+
+export function NotificationsBell({ variant = 'header', label }: NotificationsBellProps) {
   const { t } = useTranslation('notifications');
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -24,6 +30,7 @@ export function NotificationsBell() {
   if (!user) return null;
 
   const count = unread?.count ?? 0;
+  const isBottomNav = variant === 'bottomNav';
 
   const onNotificationClick = (id: string, read: boolean, link?: string | null) => {
     if (!read) markAsRead.mutate(id);
@@ -32,24 +39,32 @@ export function NotificationsBell() {
   };
 
   return (
-    <div className="relative" ref={ref}>
+    <div className={cn('relative', isBottomNav && 'flex flex-1 justify-center')} ref={ref}>
       <button
         type="button"
-        className="relative"
+        className={cn('relative', isBottomNav && 'flex w-full flex-col items-center gap-0.5 py-2 text-[11px] text-muted')}
         aria-label={t('ariaLabel')}
         data-testid="notifications-bell"
         onClick={() => setOpen((v) => !v)}
       >
-        <Bell />
-        {count > 0 && (
-          <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-paper">
-            {count}
-          </span>
-        )}
+        <span className="relative">
+          <Bell className={isBottomNav ? 'h-5 w-5' : undefined} />
+          {count > 0 && (
+            <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-paper">
+              {count}
+            </span>
+          )}
+        </span>
+        {isBottomNav && label}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-lg border border-line bg-paper shadow-lg">
+        <div
+          className={cn(
+            'absolute right-0 z-50 w-80 max-w-[90vw] rounded-lg border border-line bg-paper shadow-lg',
+            isBottomNav ? 'bottom-full mb-2' : 'top-full mt-2',
+          )}
+        >
           <div className="flex items-center justify-between border-b border-line p-3">
             <span className="text-sm font-medium">{t('title')}</span>
             {count > 0 && (
