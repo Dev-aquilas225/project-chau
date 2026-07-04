@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
-import { Store, Clock, CheckCircle, XCircle, Upload, Loader2, Check } from 'lucide-react';
+import { Store, Clock, CheckCircle, XCircle, Upload, Loader2, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -318,63 +318,87 @@ export function BecomeSellerPage() {
                     {idType === 'national_id' ? t('becomeSeller.documents.idDocumentFrontNationalLabel') : t('becomeSeller.documents.idDocumentFrontPassportLabel')}
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {idDocumentPreview && (
-                      <div className="h-24 w-20 shrink-0 overflow-hidden rounded border border-line">
+                    {idDocumentPreview ? (
+                      <div className="group relative h-24 w-20 shrink-0 overflow-hidden rounded border border-line">
                         <img src={idDocumentPreview} alt="" className="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          className="absolute right-0.5 top-0.5 rounded-full bg-white/80 p-0.5 opacity-0 group-hover:opacity-100"
+                          onClick={() => { setIdDocumentPreview(null); setIdDocumentRef(null); }}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
                       </div>
+                    ) : (
+                      <label className="flex h-24 w-20 shrink-0 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-line hover:bg-gray-50">
+                        {uploadingIdDocument ? <Loader2 className="h-5 w-5 animate-spin text-muted" /> : <Upload className="h-5 w-5 text-muted" />}
+                        <span className="mt-1 text-xs text-muted">{t('becomeSeller.documents.uploadLabel')}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={(e) => onIdDocumentFile(e.target.files)}
+                        />
+                      </label>
                     )}
-                    <label className="flex h-24 w-20 shrink-0 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-line hover:bg-gray-50">
-                      {uploadingIdDocument ? <Loader2 className="h-5 w-5 animate-spin text-muted" /> : <Upload className="h-5 w-5 text-muted" />}
-                      <span className="mt-1 text-xs text-muted">{t('becomeSeller.documents.uploadLabel')}</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="sr-only"
-                        onChange={(e) => onIdDocumentFile(e.target.files)}
-                      />
-                    </label>
                   </div>
                 </div>
                 {idType === 'national_id' && (
                   <div className="w-full min-[420px]:min-w-[140px] min-[420px]:flex-1">
                     <label className="label">{t('becomeSeller.documents.idDocumentBackLabel')}</label>
                     <div className="flex flex-wrap gap-2">
-                      {idDocumentBackPreview && (
-                        <div className="h-24 w-20 shrink-0 overflow-hidden rounded border border-line">
+                      {idDocumentBackPreview ? (
+                        <div className="group relative h-24 w-20 shrink-0 overflow-hidden rounded border border-line">
                           <img src={idDocumentBackPreview} alt="" className="h-full w-full object-cover" />
+                          <button
+                            type="button"
+                            className="absolute right-0.5 top-0.5 rounded-full bg-white/80 p-0.5 opacity-0 group-hover:opacity-100"
+                            onClick={() => { setIdDocumentBackPreview(null); setIdDocumentBackRef(null); }}
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
                         </div>
+                      ) : (
+                        <label className="flex h-24 w-20 shrink-0 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-line hover:bg-gray-50">
+                          {uploadingIdDocumentBack ? <Loader2 className="h-5 w-5 animate-spin text-muted" /> : <Upload className="h-5 w-5 text-muted" />}
+                          <span className="mt-1 text-xs text-muted">{t('becomeSeller.documents.uploadLabel')}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="sr-only"
+                            onChange={(e) => onIdDocumentBackFile(e.target.files)}
+                          />
+                        </label>
                       )}
-                      <label className="flex h-24 w-20 shrink-0 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-line hover:bg-gray-50">
-                        {uploadingIdDocumentBack ? <Loader2 className="h-5 w-5 animate-spin text-muted" /> : <Upload className="h-5 w-5 text-muted" />}
-                        <span className="mt-1 text-xs text-muted">{t('becomeSeller.documents.uploadLabel')}</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="sr-only"
-                          onChange={(e) => onIdDocumentBackFile(e.target.files)}
-                        />
-                      </label>
                     </div>
                   </div>
                 )}
                 <div className="w-full min-[420px]:min-w-[140px] min-[420px]:flex-1">
                   <label className="label">{t('becomeSeller.documents.profilePhotoLabel')}</label>
                   <div className="flex flex-wrap gap-2">
-                    {profilePhotoPreview && (
-                      <div className="h-24 w-20 shrink-0 overflow-hidden rounded border border-line">
+                    {profilePhotoPreview ? (
+                      <div className="group relative h-24 w-20 shrink-0 overflow-hidden rounded border border-line">
                         <img src={profilePhotoPreview} alt="" className="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          className="absolute right-0.5 top-0.5 rounded-full bg-white/80 p-0.5 opacity-0 group-hover:opacity-100"
+                          onClick={() => { setProfilePhotoPreview(null); setProfilePhotoRef(null); }}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
                       </div>
+                    ) : (
+                      <label className="flex h-24 w-20 shrink-0 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-line hover:bg-gray-50">
+                        {uploadingProfilePhoto ? <Loader2 className="h-5 w-5 animate-spin text-muted" /> : <Upload className="h-5 w-5 text-muted" />}
+                        <span className="mt-1 text-xs text-muted">{t('becomeSeller.documents.uploadLabel')}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={(e) => onProfilePhotoFile(e.target.files)}
+                        />
+                      </label>
                     )}
-                    <label className="flex h-24 w-20 shrink-0 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-line hover:bg-gray-50">
-                      {uploadingProfilePhoto ? <Loader2 className="h-5 w-5 animate-spin text-muted" /> : <Upload className="h-5 w-5 text-muted" />}
-                      <span className="mt-1 text-xs text-muted">{t('becomeSeller.documents.uploadLabel')}</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="sr-only"
-                        onChange={(e) => onProfilePhotoFile(e.target.files)}
-                      />
-                    </label>
                   </div>
                 </div>
               </div>
