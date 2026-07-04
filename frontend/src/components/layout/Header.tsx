@@ -17,7 +17,7 @@ export function Header() {
   const count = useCartStore((s) => s.totalQty());
   const favoritesCount = useFavoritesStore((s) => s.ids.length);
   const { data: categories } = useCategories();
-  const { sellerStatus } = useAuth();
+  const { user, sellerStatus } = useAuth();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
   const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
@@ -48,45 +48,87 @@ export function Header() {
         <button className="shrink-0 md:hidden" aria-label={t('header.menu')} onClick={() => setOpen((v) => !v)}>
           {open ? <X /> : <Menu />}
         </button>
-        <Link to="/" className="brand-logo min-w-0 shrink text-base sm:text-xl md:text-2xl">Occasion de luxe PJ international</Link>
 
-        <form onSubmit={submitSearch} className="hidden flex-1 md:block">
-          <div className="relative mx-auto max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-            <input
-              className="input pl-9"
-              placeholder={t('header.searchPlaceholder')}
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              data-testid="search-input"
-            />
-          </div>
-        </form>
+        {user ? (
+          <>
+            <Link to="/" className="brand-logo min-w-0 shrink text-base sm:text-xl md:text-2xl">Occasion de luxe PJ international</Link>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-4">
-          <NotificationsBell />
-          <Link to="/favoris" className="relative" aria-label={t('header.favorites')} data-testid="favorites-link">
-            <Heart />
-            {favoritesCount > 0 && (
-              <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-paper">
-                {favoritesCount}
-              </span>
-            )}
-          </Link>
-          <AccountMenu />
-          <Link to={sellerLink} className="btn-primary hidden px-5 py-2 text-sm md:inline-flex">
-            {t('header.sell')}
-          </Link>
-          <LanguageSelector />
-          <Link to="/panier" className="relative" aria-label={t('header.cart')} data-testid="cart-link">
-            <ShoppingBag />
-            {count > 0 && (
-              <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-paper">
-                {count}
-              </span>
-            )}
-          </Link>
-        </div>
+            <form onSubmit={submitSearch} className="hidden flex-1 md:block">
+              <div className="relative mx-auto max-w-md">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+                <input
+                  className="input pl-9"
+                  placeholder={t('header.searchPlaceholder')}
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  data-testid="search-input"
+                />
+              </div>
+            </form>
+
+            <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+              <NotificationsBell />
+              <Link to="/favoris" className="relative" aria-label={t('header.favorites')} data-testid="favorites-link">
+                <Heart />
+                {favoritesCount > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-paper">
+                    {favoritesCount}
+                  </span>
+                )}
+              </Link>
+              <AccountMenu />
+              <Link to={sellerLink} className="btn-primary hidden px-5 py-2 text-sm md:inline-flex">
+                {t('header.sell')}
+              </Link>
+              <LanguageSelector />
+              <Link to="/panier" className="relative" aria-label={t('header.cart')} data-testid="cart-link">
+                <ShoppingBag />
+                {count > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-paper">
+                    {count}
+                  </span>
+                )}
+              </Link>
+            </div>
+          </>
+        ) : (
+          <>
+            <form onSubmit={submitSearch} className="hidden flex-1 md:block">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+                <input
+                  className="w-full rounded-full bg-gray-100 py-2.5 pl-9 pr-3 text-sm outline-none"
+                  placeholder={t('header.searchPlaceholder')}
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  data-testid="search-input"
+                />
+              </div>
+            </form>
+
+            <Link to="/" className="brand-logo min-w-0 shrink text-base sm:text-xl md:text-2xl">Occasion de luxe PJ international</Link>
+
+            <div className="flex shrink-0 items-center gap-3 sm:gap-6 md:flex-1 md:justify-end">
+              <Link to={sellerLink} className="btn-primary hidden px-5 py-2 text-sm md:inline-flex">
+                {t('header.sellGuest')}
+              </Link>
+              <Link to="/login" className="hidden text-sm font-medium hover:underline md:inline">
+                {t('header.login')}
+              </Link>
+              <Link to="/register" className="hidden text-sm font-medium hover:underline md:inline">
+                {t('header.register')}
+              </Link>
+              <Link to="/panier" className="relative" aria-label={t('header.cart')} data-testid="cart-link">
+                <ShoppingBag />
+                {count > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-paper">
+                    {count}
+                  </span>
+                )}
+              </Link>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Catégories desktop */}

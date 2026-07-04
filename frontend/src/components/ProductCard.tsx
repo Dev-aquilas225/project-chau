@@ -1,15 +1,27 @@
 import { memo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Heart, Leaf } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { Product } from '@/types';
 import { cn, formatPrice } from '@/lib/utils';
 import { useFavoritesStore } from '@/stores/favoritesStore';
+import { useAuth } from '@/features/auth/AuthProvider';
 
 export const ProductCard = memo(function ProductCard({ product }: { product: Product }) {
   const { t } = useTranslation('common');
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const isFav = useFavoritesStore((s) => s.ids.includes(product.id));
   const toggle = useFavoritesStore((s) => s.toggle);
+
+  const handleToggleFavorite = () => {
+    if (!user) {
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+      return;
+    }
+    toggle(product.id);
+  };
 
   return (
     <div className="group relative" data-testid="product-card">
@@ -35,7 +47,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
       </Link>
 
       <button
-        onClick={() => toggle(product.id)}
+        onClick={handleToggleFavorite}
         aria-label={isFav ? t('productCard.removeFromFavorites') : t('productCard.addToFavorites')}
         aria-pressed={isFav}
         data-testid="fav-toggle"

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Heart, Leaf, ShieldCheck, Store } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -8,16 +8,28 @@ import { FullPageSpinner } from '@/components/ui/Spinner';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cartStore';
 import { useFavoritesStore } from '@/stores/favoritesStore';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { ProductReviews } from '@/features/reviews/ProductReviews';
 
 export function ProductDetailPage() {
   const { t } = useTranslation('catalog');
   const { id = '' } = useParams();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { data: product, isLoading, isError } = useProduct(id);
   const addItem = useCartStore((s) => s.addItem);
   const isFav = useFavoritesStore((s) => s.ids.includes(id));
   const toggle = useFavoritesStore((s) => s.toggle);
   const [active, setActive] = useState(0);
+
+  const handleToggleFavorite = () => {
+    if (!user) {
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+      return;
+    }
+    toggle(id);
+  };
 
   if (isLoading) return <FullPageSpinner />;
   if (isError || !product) return <p className="py-16 text-center text-sale">{t('productDetail.notFound')}</p>;
@@ -71,7 +83,7 @@ export function ProductDetailPage() {
               {soldOut ? t('productDetail.soldOut') : t('productDetail.addToCart')}
             </button>
             <button
-              onClick={() => toggle(product.id)}
+              onClick={handleToggleFavorite}
               aria-label={t('productDetail.favoriteAriaLabel')}
               aria-pressed={isFav}
               className="btn-outline px-4"
