@@ -1,30 +1,36 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useCreateListing, useUpdateListing } from './hooks';
 import { uploadListingImage } from './api';
 import { useCategories } from '@/features/catalog/hooks';
 import type { Product } from '@/types';
 
-const schema = z.object({
-  name: z.string().min(1, 'Nom requis'),
-  brand: z.string().min(1, 'Marque requise'),
-  description: z.string().max(5000).optional().default(''),
-  price: z.coerce.number().positive('Prix invalide'),
-  categoryId: z.string().optional(),
-  stock: z.coerce.number().int().nonnegative('Stock invalide').default(1),
-  condition: z.string().optional().default(''),
-  size: z.string().optional().default(''),
-  location: z.string().optional().default(''),
-});
+function getListingSchema(t: TFunction) {
+  return z.object({
+    name: z.string().min(1, t('seller:listing.errors.nameRequired')),
+    brand: z.string().min(1, t('seller:listing.errors.brandRequired')),
+    description: z.string().max(5000).optional().default(''),
+    price: z.coerce.number().positive(t('seller:listing.errors.priceInvalid')),
+    categoryId: z.string().optional(),
+    stock: z.coerce.number().int().nonnegative(t('seller:listing.errors.stockInvalid')).default(1),
+    condition: z.string().optional().default(''),
+    size: z.string().optional().default(''),
+    location: z.string().optional().default(''),
+  });
+}
 
-type FormValues = z.input<typeof schema>;
+type FormValues = z.input<ReturnType<typeof getListingSchema>>;
 
 export function ListingForm({ listing }: { listing?: Product }) {
+  const { t } = useTranslation('seller');
+  const schema = useMemo(() => getListingSchema(t), [t]);
   const navigate = useNavigate();
   const create = useCreateListing();
   const update = useUpdateListing();
@@ -54,7 +60,7 @@ export function ListingForm({ listing }: { listing?: Product }) {
       const results = await Promise.all(Array.from(files).map(uploadListingImage));
       setImages((prev) => [...prev, ...results.map((r) => r.url)]);
     } catch {
-      toast.error('Échec du téléversement');
+      toast.error(t('listing.errors.uploadFailed'));
     } finally {
       setUploading(false);
     }
@@ -76,14 +82,14 @@ export function ListingForm({ listing }: { listing?: Product }) {
     try {
       if (listing) {
         await update.mutateAsync({ id: listing.id, input: payload });
-        toast.success('Annonce mise à jour');
+        toast.success(t('listing.updateSuccess'));
       } else {
         await create.mutateAsync(payload);
-        toast.success('Annonce créée !');
+        toast.success(t('listing.createSuccess'));
       }
       navigate('/espace-vendeur/annonces');
     } catch {
-      toast.error('Impossible de sauvegarder l\'annonce');
+      toast.error(t('listing.errors.saveFailed'));
     }
   };
 
@@ -93,7 +99,7 @@ export function ListingForm({ listing }: { listing?: Product }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {/* Images */}
       <div>
-        <label className="label">Photos</label>
+        <label className="label">{t('listing.form.photosLabel')}</label>
         <div className="flex flex-wrap gap-2">
           {images.map((url, i) => (
             <div key={i} className="group relative h-24 w-20 overflow-hidden rounded border border-line">
@@ -109,7 +115,7 @@ export function ListingForm({ listing }: { listing?: Product }) {
           ))}
           <label className="flex h-24 w-20 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-line hover:bg-gray-50">
             {uploading ? <Loader2 className="h-5 w-5 animate-spin text-muted" /> : <Upload className="h-5 w-5 text-muted" />}
-            <span className="mt-1 text-xs text-muted">Photo</span>
+            <span className="mt-1 text-xs text-muted">{t('listing.form.uploadLabel')}</span>
             <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => onFiles(e.target.files)} />
           </label>
         </div>
@@ -117,36 +123,36 @@ export function ListingForm({ listing }: { listing?: Product }) {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="label">Marque *</label>
+          <label className="label">{t('listing.form.brandLabel')}</label>
           <input className="input" {...register('brand')} />
           {errors.brand && <p className="error">{errors.brand.message}</p>}
         </div>
         <div>
-          <label className="label">Nom / Modèle *</label>
+          <label className="label">{t('listing.form.nameLabel')}</label>
           <input className="input" {...register('name')} />
           {errors.name && <p className="error">{errors.name.message}</p>}
         </div>
       </div>
 
       <div>
-        <label className="label">Description</label>
+        <label className="label">{t('listing.form.descriptionLabel')}</label>
         <textarea className="input" rows={4} {...register('description')} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div>
-          <label className="label">Prix (€) *</label>
+          <label className="label">{t('listing.form.priceLabel')}</label>
           <input className="input" type="number" step="0.01" min="0" {...register('price')} />
           {errors.price && <p className="error">{errors.price.message}</p>}
         </div>
         <div>
-          <label className="label">Stock</label>
+          <label className="label">{t('listing.form.stockLabel')}</label>
           <input className="input" type="number" min="0" {...register('stock')} />
         </div>
         <div>
-          <label className="label">Catégorie</label>
+          <label className="label">{t('listing.form.categoryLabel')}</label>
           <select className="input" {...register('categoryId')}>
-            <option value="">— Choisir —</option>
+            <option value="">{t('listing.form.categoryPlaceholder')}</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
@@ -154,25 +160,25 @@ export function ListingForm({ listing }: { listing?: Product }) {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div>
-          <label className="label">État</label>
-          <input className="input" placeholder="Ex : Très bon état" {...register('condition')} />
+          <label className="label">{t('listing.form.conditionLabel')}</label>
+          <input className="input" placeholder={t('listing.form.conditionPlaceholder')} {...register('condition')} />
         </div>
         <div>
-          <label className="label">Taille</label>
-          <input className="input" placeholder="Ex : 38, M…" {...register('size')} />
+          <label className="label">{t('listing.form.sizeLabel')}</label>
+          <input className="input" placeholder={t('listing.form.sizePlaceholder')} {...register('size')} />
         </div>
         <div>
-          <label className="label">Origine</label>
-          <input className="input" placeholder="Ex : Paris" {...register('location')} />
+          <label className="label">{t('listing.form.locationLabel')}</label>
+          <input className="input" placeholder={t('listing.form.locationPlaceholder')} {...register('location')} />
         </div>
       </div>
 
       <div className="flex gap-3 pt-2">
         <button type="submit" className="btn-primary" disabled={isPending}>
-          {isPending ? 'Sauvegarde…' : listing ? 'Mettre à jour' : 'Publier l\'annonce'}
+          {isPending ? t('listing.form.saving') : listing ? t('listing.form.update') : t('listing.form.publish')}
         </button>
         <button type="button" className="btn-outline" onClick={() => navigate('/espace-vendeur/annonces')}>
-          Annuler
+          {t('listing.form.cancel')}
         </button>
       </div>
     </form>

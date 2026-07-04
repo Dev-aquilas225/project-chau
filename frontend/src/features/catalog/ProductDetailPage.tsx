@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Heart, Leaf, ShieldCheck, Store } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useProduct } from './hooks';
 import { FullPageSpinner } from '@/components/ui/Spinner';
 import { cn, formatPrice } from '@/lib/utils';
@@ -10,6 +11,7 @@ import { useFavoritesStore } from '@/stores/favoritesStore';
 import { ProductReviews } from '@/features/reviews/ProductReviews';
 
 export function ProductDetailPage() {
+  const { t } = useTranslation('catalog');
   const { id = '' } = useParams();
   const { data: product, isLoading, isError } = useProduct(id);
   const addItem = useCartStore((s) => s.addItem);
@@ -18,7 +20,7 @@ export function ProductDetailPage() {
   const [active, setActive] = useState(0);
 
   if (isLoading) return <FullPageSpinner />;
-  if (isError || !product) return <p className="py-16 text-center text-sale">Produit introuvable.</p>;
+  if (isError || !product) return <p className="py-16 text-center text-sale">{t('productDetail.notFound')}</p>;
 
   const soldOut = product.stock === 0;
 
@@ -51,10 +53,10 @@ export function ProductDetailPage() {
           <p className="mt-3 text-2xl font-semibold">{formatPrice(product.price)}</p>
 
           <dl className="mt-5 space-y-1 text-sm">
-            {product.size && <div className="flex gap-2"><dt className="text-muted">Taille :</dt><dd>{product.size}</dd></div>}
-            {product.condition && <div className="flex gap-2"><dt className="text-muted">État :</dt><dd>{product.condition}</dd></div>}
+            {product.size && <div className="flex gap-2"><dt className="text-muted">{t('productDetail.size')}</dt><dd>{product.size}</dd></div>}
+            {product.condition && <div className="flex gap-2"><dt className="text-muted">{t('productDetail.condition')}</dt><dd>{product.condition}</dd></div>}
             {product.location && (
-              <div className="flex items-center gap-2"><dt className="text-muted">Origine :</dt>
+              <div className="flex items-center gap-2"><dt className="text-muted">{t('productDetail.origin')}</dt>
                 <dd className="flex items-center gap-1"><Leaf className="h-3.5 w-3.5" />{product.location}</dd></div>
             )}
           </dl>
@@ -64,13 +66,13 @@ export function ProductDetailPage() {
               className="btn-primary flex-1"
               disabled={soldOut}
               data-testid="add-to-cart"
-              onClick={() => { addItem(product); toast.success('Ajouté au panier'); }}
+              onClick={() => { addItem(product); toast.success(t('productDetail.addedToCart')); }}
             >
-              {soldOut ? 'Vendu' : 'Ajouter au panier'}
+              {soldOut ? t('productDetail.soldOut') : t('productDetail.addToCart')}
             </button>
             <button
               onClick={() => toggle(product.id)}
-              aria-label="Favori"
+              aria-label={t('productDetail.favoriteAriaLabel')}
               aria-pressed={isFav}
               className="btn-outline px-4"
             >
@@ -82,10 +84,9 @@ export function ProductDetailPage() {
 
           {/* Authenticité (inspiré de la capture) */}
           <div className="mt-8 rounded-lg border border-line p-4">
-            <p className="flex items-center gap-2 font-semibold"><ShieldCheck className="h-5 w-5" /> Information importante</p>
+            <p className="flex items-center gap-2 font-semibold"><ShieldCheck className="h-5 w-5" /> {t('productDetail.authenticity.title')}</p>
             <p className="mt-2 text-sm leading-relaxed text-muted">
-              Tous les services de vérification d'authenticité et les contrôles qualité sont effectués de manière
-              indépendante par Occasion de luxe PJ international. Les achats d'articles non authentiques sont remboursés intégralement.
+              {t('productDetail.authenticity.text')}
             </p>
           </div>
 
@@ -99,13 +100,13 @@ export function ProductDetailPage() {
                   to={`/catalogue?sellerId=${product.seller.id}`}
                   className="text-xs text-muted underline"
                 >
-                  Voir toutes ses annonces
+                  {t('productDetail.seller.viewAllListings')}
                 </Link>
               </div>
             </div>
           )}
 
-          <Link to="/catalogue" className="mt-6 inline-block text-sm underline">← Retour au catalogue</Link>
+          <Link to="/catalogue" className="mt-6 inline-block text-sm underline">{t('productDetail.backToCatalog')}</Link>
         </div>
       </div>
 

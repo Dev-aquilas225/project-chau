@@ -1,0 +1,70 @@
+{
+  "home": {
+    "hero": {
+      "title": "Moda de lujo, de segunda mano",
+      "subtitle": "Compra y vende piezas excepcionales autentificadas. Moda circular, precios accesibles.",
+      "cta": "Descubrir el catálogo"
+    },
+    "favorites": {
+      "title": "Nuestros favoritos",
+      "seeMore": "Ver más"
+    },
+    "new": {
+      "title": "Novedades",
+      "seeMore": "Ver más"
+    },
+    "journal": {
+      "title": "El Diario",
+      "items": [
+        {
+          "tag": "Historias de moda",
+          "title": "From Screen to Closet",
+          "description": "Los looks del nuevo programa de moda."
+        },
+        {
+          "tag": "Historias de moda",
+          "title": "Vintage Icons",
+          "description": "Las piezas emblemáticas que atraviesan las décadas."
+        }
+      ]
+    }
+  },
+  "catalog": {
+    "title": {
+      "default": "Catálogo",
+      "results": "Resultados: «{{search}}»"
+    },
+    "itemsCount_one": "{{count}} artículo",
+    "itemsCount_other": "{{count}} artículos",
+    "filters": {
+      "allCategories": "Todas las categorías",
+      "minPricePlaceholder": "Precio mín.",
+      "maxPricePlaceholder": "Precio máx."
+    },
+    "sort": {
+      "recent": "Más recientes",
+      "priceAsc": "Precio ascendente",
+      "priceDesc": "Precio descendente"
+    },
+    "error": "No se pudieron cargar los productos.",
+    "empty": "Ningún artículo coincide con tu búsqueda."
+  },
+  "productDetail": {
+    "notFound": "Producto no encontrado.",
+    "size": "Talla:",
+    "condition": "Estado:",
+    "origin": "Origen:",
+    "addToCart": "Añadir a la cesta",
+    "soldOut": "Vendido",
+    "addedToCart": "Añadido a la cesta",
+    "favoriteAriaLabel": "Favorito",
+    "authenticity": {
+      "title": "Información importante",
+      "text": "Todos los servicios de verificación de autenticidad y los controles de calidad se realizan de forma independiente por Occasion de luxe PJ international. Las compras de artículos no auténticos se reembolsan íntegramente."
+    },
+    "seller": {
+      "viewAllListings": "Ver todos sus anuncios"
+    },
+    "backToCatalog": "← Volver al catálogo"
+  }
+}

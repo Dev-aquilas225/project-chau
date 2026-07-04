@@ -1,0 +1,54 @@
+{
+  "header": {
+    "menu": "Menü",
+    "searchPlaceholder": "Nach Marke oder Artikel suchen…",
+    "searchPlaceholderMobile": "Suchen…",
+    "sell": "Verkaufen",
+    "favorites": "Favoriten",
+    "cart": "Warenkorb",
+    "all": "Alle"
+  },
+  "footer": {
+    "sections": ["Unsere Leistungen", "Kaufen", "Verkaufen", "Hilfe", "Occasion de luxe PJ international"],
+    "copyright": "©{{year}} Occasion de luxe PJ international"
+  },
+  "bottomNav": {
+    "home": "Start",
+    "favorites": "Favoriten",
+    "cart": "Warenkorb",
+    "orders": "Bestellungen",
+    "me": "Ich"
+  },
+  "accountMenu": {
+    "ariaLabel": "Mein Konto",
+    "login": "Anmelden",
+    "myAccount": "Mein Konto",
+    "myOrders": "Meine Bestellungen",
+    "logout": "Abmelden",
+    "photoAlt": "Profilfoto"
+  },
+  "languageSelector": {
+    "ariaLabel": "Sprache"
+  },
+  "productCard": {
+    "noImage": "Kein Bild",
+    "sold": "Verkauft",
+    "addToFavorites": "Zu Favoriten hinzufügen",
+    "removeFromFavorites": "Aus Favoriten entfernen"
+  },
+  "loading": "Lädt",
+  "notFound": "Seite nicht gefunden.",
+  "orderStatus": {
+    "pending": "Zahlung ausstehend",
+    "paid": "Bezahlt",
+    "shipped": "Versendet",
+    "delivered": "Geliefert",
+    "cancelled": "Storniert"
+  },
+  "errors": {
+    "unauthorized": "Falsche E-Mail-Adresse oder falsches Passwort.",
+    "forbidden": "Du hast keine Berechtigung für diese Aktion.",
+    "conflict": "Diese E-Mail-Adresse wird bereits verwendet.",
+    "generic": "Ein Fehler ist aufgetreten. Bitte versuche es erneut."
+  }
+}

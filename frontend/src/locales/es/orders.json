@@ -1,0 +1,13 @@
+{
+  "title": "Mis pedidos",
+  "empty": "Todavía no tienes pedidos.",
+  "browseCatalog": "Descubrir el catálogo",
+  "orderNumber": "Pedido #{{id}}",
+  "itemsCount_one": "{{count}} artículo",
+  "itemsCount_other": "{{count}} artículos",
+  "showTimeline": "Ver seguimiento",
+  "hideTimeline": "Ocultar seguimiento",
+  "timeline": {
+    "upcoming": "Pendiente"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Kundenbewertungen",
+  "starsAriaLabel": "{{value}} von 5",
+  "averageSummary": "{{average}} / 5 · {{count}} Bewertungen",
+  "yourRating": "Deine Bewertung",
+  "ratingAriaLabel_one": "{{count}} Stern",
+  "ratingAriaLabel_other": "{{count}} Sterne",
+  "comment": "Kommentar (optional)",
+  "commentPlaceholder": "Teile deine Erfahrung mit diesem Produkt…",
+  "submit": "Bewertung veröffentlichen",
+  "submitting": "Wird gesendet…",
+  "loginPrompt": "Melde dich an, um eine Bewertung abzugeben.",
+  "loading": "Bewertungen werden geladen…",
+  "empty": "Noch keine Bewertungen für dieses Produkt.",
+  "success": "Bewertung veröffentlicht, danke!",
+  "error": "Deine Bewertung konnte nicht gespeichert werden."
+}

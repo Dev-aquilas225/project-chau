@@ -1,0 +1,19 @@
+{
+  "empty": {
+    "message": "Tu carrito está vacío.",
+    "continueShopping": "Seguir comprando"
+  },
+  "title": "Mi carrito",
+  "quantity": {
+    "decrease": "Disminuir",
+    "increase": "Aumentar"
+  },
+  "remove": "Eliminar",
+  "summary": {
+    "subtotal": "Subtotal",
+    "shipping": "Envío",
+    "shippingNote": "Se calcula en el siguiente paso",
+    "total": "Total"
+  },
+  "checkoutButton": "Finalizar compra"
+}

@@ -22,11 +22,3 @@ export function useCreateOrder() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['orders'] }),
   });
 }
-
-export const ORDER_STATUS_LABEL: Record<string, string> = {
-  pending: 'En attente de paiement',
-  paid: 'Payée',
-  shipped: 'Expédiée',
-  delivered: 'Livrée',
-  cancelled: 'Annulée',
-};

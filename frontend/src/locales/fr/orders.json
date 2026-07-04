@@ -1,0 +1,13 @@
+{
+  "title": "Mes commandes",
+  "empty": "Aucune commande pour le moment.",
+  "browseCatalog": "Découvrir le catalogue",
+  "orderNumber": "Commande #{{id}}",
+  "itemsCount_one": "{{count}} article",
+  "itemsCount_other": "{{count}} articles",
+  "showTimeline": "Voir le suivi",
+  "hideTimeline": "Masquer le suivi",
+  "timeline": {
+    "upcoming": "En attente"
+  }
+}

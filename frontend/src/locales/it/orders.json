@@ -1,0 +1,13 @@
+{
+  "title": "I miei ordini",
+  "empty": "Nessun ordine per ora.",
+  "browseCatalog": "Scopri il catalogo",
+  "orderNumber": "Ordine #{{id}}",
+  "itemsCount_one": "{{count}} articolo",
+  "itemsCount_other": "{{count}} articoli",
+  "showTimeline": "Mostra tracciamento",
+  "hideTimeline": "Nascondi tracciamento",
+  "timeline": {
+    "upcoming": "In attesa"
+  }
+}

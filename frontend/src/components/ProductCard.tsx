@@ -1,11 +1,13 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Leaf } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { Product } from '@/types';
 import { cn, formatPrice } from '@/lib/utils';
 import { useFavoritesStore } from '@/stores/favoritesStore';
 
 export const ProductCard = memo(function ProductCard({ product }: { product: Product }) {
+  const { t } = useTranslation('common');
   const isFav = useFavoritesStore((s) => s.ids.includes(product.id));
   const toggle = useFavoritesStore((s) => s.toggle);
 
@@ -21,12 +23,12 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
               className="h-full w-full object-cover transition group-hover:scale-[1.02]"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-muted">Pas d'image</div>
+            <div className="flex h-full items-center justify-center text-muted">{t('productCard.noImage')}</div>
           )}
           {product.weLove && <span className="badge absolute left-2 top-2 bg-white/90">WE LOVE</span>}
           {product.stock === 0 && (
             <span className="absolute inset-x-0 bottom-0 bg-ink/80 py-1 text-center text-xs font-medium text-paper">
-              Vendu
+              {t('productCard.sold')}
             </span>
           )}
         </div>
@@ -34,7 +36,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
 
       <button
         onClick={() => toggle(product.id)}
-        aria-label={isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+        aria-label={isFav ? t('productCard.removeFromFavorites') : t('productCard.addToFavorites')}
         aria-pressed={isFav}
         data-testid="fav-toggle"
         className="absolute right-2 top-2 rounded-full bg-white/80 p-1.5 backdrop-blur"

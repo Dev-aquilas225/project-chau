@@ -1,0 +1,17 @@
+{
+  "title": "Avis clients",
+  "starsAriaLabel": "{{value}} sur 5",
+  "averageSummary": "{{average}} / 5 · {{count}} avis",
+  "yourRating": "Votre note",
+  "ratingAriaLabel_one": "{{count}} étoile",
+  "ratingAriaLabel_other": "{{count}} étoiles",
+  "comment": "Commentaire (optionnel)",
+  "commentPlaceholder": "Partagez votre expérience avec ce produit…",
+  "submit": "Publier mon avis",
+  "submitting": "Envoi…",
+  "loginPrompt": "Connectez-vous pour laisser un avis.",
+  "loading": "Chargement des avis…",
+  "empty": "Aucun avis pour ce produit.",
+  "success": "Avis publié, merci !",
+  "error": "Impossible d'enregistrer votre avis."
+}

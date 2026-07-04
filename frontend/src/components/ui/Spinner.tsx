@@ -1,8 +1,10 @@
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 export function Spinner({ className }: { className?: string }) {
-  return <Loader2 className={cn('h-6 w-6 animate-spin text-muted', className)} aria-label="Chargement" />;
+  const { t } = useTranslation('common');
+  return <Loader2 className={cn('h-6 w-6 animate-spin text-muted', className)} aria-label={t('loading')} />;
 }
 
 export function FullPageSpinner() {

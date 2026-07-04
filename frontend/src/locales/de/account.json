@@ -1,0 +1,35 @@
+{
+  "title": "Mein Konto",
+  "profile": {
+    "heading": "Profilinformationen",
+    "photoAlt": "Profilfoto",
+    "photoLabel": "Dein Profilfoto",
+    "choosePhoto": "Foto auswählen",
+    "usernameLabel": "Benutzername",
+    "bioLabel": "Über dich",
+    "bioPlaceholder": "Stell dich den anderen Mitgliedern vor",
+    "positionLabel": "Mein Standort",
+    "countryPlaceholder": "Land",
+    "cityPlaceholder": "Stadt",
+    "save": "Speichern"
+  },
+  "addresses": {
+    "heading": "Adressen",
+    "empty": "Noch keine Adresse gespeichert.",
+    "fullNamePlaceholder": "Vollständiger Name",
+    "addressPlaceholder": "Adresse",
+    "cityPlaceholder": "Stadt",
+    "zipPlaceholder": "Postleitzahl",
+    "add": "Adresse hinzufügen"
+  },
+  "toasts": {
+    "profileUpdated": "Profil aktualisiert",
+    "updateError": "Fehler bei der Aktualisierung",
+    "photoUpdated": "Profilfoto aktualisiert",
+    "uploadFailed": "Hochladen fehlgeschlagen",
+    "addressAdded": "Adresse hinzugefügt",
+    "addressIncomplete": "Unvollständige Adresse",
+    "genericError": "Fehler"
+  },
+  "logout": "Abmelden"
+}

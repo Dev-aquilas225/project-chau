@@ -1,0 +1,54 @@
+{
+  "header": {
+    "menu": "Menu",
+    "searchPlaceholder": "Search for a brand, an item…",
+    "searchPlaceholderMobile": "Search…",
+    "sell": "Sell",
+    "favorites": "Favorites",
+    "cart": "Cart",
+    "all": "All"
+  },
+  "footer": {
+    "sections": ["Our services", "Buy", "Sell", "Help", "Occasion de luxe PJ international"],
+    "copyright": "©{{year}} Occasion de luxe PJ international"
+  },
+  "bottomNav": {
+    "home": "Home",
+    "favorites": "Favorites",
+    "cart": "Cart",
+    "orders": "Orders",
+    "me": "Me"
+  },
+  "accountMenu": {
+    "ariaLabel": "My account",
+    "login": "Log in",
+    "myAccount": "My account",
+    "myOrders": "My orders",
+    "logout": "Log out",
+    "photoAlt": "Profile photo"
+  },
+  "languageSelector": {
+    "ariaLabel": "Language"
+  },
+  "productCard": {
+    "noImage": "No image",
+    "sold": "Sold",
+    "addToFavorites": "Add to favorites",
+    "removeFromFavorites": "Remove from favorites"
+  },
+  "loading": "Loading",
+  "notFound": "Page not found.",
+  "orderStatus": {
+    "pending": "Awaiting payment",
+    "paid": "Paid",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled"
+  },
+  "errors": {
+    "unauthorized": "Incorrect email or password.",
+    "forbidden": "You don't have permission for this action.",
+    "conflict": "This email address is already in use.",
+    "generic": "Something went wrong. Please try again."
+  }
+}

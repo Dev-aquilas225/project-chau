@@ -1,0 +1,70 @@
+{
+  "home": {
+    "hero": {
+      "title": "Moda di lusso, di seconda mano",
+      "subtitle": "Compra e vendi pezzi eccezionali autenticati. Moda circolare, prezzi accessibili.",
+      "cta": "Scopri il catalogo"
+    },
+    "favorites": {
+      "title": "I nostri preferiti",
+      "seeMore": "Vedi altro"
+    },
+    "new": {
+      "title": "Novità",
+      "seeMore": "Vedi altro"
+    },
+    "journal": {
+      "title": "Il Journal",
+      "items": [
+        {
+          "tag": "Storie di moda",
+          "title": "From Screen to Closet",
+          "description": "I look del nuovo show di moda."
+        },
+        {
+          "tag": "Storie di moda",
+          "title": "Vintage Icons",
+          "description": "I pezzi iconici che attraversano i decenni."
+        }
+      ]
+    }
+  },
+  "catalog": {
+    "title": {
+      "default": "Catalogo",
+      "results": "Risultati: «{{search}}»"
+    },
+    "itemsCount_one": "{{count}} articolo",
+    "itemsCount_other": "{{count}} articoli",
+    "filters": {
+      "allCategories": "Tutte le categorie",
+      "minPricePlaceholder": "Prezzo min",
+      "maxPricePlaceholder": "Prezzo max"
+    },
+    "sort": {
+      "recent": "Più recenti",
+      "priceAsc": "Prezzo crescente",
+      "priceDesc": "Prezzo decrescente"
+    },
+    "error": "Impossibile caricare i prodotti.",
+    "empty": "Nessun articolo corrisponde alla tua ricerca."
+  },
+  "productDetail": {
+    "notFound": "Prodotto non trovato.",
+    "size": "Taglia:",
+    "condition": "Condizione:",
+    "origin": "Origine:",
+    "addToCart": "Aggiungi al carrello",
+    "soldOut": "Venduto",
+    "addedToCart": "Aggiunto al carrello",
+    "favoriteAriaLabel": "Preferito",
+    "authenticity": {
+      "title": "Informazione importante",
+      "text": "Tutti i servizi di verifica dell'autenticità e i controlli di qualità sono effettuati in modo indipendente da Occasion de luxe PJ international. Gli acquisti di articoli non autentici vengono rimborsati integralmente."
+    },
+    "seller": {
+      "viewAllListings": "Vedi tutti i suoi annunci"
+    },
+    "backToCatalog": "← Torna al catalogo"
+  }
+}

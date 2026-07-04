@@ -1,10 +1,8 @@
 import { Package } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useSellerOrders } from './hooks';
 import { formatPrice, formatDate, cn } from '@/lib/utils';
 
-const STATUS_LABEL: Record<string, string> = {
-  pending: 'En attente', paid: 'Payée', shipped: 'Expédiée', delivered: 'Livrée', cancelled: 'Annulée',
-};
 const STATUS_COLOR: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
   paid: 'bg-blue-100 text-blue-700',
@@ -14,18 +12,19 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 export function SellerOrdersPage() {
+  const { t } = useTranslation(['seller', 'common']);
   const { data: orders = [], isLoading } = useSellerOrders();
 
   return (
     <div className="container-app py-8">
-      <h1 className="mb-6 text-2xl font-bold">Commandes reçues</h1>
+      <h1 className="mb-6 text-2xl font-bold">{t('sellerOrders.title')}</h1>
 
       {isLoading ? (
-        <p className="text-muted">Chargement…</p>
+        <p className="text-muted">{t('sellerOrders.loading')}</p>
       ) : orders.length === 0 ? (
         <div className="py-16 text-center">
           <Package className="mx-auto mb-3 h-12 w-12 text-muted" />
-          <p className="text-muted">Aucune commande pour le moment.</p>
+          <p className="text-muted">{t('sellerOrders.empty')}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -37,12 +36,12 @@ export function SellerOrdersPage() {
                   <p className="text-sm text-muted">{formatDate(order.createdAt)}</p>
                 </div>
                 <span className={cn('rounded-full px-2 py-0.5 text-xs font-medium', STATUS_COLOR[order.status] ?? '')}>
-                  {STATUS_LABEL[order.status] ?? order.status}
+                  {t(`common:orderStatus.${order.status}`, { defaultValue: order.status })}
                 </span>
                 <div className="text-right">
                   <p className="font-semibold">{formatPrice(order.total)}</p>
                   {order.sellerPayout != null && (
-                    <p className="text-xs text-muted">Votre part : {formatPrice(order.sellerPayout)}</p>
+                    <p className="text-xs text-muted">{t('sellerOrders.yourShare')} {formatPrice(order.sellerPayout)}</p>
                   )}
                 </div>
               </div>
@@ -56,7 +55,7 @@ export function SellerOrdersPage() {
               </ul>
               {order.shippingAddress && (
                 <p className="mt-2 text-xs text-muted">
-                  Livraison : {order.shippingAddress.fullName}, {order.shippingAddress.line1}, {order.shippingAddress.zip} {order.shippingAddress.city}
+                  {t('sellerOrders.shippingLabel')} {order.shippingAddress.fullName}, {order.shippingAddress.line1}, {order.shippingAddress.zip} {order.shippingAddress.city}
                 </p>
               )}
             </div>

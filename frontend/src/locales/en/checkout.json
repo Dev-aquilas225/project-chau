@@ -1,0 +1,36 @@
+{
+  "title": "Checkout",
+  "empty": "Your cart is empty.",
+  "address": {
+    "sectionTitle": "Shipping address",
+    "fullNamePlaceholder": "Full name",
+    "line1Placeholder": "Address",
+    "cityPlaceholder": "City",
+    "zipPlaceholder": "ZIP code",
+    "countryPlaceholder": "Country",
+    "requiredError": "Please fill in all fields."
+  },
+  "payment": {
+    "sectionTitle": "Payment",
+    "card": "Credit card (Visa, Mastercard, Amex)",
+    "paypal": "PayPal",
+    "klarna": "Klarna — pay in 3 installments",
+    "simulatedNote": "Simulated payment for demonstration purposes. In production, integrate a PSP (Stripe…) via a Cloud Function — no payment secret on the client side."
+  },
+  "summary": {
+    "title": "Summary",
+    "promoPlaceholder": "Promo code",
+    "promoApply": "OK",
+    "subtotal": "Subtotal",
+    "discount": "Discount ({{code}})",
+    "total": "Total",
+    "processing": "Processing…",
+    "payButton": "Pay {{amount}}"
+  },
+  "toasts": {
+    "promoApplied": "Promo code applied",
+    "promoInvalid": "Invalid code",
+    "orderConfirmed": "Order confirmed!",
+    "paymentFailed": "Payment failed. Please try again."
+  }
+}

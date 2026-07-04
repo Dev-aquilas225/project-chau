@@ -1,0 +1,70 @@
+{
+  "home": {
+    "hero": {
+      "title": "La mode de luxe, en seconde main",
+      "subtitle": "Achetez et vendez des pièces d'exception authentifiées. Mode circulaire, prix accessibles.",
+      "cta": "Découvrir le catalogue"
+    },
+    "favorites": {
+      "title": "Nos coups de cœur",
+      "seeMore": "Voir plus"
+    },
+    "new": {
+      "title": "Nouveautés",
+      "seeMore": "Voir plus"
+    },
+    "journal": {
+      "title": "Le Journal",
+      "items": [
+        {
+          "tag": "Histoires de mode",
+          "title": "From Screen to Closet",
+          "description": "Les looks de la nouvelle émission mode."
+        },
+        {
+          "tag": "Histoires de mode",
+          "title": "Vintage Icons",
+          "description": "Les pièces signatures qui traversent les décennies."
+        }
+      ]
+    }
+  },
+  "catalog": {
+    "title": {
+      "default": "Catalogue",
+      "results": "Résultats : « {{search}} »"
+    },
+    "itemsCount_one": "{{count}} article",
+    "itemsCount_other": "{{count}} articles",
+    "filters": {
+      "allCategories": "Toutes catégories",
+      "minPricePlaceholder": "Prix min",
+      "maxPricePlaceholder": "Prix max"
+    },
+    "sort": {
+      "recent": "Plus récents",
+      "priceAsc": "Prix croissant",
+      "priceDesc": "Prix décroissant"
+    },
+    "error": "Impossible de charger les produits.",
+    "empty": "Aucun article ne correspond à votre recherche."
+  },
+  "productDetail": {
+    "notFound": "Produit introuvable.",
+    "size": "Taille :",
+    "condition": "État :",
+    "origin": "Origine :",
+    "addToCart": "Ajouter au panier",
+    "soldOut": "Vendu",
+    "addedToCart": "Ajouté au panier",
+    "favoriteAriaLabel": "Favori",
+    "authenticity": {
+      "title": "Information importante",
+      "text": "Tous les services de vérification d'authenticité et les contrôles qualité sont effectués de manière indépendante par Occasion de luxe PJ international. Les achats d'articles non authentiques sont remboursés intégralement."
+    },
+    "seller": {
+      "viewAllListings": "Voir toutes ses annonces"
+    },
+    "backToCatalog": "← Retour au catalogue"
+  }
+}

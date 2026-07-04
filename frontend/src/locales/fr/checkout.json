@@ -1,0 +1,36 @@
+{
+  "title": "Commande",
+  "empty": "Votre panier est vide.",
+  "address": {
+    "sectionTitle": "Adresse de livraison",
+    "fullNamePlaceholder": "Nom complet",
+    "line1Placeholder": "Adresse",
+    "cityPlaceholder": "Ville",
+    "zipPlaceholder": "Code postal",
+    "countryPlaceholder": "Pays",
+    "requiredError": "Veuillez remplir tous les champs."
+  },
+  "payment": {
+    "sectionTitle": "Paiement",
+    "card": "Carte bancaire (Visa, Mastercard, Amex)",
+    "paypal": "PayPal",
+    "klarna": "Klarna — paiement en 3x",
+    "simulatedNote": "Paiement simulé en démonstration. En production, intégrer un PSP (Stripe…) via une Cloud Function — aucun secret de paiement côté client."
+  },
+  "summary": {
+    "title": "Récapitulatif",
+    "promoPlaceholder": "Code promo",
+    "promoApply": "OK",
+    "subtotal": "Sous-total",
+    "discount": "Remise ({{code}})",
+    "total": "Total",
+    "processing": "Traitement…",
+    "payButton": "Payer {{amount}}"
+  },
+  "toasts": {
+    "promoApplied": "Code promo appliqué",
+    "promoInvalid": "Code invalide",
+    "orderConfirmed": "Commande confirmée !",
+    "paymentFailed": "Le paiement n'a pas abouti. Réessayez."
+  }
+}

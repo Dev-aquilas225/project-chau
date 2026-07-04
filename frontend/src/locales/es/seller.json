@@ -1,0 +1,162 @@
+{
+  "becomeSeller": {
+    "steps": { "store": "Tienda", "identity": "Identidad", "documents": "Documentos", "recap": "Resumen" },
+    "stepIndicator": "Paso {{current}}/{{total}} — {{label}}",
+    "idTypeLabel": { "national_id": "Documento nacional de identidad", "passport": "Pasaporte" },
+    "errors": {
+      "storeNameRequired": "Nombre de la tienda obligatorio",
+      "identityIncomplete": "Completa toda la información de identidad",
+      "idDocumentRequired": "Sube tu documento de identidad",
+      "idDocumentBackRequired": "Sube el reverso de tu documento de identidad",
+      "profilePhotoRequired": "Sube tu foto de perfil",
+      "submitFailed": "No se pudo enviar tu solicitud",
+      "idDocumentUploadFailed": "Error al subir el documento de identidad",
+      "idDocumentBackUploadFailed": "Error al subir el reverso del documento de identidad",
+      "profilePhotoUploadFailed": "Error al subir la foto de perfil"
+    },
+    "submitSuccess": "Solicitud enviada: tu cuenta está en revisión.",
+    "pending": {
+      "title": "Solicitud pendiente",
+      "text": "Tu solicitud está siendo revisada. Te avisaremos en cuanto sea aprobada.",
+      "backHome": "Volver al inicio"
+    },
+    "rejected": {
+      "title": "Solicitud rechazada",
+      "text": "Tu solicitud no fue aceptada. Contacta con soporte para más información.",
+      "reasonLabel": "Motivo indicado por nuestro equipo:"
+    },
+    "heading": {
+      "title": "Conviértete en vendedor",
+      "subtitle": "Únete a nuestro marketplace y ofrece tus piezas de lujo a nuestra comunidad."
+    },
+    "store": {
+      "nameLabel": "Nombre de tu tienda *",
+      "namePlaceholder": "Ej.: Elegancia Parisina",
+      "bioLabel": "Presentación (opcional)",
+      "bioPlaceholder": "Describe tu tienda, tu especialidad…",
+      "benefitsTitle": "Lo que obtienes",
+      "benefit1": "Publicación ilimitada de artículos",
+      "benefit2": "Pago seguro mediante depósito en garantía",
+      "benefit3": "Panel de control de vendedor dedicado"
+    },
+    "identity": {
+      "title": "Verificación de identidad",
+      "subtitle": "Necesaria para activar tu cuenta de vendedor.",
+      "idTypeLabel": "Tipo de documento *",
+      "idNumberLabel": "Número de documento *",
+      "idCountryLabel": "País de expedición *",
+      "idCountryPlaceholder": "Ej.: Francia",
+      "dateOfBirthLabel": "Fecha de nacimiento *",
+      "fullNameLabel": "Nombre completo (como figura en el documento) *"
+    },
+    "documents": {
+      "idDocumentFrontNationalLabel": "Documento de identidad (anverso) *",
+      "idDocumentFrontPassportLabel": "Documento de identidad (foto) *",
+      "idDocumentBackLabel": "Documento de identidad (reverso) *",
+      "profilePhotoLabel": "Foto de perfil *",
+      "uploadLabel": "Foto"
+    },
+    "recap": {
+      "title": "Resumen",
+      "subtitle": "Revisa tu información antes de enviar tu solicitud.",
+      "storeTitle": "Tienda",
+      "edit": "Editar",
+      "identityTitle": "Identidad",
+      "idType": "Tipo de documento",
+      "idNumber": "Número",
+      "idCountry": "País de expedición",
+      "dateOfBirth": "Fecha de nacimiento",
+      "fullName": "Nombre completo",
+      "documentsTitle": "Documentos",
+      "front": "Anverso",
+      "frontPhoto": "Foto",
+      "back": "Reverso",
+      "profile": "Perfil"
+    },
+    "nav": {
+      "back": "Atrás",
+      "next": "Siguiente",
+      "submitting": "Enviando…",
+      "submit": "Confirmar y enviar"
+    }
+  },
+  "listing": {
+    "form": {
+      "photosLabel": "Fotos",
+      "uploadLabel": "Foto",
+      "brandLabel": "Marca *",
+      "nameLabel": "Nombre / Modelo *",
+      "descriptionLabel": "Descripción",
+      "priceLabel": "Precio (€) *",
+      "stockLabel": "Stock",
+      "categoryLabel": "Categoría",
+      "categoryPlaceholder": "— Elegir —",
+      "conditionLabel": "Estado",
+      "conditionPlaceholder": "Ej.: Muy buen estado",
+      "sizeLabel": "Talla",
+      "sizePlaceholder": "Ej.: 38, M…",
+      "locationLabel": "Origen",
+      "locationPlaceholder": "Ej.: París",
+      "saving": "Guardando…",
+      "update": "Actualizar",
+      "publish": "Publicar anuncio",
+      "cancel": "Cancelar"
+    },
+    "errors": {
+      "nameRequired": "Nombre obligatorio",
+      "brandRequired": "Marca obligatoria",
+      "priceInvalid": "Precio no válido",
+      "stockInvalid": "Stock no válido",
+      "uploadFailed": "Error al subir el archivo",
+      "saveFailed": "No se pudo guardar el anuncio"
+    },
+    "updateSuccess": "Anuncio actualizado",
+    "createSuccess": "¡Anuncio creado!"
+  },
+  "myListings": {
+    "title": "Mis anuncios",
+    "newListing": "Nuevo anuncio",
+    "loading": "Cargando…",
+    "empty": "Todavía no tienes anuncios.",
+    "createFirst": "Crear mi primer anuncio",
+    "stockLabel": "Stock:",
+    "edit": "Editar",
+    "archiveConfirm": "¿Archivar \"{{name}}\"?",
+    "archiveSuccess": "Artículo archivado",
+    "archiveFailed": "No se pudo archivar el artículo",
+    "listingStatus": { "active": "Activo", "draft": "Borrador", "archived": "Archivado" }
+  },
+  "dashboard": {
+    "title": "Mi espacio de vendedor",
+    "stats": {
+      "activeListings": "Artículos activos",
+      "ordersReceived": "Pedidos recibidos",
+      "revenue": "Ingresos (neto estimado)"
+    },
+    "actions": {
+      "myListingsTitle": "Mis anuncios",
+      "myListingsSubtitle": "Gestionar mis artículos en venta",
+      "newListingTitle": "Nuevo anuncio",
+      "newListingSubtitle": "Poner un artículo a la venta",
+      "ordersTitle": "Pedidos recibidos",
+      "ordersSubtitle": "Seguir las compras de mis artículos"
+    }
+  },
+  "sellerOrders": {
+    "title": "Pedidos recibidos",
+    "loading": "Cargando…",
+    "empty": "Todavía no hay pedidos.",
+    "yourShare": "Tu parte:",
+    "shippingLabel": "Envío:"
+  },
+  "editListing": {
+    "backToListings": "Mis anuncios",
+    "title": "Editar anuncio",
+    "loading": "Cargando…",
+    "notFound": "Anuncio no encontrado."
+  },
+  "createListing": {
+    "backToListings": "Mis anuncios",
+    "title": "Nuevo anuncio"
+  }
+}

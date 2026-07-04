@@ -1,0 +1,13 @@
+{
+  "title": "Meine Bestellungen",
+  "empty": "Noch keine Bestellungen.",
+  "browseCatalog": "Katalog entdecken",
+  "orderNumber": "Bestellung #{{id}}",
+  "itemsCount_one": "{{count}} Artikel",
+  "itemsCount_other": "{{count}} Artikel",
+  "showTimeline": "Sendungsverfolgung anzeigen",
+  "hideTimeline": "Sendungsverfolgung ausblenden",
+  "timeline": {
+    "upcoming": "Ausstehend"
+  }
+}

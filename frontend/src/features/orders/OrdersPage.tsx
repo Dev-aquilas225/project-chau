@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Package, ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useMyOrders, useOrder, ORDER_STATUS_LABEL } from './hooks';
+import { useMyOrders, useOrder } from './hooks';
 import { OrderTimeline } from './components/OrderTimeline';
 import { Spinner } from '@/components/ui/Spinner';
 import { cn, formatPrice, formatDate } from '@/lib/utils';
@@ -19,6 +20,7 @@ const statusColor: Record<OrderStatus, string> = {
 };
 
 export function OrdersPage() {
+  const { t } = useTranslation(['orders', 'common']);
   const { user } = useAuth();
   const { data: orders, isLoading } = useMyOrders(user?.id);
   const [params] = useSearchParams();
@@ -31,15 +33,15 @@ export function OrdersPage() {
     return (
       <div className="container-app py-16 text-center text-muted">
         <Package className="mx-auto mb-3 h-10 w-10" />
-        <p>Aucune commande pour le moment.</p>
-        <Link to="/catalogue" className="btn-outline mt-4">Découvrir le catalogue</Link>
+        <p>{t('empty')}</p>
+        <Link to="/catalogue" className="btn-outline mt-4">{t('browseCatalog')}</Link>
       </div>
     );
   }
 
   return (
     <div className="container-app py-6">
-      <h1 className="mb-6 text-2xl">Mes commandes</h1>
+      <h1 className="mb-6 text-2xl">{t('title')}</h1>
       <div className="space-y-4">
         {orders.map((o) => {
           const stepIndex = STATUS_STEPS.indexOf(o.status);
@@ -47,11 +49,11 @@ export function OrdersPage() {
             <article key={o.id} className={cn('rounded-lg border p-4', o.id === last ? 'border-ink' : 'border-line')}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="text-sm text-muted">Commande #{o.id.slice(0, 8).toUpperCase()}</p>
+                  <p className="text-sm text-muted">{t('orderNumber', { id: o.id.slice(0, 8).toUpperCase() })}</p>
                   <p className="text-xs text-muted">{formatDate(o.createdAt)}</p>
                 </div>
                 <span className={cn('rounded-full px-3 py-1 text-xs font-medium', statusColor[o.status])}>
-                  {ORDER_STATUS_LABEL[o.status]}
+                  {t(`common:orderStatus.${o.status}`)}
                 </span>
               </div>
 
@@ -78,7 +80,7 @@ export function OrdersPage() {
               </ul>
 
               <div className="mt-3 flex justify-between border-t border-line pt-3 text-sm">
-                <span className="text-muted">{o.items.reduce((n, i) => n + i.qty, 0)} article(s)</span>
+                <span className="text-muted">{t('itemsCount', { count: o.items.reduce((n, i) => n + i.qty, 0) })}</span>
                 <span className="font-semibold">{formatPrice(o.total)}</span>
               </div>
 
@@ -88,7 +90,7 @@ export function OrdersPage() {
                 onClick={() => setExpanded(expanded === o.id ? null : o.id)}
                 className="mt-3 flex w-full items-center justify-center gap-1 border-t border-line pt-3 text-sm text-muted hover:text-ink"
               >
-                {expanded === o.id ? <>Masquer le suivi <ChevronUp className="h-4 w-4" /></> : <>Voir le suivi <ChevronDown className="h-4 w-4" /></>}
+                {expanded === o.id ? <>{t('hideTimeline')} <ChevronUp className="h-4 w-4" /></> : <>{t('showTimeline')} <ChevronDown className="h-4 w-4" /></>}
               </button>
 
               {expanded === o.id && <OrderTimelineSection orderId={o.id} fallbackStatus={o.status} />}

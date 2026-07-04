@@ -1,0 +1,70 @@
+{
+  "home": {
+    "hero": {
+      "title": "Luxusmode aus zweiter Hand",
+      "subtitle": "Kaufen und verkaufen Sie authentifizierte, außergewöhnliche Stücke. Kreislaufmode zu erschwinglichen Preisen.",
+      "cta": "Katalog entdecken"
+    },
+    "favorites": {
+      "title": "Unsere Favoriten",
+      "seeMore": "Mehr anzeigen"
+    },
+    "new": {
+      "title": "Neuheiten",
+      "seeMore": "Mehr anzeigen"
+    },
+    "journal": {
+      "title": "Das Journal",
+      "items": [
+        {
+          "tag": "Mode-Geschichten",
+          "title": "From Screen to Closet",
+          "description": "Die Looks der neuen Modesendung."
+        },
+        {
+          "tag": "Mode-Geschichten",
+          "title": "Vintage Icons",
+          "description": "Die Signature-Stücke, die die Jahrzehnte überdauern."
+        }
+      ]
+    }
+  },
+  "catalog": {
+    "title": {
+      "default": "Katalog",
+      "results": "Ergebnisse: „{{search}}“"
+    },
+    "itemsCount_one": "{{count}} Artikel",
+    "itemsCount_other": "{{count}} Artikel",
+    "filters": {
+      "allCategories": "Alle Kategorien",
+      "minPricePlaceholder": "Mindestpreis",
+      "maxPricePlaceholder": "Höchstpreis"
+    },
+    "sort": {
+      "recent": "Neueste zuerst",
+      "priceAsc": "Preis aufsteigend",
+      "priceDesc": "Preis absteigend"
+    },
+    "error": "Produkte konnten nicht geladen werden.",
+    "empty": "Kein Artikel entspricht Ihrer Suche."
+  },
+  "productDetail": {
+    "notFound": "Produkt nicht gefunden.",
+    "size": "Größe:",
+    "condition": "Zustand:",
+    "origin": "Herkunft:",
+    "addToCart": "In den Warenkorb",
+    "soldOut": "Verkauft",
+    "addedToCart": "Zum Warenkorb hinzugefügt",
+    "favoriteAriaLabel": "Favorit",
+    "authenticity": {
+      "title": "Wichtiger Hinweis",
+      "text": "Alle Echtheitsprüfungen und Qualitätskontrollen werden unabhängig von Occasion de luxe PJ international durchgeführt. Käufe nicht authentischer Artikel werden vollständig erstattet."
+    },
+    "seller": {
+      "viewAllListings": "Alle Anzeigen ansehen"
+    },
+    "backToCatalog": "← Zurück zum Katalog"
+  }
+}

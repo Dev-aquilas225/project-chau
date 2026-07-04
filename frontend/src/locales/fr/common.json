@@ -1,0 +1,54 @@
+{
+  "header": {
+    "menu": "Menu",
+    "searchPlaceholder": "Rechercher une marque, un article…",
+    "searchPlaceholderMobile": "Rechercher…",
+    "sell": "Vendre",
+    "favorites": "Favoris",
+    "cart": "Panier",
+    "all": "Tout"
+  },
+  "footer": {
+    "sections": ["Nos services", "Acheter", "Vendre", "Aide", "Occasion de luxe PJ international"],
+    "copyright": "©{{year}} Occasion de luxe PJ international"
+  },
+  "bottomNav": {
+    "home": "Accueil",
+    "favorites": "Favoris",
+    "cart": "Panier",
+    "orders": "Commandes",
+    "me": "Moi"
+  },
+  "accountMenu": {
+    "ariaLabel": "Mon compte",
+    "login": "Connexion",
+    "myAccount": "Mon compte",
+    "myOrders": "Mes commandes",
+    "logout": "Déconnexion",
+    "photoAlt": "Photo de profil"
+  },
+  "languageSelector": {
+    "ariaLabel": "Langue"
+  },
+  "productCard": {
+    "noImage": "Pas d'image",
+    "sold": "Vendu",
+    "addToFavorites": "Ajouter aux favoris",
+    "removeFromFavorites": "Retirer des favoris"
+  },
+  "loading": "Chargement",
+  "notFound": "Page introuvable.",
+  "orderStatus": {
+    "pending": "En attente de paiement",
+    "paid": "Payée",
+    "shipped": "Expédiée",
+    "delivered": "Livrée",
+    "cancelled": "Annulée"
+  },
+  "errors": {
+    "unauthorized": "Email ou mot de passe incorrect.",
+    "forbidden": "Vous n'avez pas les droits pour cette action.",
+    "conflict": "Cette adresse email est déjà utilisée.",
+    "generic": "Une erreur est survenue. Réessayez."
+  }
+}

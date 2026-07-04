@@ -1,0 +1,35 @@
+{
+  "title": "My account",
+  "profile": {
+    "heading": "Profile information",
+    "photoAlt": "Profile photo",
+    "photoLabel": "Your profile photo",
+    "choosePhoto": "Choose a photo",
+    "usernameLabel": "Username",
+    "bioLabel": "About you",
+    "bioPlaceholder": "Introduce yourself to other members",
+    "positionLabel": "My location",
+    "countryPlaceholder": "Country",
+    "cityPlaceholder": "City",
+    "save": "Save"
+  },
+  "addresses": {
+    "heading": "Addresses",
+    "empty": "No address saved yet.",
+    "fullNamePlaceholder": "Full name",
+    "addressPlaceholder": "Address",
+    "cityPlaceholder": "City",
+    "zipPlaceholder": "Postal code",
+    "add": "Add address"
+  },
+  "toasts": {
+    "profileUpdated": "Profile updated",
+    "updateError": "Error while updating",
+    "photoUpdated": "Profile photo updated",
+    "uploadFailed": "Upload failed",
+    "addressAdded": "Address added",
+    "addressIncomplete": "Incomplete address",
+    "genericError": "Error"
+  },
+  "logout": "Log out"
+}

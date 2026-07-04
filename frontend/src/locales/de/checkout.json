@@ -1,0 +1,36 @@
+{
+  "title": "Zur Kasse",
+  "empty": "Ihr Warenkorb ist leer.",
+  "address": {
+    "sectionTitle": "Lieferadresse",
+    "fullNamePlaceholder": "Vollständiger Name",
+    "line1Placeholder": "Adresse",
+    "cityPlaceholder": "Stadt",
+    "zipPlaceholder": "Postleitzahl",
+    "countryPlaceholder": "Land",
+    "requiredError": "Bitte füllen Sie alle Felder aus."
+  },
+  "payment": {
+    "sectionTitle": "Zahlung",
+    "card": "Kreditkarte (Visa, Mastercard, Amex)",
+    "paypal": "PayPal",
+    "klarna": "Klarna — Ratenzahlung in 3 Raten",
+    "simulatedNote": "Simulierte Zahlung zu Demonstrationszwecken. In der Produktion einen PSP (Stripe…) über eine Cloud Function integrieren — kein Zahlungsgeheimnis auf der Clientseite."
+  },
+  "summary": {
+    "title": "Zusammenfassung",
+    "promoPlaceholder": "Gutscheincode",
+    "promoApply": "OK",
+    "subtotal": "Zwischensumme",
+    "discount": "Rabatt ({{code}})",
+    "total": "Gesamt",
+    "processing": "Wird verarbeitet…",
+    "payButton": "{{amount}} bezahlen"
+  },
+  "toasts": {
+    "promoApplied": "Gutscheincode angewendet",
+    "promoInvalid": "Ungültiger Code",
+    "orderConfirmed": "Bestellung bestätigt!",
+    "paymentFailed": "Die Zahlung ist fehlgeschlagen. Bitte versuchen Sie es erneut."
+  }
+}

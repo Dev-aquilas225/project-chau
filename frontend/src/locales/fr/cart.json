@@ -1,0 +1,19 @@
+{
+  "empty": {
+    "message": "Votre panier est vide.",
+    "continueShopping": "Continuer mes achats"
+  },
+  "title": "Mon panier",
+  "quantity": {
+    "decrease": "Moins",
+    "increase": "Plus"
+  },
+  "remove": "Supprimer",
+  "summary": {
+    "subtotal": "Sous-total",
+    "shipping": "Livraison",
+    "shippingNote": "Calculée à l'étape suivante",
+    "total": "Total"
+  },
+  "checkoutButton": "Passer la commande"
+}

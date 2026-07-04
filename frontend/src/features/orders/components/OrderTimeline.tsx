@@ -1,4 +1,5 @@
 import { Clock, Package, Truck, CheckCircle, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn, formatDate } from '@/lib/utils';
 import type { OrderStatus, OrderStatusHistoryEntry } from '@/types';
 
@@ -12,14 +13,6 @@ const STATUS_ICON: Record<OrderStatus, typeof Clock> = {
   cancelled: XCircle,
 };
 
-const STATUS_LABEL: Record<OrderStatus, string> = {
-  pending: 'En attente de paiement',
-  paid: 'Payée',
-  shipped: 'Expédiée',
-  delivered: 'Livrée',
-  cancelled: 'Annulée',
-};
-
 export interface OrderTimelineProps {
   status: OrderStatus;
   statusHistory?: OrderStatusHistoryEntry[];
@@ -27,6 +20,7 @@ export interface OrderTimelineProps {
 
 /** Timeline verticale de l'avancement d'une commande (pending -> paid -> shipped -> delivered, ou cancelled). */
 export function OrderTimeline({ status, statusHistory = [] }: OrderTimelineProps) {
+  const { t } = useTranslation(['orders', 'common']);
   const historyByStatus = new Map(statusHistory.map((h) => [h.status, h]));
 
   if (status === 'cancelled') {
@@ -50,7 +44,7 @@ export function OrderTimeline({ status, statusHistory = [] }: OrderTimelineProps
               </div>
               <div>
                 <p className={cn('text-sm font-medium', isCurrent ? 'text-red-600' : reached ? 'text-ink' : 'text-muted')}>
-                  {STATUS_LABEL[step]}
+                  {t(`common:orderStatus.${step}`)}
                 </p>
                 {entry && <p className="text-xs text-muted">{formatDate(entry.createdAt)}</p>}
                 {entry?.note && <p className="text-xs text-muted">{entry.note}</p>}
@@ -88,7 +82,7 @@ export function OrderTimeline({ status, statusHistory = [] }: OrderTimelineProps
             </div>
             <div>
               <p className={cn('text-sm font-medium', isFuture ? 'text-muted' : 'text-ink', isCurrent && 'font-semibold')}>
-                {STATUS_LABEL[step]}
+                {t(`common:orderStatus.${step}`)}
               </p>
               {entry ? (
                 <>
@@ -96,7 +90,7 @@ export function OrderTimeline({ status, statusHistory = [] }: OrderTimelineProps
                   {entry.note && <p className="text-xs text-muted">{entry.note}</p>}
                 </>
               ) : isFuture ? (
-                <p className="text-xs text-muted">En attente</p>
+                <p className="text-xs text-muted">{t('timeline.upcoming')}</p>
               ) : null}
             </div>
           </li>

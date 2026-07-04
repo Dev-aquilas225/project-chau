@@ -1,0 +1,36 @@
+{
+  "title": "Finalizar compra",
+  "empty": "Tu carrito está vacío.",
+  "address": {
+    "sectionTitle": "Dirección de envío",
+    "fullNamePlaceholder": "Nombre completo",
+    "line1Placeholder": "Dirección",
+    "cityPlaceholder": "Ciudad",
+    "zipPlaceholder": "Código postal",
+    "countryPlaceholder": "País",
+    "requiredError": "Por favor, completa todos los campos."
+  },
+  "payment": {
+    "sectionTitle": "Pago",
+    "card": "Tarjeta bancaria (Visa, Mastercard, Amex)",
+    "paypal": "PayPal",
+    "klarna": "Klarna — pago en 3 plazos",
+    "simulatedNote": "Pago simulado con fines de demostración. En producción, integra un PSP (Stripe…) mediante una Cloud Function — ningún dato sensible de pago del lado del cliente."
+  },
+  "summary": {
+    "title": "Resumen",
+    "promoPlaceholder": "Código promocional",
+    "promoApply": "OK",
+    "subtotal": "Subtotal",
+    "discount": "Descuento ({{code}})",
+    "total": "Total",
+    "processing": "Procesando…",
+    "payButton": "Pagar {{amount}}"
+  },
+  "toasts": {
+    "promoApplied": "Código promocional aplicado",
+    "promoInvalid": "Código no válido",
+    "orderConfirmed": "¡Pedido confirmado!",
+    "paymentFailed": "El pago no se ha completado. Inténtalo de nuevo."
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "becomeSeller": {
+    "steps": { "store": "Shop", "identity": "Identity", "documents": "Documents", "recap": "Summary" },
+    "stepIndicator": "Step {{current}}/{{total}} — {{label}}",
+    "idTypeLabel": { "national_id": "National ID card", "passport": "Passport" },
+    "errors": {
+      "storeNameRequired": "Shop name required",
+      "identityIncomplete": "Please complete all identity information",
+      "idDocumentRequired": "Please upload your ID document",
+      "idDocumentBackRequired": "Please upload the back of your ID document",
+      "profilePhotoRequired": "Please upload your profile photo",
+      "submitFailed": "Could not submit your application",
+      "idDocumentUploadFailed": "Failed to upload the ID document",
+      "idDocumentBackUploadFailed": "Failed to upload the back of the ID document",
+      "profilePhotoUploadFailed": "Failed to upload the profile photo"
+    },
+    "submitSuccess": "Application sent: your account is under review.",
+    "pending": {
+      "title": "Application pending",
+      "text": "Your request is being reviewed. You'll be notified once approved.",
+      "backHome": "Back to home"
+    },
+    "rejected": {
+      "title": "Application rejected",
+      "text": "Your application was not accepted. Contact support for more information.",
+      "reasonLabel": "Reason given by our team:"
+    },
+    "heading": {
+      "title": "Become a seller",
+      "subtitle": "Join our marketplace and offer your luxury pieces to our community."
+    },
+    "store": {
+      "nameLabel": "Your shop name *",
+      "namePlaceholder": "E.g.: Parisian Elegance",
+      "bioLabel": "Presentation (optional)",
+      "bioPlaceholder": "Describe your shop, your specialty…",
+      "benefitsTitle": "What you get",
+      "benefit1": "Unlimited item listings",
+      "benefit2": "Secure escrow payment",
+      "benefit3": "Dedicated seller dashboard"
+    },
+    "identity": {
+      "title": "Identity verification",
+      "subtitle": "Required to activate your seller account.",
+      "idTypeLabel": "Document type *",
+      "idNumberLabel": "Document number *",
+      "idCountryLabel": "Country of issue *",
+      "idCountryPlaceholder": "E.g.: France",
+      "dateOfBirthLabel": "Date of birth *",
+      "fullNameLabel": "Full name (as shown on the document) *"
+    },
+    "documents": {
+      "idDocumentFrontNationalLabel": "ID document (front) *",
+      "idDocumentFrontPassportLabel": "ID document (photo) *",
+      "idDocumentBackLabel": "ID document (back) *",
+      "profilePhotoLabel": "Profile photo *",
+      "uploadLabel": "Photo"
+    },
+    "recap": {
+      "title": "Summary",
+      "subtitle": "Review your information before submitting your application.",
+      "storeTitle": "Shop",
+      "edit": "Edit",
+      "identityTitle": "Identity",
+      "idType": "Document type",
+      "idNumber": "Number",
+      "idCountry": "Country of issue",
+      "dateOfBirth": "Date of birth",
+      "fullName": "Full name",
+      "documentsTitle": "Documents",
+      "front": "Front",
+      "frontPhoto": "Photo",
+      "back": "Back",
+      "profile": "Profile"
+    },
+    "nav": {
+      "back": "Back",
+      "next": "Next",
+      "submitting": "Sending…",
+      "submit": "Confirm and submit"
+    }
+  },
+  "listing": {
+    "form": {
+      "photosLabel": "Photos",
+      "uploadLabel": "Photo",
+      "brandLabel": "Brand *",
+      "nameLabel": "Name / Model *",
+      "descriptionLabel": "Description",
+      "priceLabel": "Price (€) *",
+      "stockLabel": "Stock",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "— Choose —",
+      "conditionLabel": "Condition",
+      "conditionPlaceholder": "E.g.: Very good condition",
+      "sizeLabel": "Size",
+      "sizePlaceholder": "E.g.: 38, M…",
+      "locationLabel": "Origin",
+      "locationPlaceholder": "E.g.: Paris",
+      "saving": "Saving…",
+      "update": "Update",
+      "publish": "Publish listing",
+      "cancel": "Cancel"
+    },
+    "errors": {
+      "nameRequired": "Name required",
+      "brandRequired": "Brand required",
+      "priceInvalid": "Invalid price",
+      "stockInvalid": "Invalid stock",
+      "uploadFailed": "Upload failed",
+      "saveFailed": "Could not save the listing"
+    },
+    "updateSuccess": "Listing updated",
+    "createSuccess": "Listing created!"
+  },
+  "myListings": {
+    "title": "My listings",
+    "newListing": "New listing",
+    "loading": "Loading…",
+    "empty": "You don't have any listings yet.",
+    "createFirst": "Create my first listing",
+    "stockLabel": "Stock:",
+    "edit": "Edit",
+    "archiveConfirm": "Archive \"{{name}}\"?",
+    "archiveSuccess": "Item archived",
+    "archiveFailed": "Could not archive the item",
+    "listingStatus": { "active": "Active", "draft": "Draft", "archived": "Archived" }
+  },
+  "dashboard": {
+    "title": "My seller space",
+    "stats": {
+      "activeListings": "Active listings",
+      "ordersReceived": "Orders received",
+      "revenue": "Revenue (net estimate)"
+    },
+    "actions": {
+      "myListingsTitle": "My listings",
+      "myListingsSubtitle": "Manage my items for sale",
+      "newListingTitle": "New listing",
+      "newListingSubtitle": "List an item for sale",
+      "ordersTitle": "Orders received",
+      "ordersSubtitle": "Track purchases of my items"
+    }
+  },
+  "sellerOrders": {
+    "title": "Orders received",
+    "loading": "Loading…",
+    "empty": "No orders yet.",
+    "yourShare": "Your share:",
+    "shippingLabel": "Shipping:"
+  },
+  "editListing": {
+    "backToListings": "My listings",
+    "title": "Edit listing",
+    "loading": "Loading…",
+    "notFound": "Listing not found."
+  },
+  "createListing": {
+    "backToListings": "My listings",
+    "title": "New listing"
+  }
+}

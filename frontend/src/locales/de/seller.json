@@ -1,0 +1,162 @@
+{
+  "becomeSeller": {
+    "steps": { "store": "Shop", "identity": "Identität", "documents": "Dokumente", "recap": "Zusammenfassung" },
+    "stepIndicator": "Schritt {{current}}/{{total}} — {{label}}",
+    "idTypeLabel": { "national_id": "Personalausweis", "passport": "Reisepass" },
+    "errors": {
+      "storeNameRequired": "Shopname erforderlich",
+      "identityIncomplete": "Bitte alle Identitätsangaben vervollständigen",
+      "idDocumentRequired": "Bitte lade dein Ausweisdokument hoch",
+      "idDocumentBackRequired": "Bitte lade die Rückseite deines Ausweisdokuments hoch",
+      "profilePhotoRequired": "Bitte lade dein Profilfoto hoch",
+      "submitFailed": "Deine Bewerbung konnte nicht gesendet werden",
+      "idDocumentUploadFailed": "Hochladen des Ausweisdokuments fehlgeschlagen",
+      "idDocumentBackUploadFailed": "Hochladen der Rückseite des Ausweisdokuments fehlgeschlagen",
+      "profilePhotoUploadFailed": "Hochladen des Profilfotos fehlgeschlagen"
+    },
+    "submitSuccess": "Bewerbung gesendet: dein Konto wird geprüft.",
+    "pending": {
+      "title": "Bewerbung ausstehend",
+      "text": "Deine Anfrage wird geprüft. Du wirst benachrichtigt, sobald sie genehmigt ist.",
+      "backHome": "Zurück zur Startseite"
+    },
+    "rejected": {
+      "title": "Bewerbung abgelehnt",
+      "text": "Deine Bewerbung wurde nicht angenommen. Kontaktiere den Support für weitere Informationen.",
+      "reasonLabel": "Von unserem Team angegebener Grund:"
+    },
+    "heading": {
+      "title": "Werde Verkäufer",
+      "subtitle": "Tritt unserem Marketplace bei und biete deiner Community deine Luxusartikel an."
+    },
+    "store": {
+      "nameLabel": "Name deines Shops *",
+      "namePlaceholder": "Z. B.: Pariser Eleganz",
+      "bioLabel": "Vorstellung (optional)",
+      "bioPlaceholder": "Beschreibe deinen Shop, deine Spezialität…",
+      "benefitsTitle": "Das bekommst du",
+      "benefit1": "Unbegrenzte Artikeleinstellungen",
+      "benefit2": "Sichere Treuhandzahlung",
+      "benefit3": "Eigenes Verkäufer-Dashboard"
+    },
+    "identity": {
+      "title": "Identitätsprüfung",
+      "subtitle": "Erforderlich, um dein Verkäuferkonto zu aktivieren.",
+      "idTypeLabel": "Dokumenttyp *",
+      "idNumberLabel": "Dokumentnummer *",
+      "idCountryLabel": "Ausstellungsland *",
+      "idCountryPlaceholder": "Z. B.: Frankreich",
+      "dateOfBirthLabel": "Geburtsdatum *",
+      "fullNameLabel": "Vollständiger Name (wie im Dokument angegeben) *"
+    },
+    "documents": {
+      "idDocumentFrontNationalLabel": "Ausweisdokument (Vorderseite) *",
+      "idDocumentFrontPassportLabel": "Ausweisdokument (Foto) *",
+      "idDocumentBackLabel": "Ausweisdokument (Rückseite) *",
+      "profilePhotoLabel": "Profilfoto *",
+      "uploadLabel": "Foto"
+    },
+    "recap": {
+      "title": "Zusammenfassung",
+      "subtitle": "Überprüfe deine Angaben, bevor du deine Bewerbung sendest.",
+      "storeTitle": "Shop",
+      "edit": "Bearbeiten",
+      "identityTitle": "Identität",
+      "idType": "Dokumenttyp",
+      "idNumber": "Nummer",
+      "idCountry": "Ausstellungsland",
+      "dateOfBirth": "Geburtsdatum",
+      "fullName": "Vollständiger Name",
+      "documentsTitle": "Dokumente",
+      "front": "Vorderseite",
+      "frontPhoto": "Foto",
+      "back": "Rückseite",
+      "profile": "Profil"
+    },
+    "nav": {
+      "back": "Zurück",
+      "next": "Weiter",
+      "submitting": "Wird gesendet…",
+      "submit": "Bestätigen und senden"
+    }
+  },
+  "listing": {
+    "form": {
+      "photosLabel": "Fotos",
+      "uploadLabel": "Foto",
+      "brandLabel": "Marke *",
+      "nameLabel": "Name / Modell *",
+      "descriptionLabel": "Beschreibung",
+      "priceLabel": "Preis (€) *",
+      "stockLabel": "Bestand",
+      "categoryLabel": "Kategorie",
+      "categoryPlaceholder": "— Auswählen —",
+      "conditionLabel": "Zustand",
+      "conditionPlaceholder": "Z. B.: Sehr guter Zustand",
+      "sizeLabel": "Größe",
+      "sizePlaceholder": "Z. B.: 38, M…",
+      "locationLabel": "Herkunft",
+      "locationPlaceholder": "Z. B.: Paris",
+      "saving": "Wird gespeichert…",
+      "update": "Aktualisieren",
+      "publish": "Anzeige veröffentlichen",
+      "cancel": "Abbrechen"
+    },
+    "errors": {
+      "nameRequired": "Name erforderlich",
+      "brandRequired": "Marke erforderlich",
+      "priceInvalid": "Ungültiger Preis",
+      "stockInvalid": "Ungültiger Bestand",
+      "uploadFailed": "Upload fehlgeschlagen",
+      "saveFailed": "Die Anzeige konnte nicht gespeichert werden"
+    },
+    "updateSuccess": "Anzeige aktualisiert",
+    "createSuccess": "Anzeige erstellt!"
+  },
+  "myListings": {
+    "title": "Meine Anzeigen",
+    "newListing": "Neue Anzeige",
+    "loading": "Wird geladen…",
+    "empty": "Du hast noch keine Anzeigen.",
+    "createFirst": "Meine erste Anzeige erstellen",
+    "stockLabel": "Bestand:",
+    "edit": "Bearbeiten",
+    "archiveConfirm": "\"{{name}}\" archivieren?",
+    "archiveSuccess": "Artikel archiviert",
+    "archiveFailed": "Der Artikel konnte nicht archiviert werden",
+    "listingStatus": { "active": "Aktiv", "draft": "Entwurf", "archived": "Archiviert" }
+  },
+  "dashboard": {
+    "title": "Mein Verkäuferbereich",
+    "stats": {
+      "activeListings": "Aktive Anzeigen",
+      "ordersReceived": "Erhaltene Bestellungen",
+      "revenue": "Umsatz (geschätzt netto)"
+    },
+    "actions": {
+      "myListingsTitle": "Meine Anzeigen",
+      "myListingsSubtitle": "Meine zum Verkauf stehenden Artikel verwalten",
+      "newListingTitle": "Neue Anzeige",
+      "newListingSubtitle": "Einen Artikel zum Verkauf anbieten",
+      "ordersTitle": "Erhaltene Bestellungen",
+      "ordersSubtitle": "Käufe meiner Artikel verfolgen"
+    }
+  },
+  "sellerOrders": {
+    "title": "Erhaltene Bestellungen",
+    "loading": "Wird geladen…",
+    "empty": "Noch keine Bestellungen.",
+    "yourShare": "Dein Anteil:",
+    "shippingLabel": "Versand:"
+  },
+  "editListing": {
+    "backToListings": "Meine Anzeigen",
+    "title": "Anzeige bearbeiten",
+    "loading": "Wird geladen…",
+    "notFound": "Anzeige nicht gefunden."
+  },
+  "createListing": {
+    "backToListings": "Meine Anzeigen",
+    "title": "Neue Anzeige"
+  }
+}

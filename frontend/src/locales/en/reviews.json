@@ -1,0 +1,17 @@
+{
+  "title": "Customer reviews",
+  "starsAriaLabel": "{{value}} out of 5",
+  "averageSummary": "{{average}} / 5 · {{count}} reviews",
+  "yourRating": "Your rating",
+  "ratingAriaLabel_one": "{{count}} star",
+  "ratingAriaLabel_other": "{{count}} stars",
+  "comment": "Comment (optional)",
+  "commentPlaceholder": "Share your experience with this product…",
+  "submit": "Post my review",
+  "submitting": "Sending…",
+  "loginPrompt": "Log in to leave a review.",
+  "loading": "Loading reviews…",
+  "empty": "No reviews for this product yet.",
+  "success": "Review posted, thank you!",
+  "error": "Could not save your review."
+}

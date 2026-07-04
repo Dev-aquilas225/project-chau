@@ -1,6 +1,5 @@
+import { useTranslation } from 'react-i18next';
 import { LegalNotice } from '@/components/LegalNotice';
-
-const sections = ['Nos services', 'Acheter', 'Vendre', 'Aide', 'Occasion de luxe PJ international'];
 
 const payments = [
   { name: 'PayPal', slug: 'paypal' },
@@ -12,6 +11,9 @@ const payments = [
 ];
 
 export function Footer() {
+  const { t } = useTranslation('common');
+  const sections = t('footer.sections', { returnObjects: true }) as string[];
+
   return (
     <footer className="mt-12 bg-ink text-paper">
       <div className="container-app py-8">
@@ -41,7 +43,7 @@ export function Footer() {
           <LegalNotice className="border-amber-300/40 bg-white/5 text-white/70" />
         </div>
 
-        <p className="mt-8 text-center text-xs text-white/50">©{new Date().getFullYear()} Occasion de luxe PJ international</p>
+        <p className="mt-8 text-center text-xs text-white/50">{t('footer.copyright', { year: new Date().getFullYear() })}</p>
       </div>
     </footer>
   );

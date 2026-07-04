@@ -1,0 +1,17 @@
+{
+  "title": "Opiniones de clientes",
+  "starsAriaLabel": "{{value}} de 5",
+  "averageSummary": "{{average}} / 5 · {{count}} opiniones",
+  "yourRating": "Tu valoración",
+  "ratingAriaLabel_one": "{{count}} estrella",
+  "ratingAriaLabel_other": "{{count}} estrellas",
+  "comment": "Comentario (opcional)",
+  "commentPlaceholder": "Comparte tu experiencia con este producto…",
+  "submit": "Publicar mi opinión",
+  "submitting": "Enviando…",
+  "loginPrompt": "Inicia sesión para dejar una opinión.",
+  "loading": "Cargando opiniones…",
+  "empty": "Todavía no hay opiniones para este producto.",
+  "success": "¡Opinión publicada, gracias!",
+  "error": "No se pudo guardar tu opinión."
+}

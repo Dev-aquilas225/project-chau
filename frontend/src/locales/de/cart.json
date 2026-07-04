@@ -1,0 +1,19 @@
+{
+  "empty": {
+    "message": "Ihr Warenkorb ist leer.",
+    "continueShopping": "Weiter einkaufen"
+  },
+  "title": "Mein Warenkorb",
+  "quantity": {
+    "decrease": "Verringern",
+    "increase": "Erhöhen"
+  },
+  "remove": "Entfernen",
+  "summary": {
+    "subtotal": "Zwischensumme",
+    "shipping": "Versand",
+    "shippingNote": "Wird im nächsten Schritt berechnet",
+    "total": "Gesamt"
+  },
+  "checkoutButton": "Zur Kasse"
+}

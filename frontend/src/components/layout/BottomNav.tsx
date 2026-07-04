@@ -1,18 +1,21 @@
 import { NavLink } from 'react-router-dom';
 import { Home, Heart, ShoppingBag, Package, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cartStore';
 
-const items = [
-  { to: '/', label: 'Accueil', icon: Home, end: true },
-  { to: '/favoris', label: 'Favoris', icon: Heart },
-  { to: '/panier', label: 'Panier', icon: ShoppingBag },
-  { to: '/commandes', label: 'Commandes', icon: Package },
-  { to: '/compte', label: 'Moi', icon: User },
-];
-
 export function BottomNav() {
+  const { t } = useTranslation('common');
   const count = useCartStore((s) => s.totalQty());
+
+  const items = [
+    { to: '/', label: t('bottomNav.home'), icon: Home, end: true },
+    { to: '/favoris', label: t('bottomNav.favorites'), icon: Heart },
+    { to: '/panier', label: t('bottomNav.cart'), icon: ShoppingBag },
+    { to: '/commandes', label: t('bottomNav.orders'), icon: Package },
+    { to: '/compte', label: t('bottomNav.me'), icon: User },
+  ];
+
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper md:hidden">
       <div className="grid grid-cols-5">

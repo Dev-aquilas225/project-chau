@@ -1,0 +1,162 @@
+{
+  "becomeSeller": {
+    "steps": { "store": "Boutique", "identity": "Identité", "documents": "Documents", "recap": "Récapitulatif" },
+    "stepIndicator": "Étape {{current}}/{{total}} — {{label}}",
+    "idTypeLabel": { "national_id": "Carte nationale d'identité", "passport": "Passeport" },
+    "errors": {
+      "storeNameRequired": "Nom de boutique requis",
+      "identityIncomplete": "Merci de compléter toutes les informations d'identité",
+      "idDocumentRequired": "Merci de téléverser votre pièce d'identité",
+      "idDocumentBackRequired": "Merci de téléverser le verso de votre pièce d'identité",
+      "profilePhotoRequired": "Merci de téléverser votre photo de profil",
+      "submitFailed": "Impossible de soumettre la candidature",
+      "idDocumentUploadFailed": "Échec du téléversement de la pièce d'identité",
+      "idDocumentBackUploadFailed": "Échec du téléversement du verso de la pièce d'identité",
+      "profilePhotoUploadFailed": "Échec du téléversement de la photo de profil"
+    },
+    "submitSuccess": "Candidature envoyée : votre compte est en cours de vérification.",
+    "pending": {
+      "title": "Candidature en attente",
+      "text": "Votre demande est en cours d'examen. Vous serez notifié une fois approuvé.",
+      "backHome": "Retour à l'accueil"
+    },
+    "rejected": {
+      "title": "Candidature refusée",
+      "text": "Votre candidature n'a pas été acceptée. Contactez le support pour plus d'informations.",
+      "reasonLabel": "Motif indiqué par notre équipe :"
+    },
+    "heading": {
+      "title": "Devenez vendeur",
+      "subtitle": "Rejoignez notre marketplace et proposez vos pièces de luxe à notre communauté."
+    },
+    "store": {
+      "nameLabel": "Nom de votre boutique *",
+      "namePlaceholder": "Ex : Élégance Parisienne",
+      "bioLabel": "Présentation (optionnel)",
+      "bioPlaceholder": "Décrivez votre boutique, votre spécialité…",
+      "benefitsTitle": "Ce que vous obtenez",
+      "benefit1": "Mise en vente illimitée d'articles",
+      "benefit2": "Paiement sécurisé par escrow",
+      "benefit3": "Tableau de bord vendeur dédié"
+    },
+    "identity": {
+      "title": "Vérification d'identité",
+      "subtitle": "Requise pour activer votre compte vendeur.",
+      "idTypeLabel": "Type de pièce *",
+      "idNumberLabel": "Numéro de la pièce *",
+      "idCountryLabel": "Pays de délivrance *",
+      "idCountryPlaceholder": "Ex : France",
+      "dateOfBirthLabel": "Date de naissance *",
+      "fullNameLabel": "Nom complet (tel qu'indiqué sur la pièce) *"
+    },
+    "documents": {
+      "idDocumentFrontNationalLabel": "Pièce d'identité (recto) *",
+      "idDocumentFrontPassportLabel": "Pièce d'identité (photo) *",
+      "idDocumentBackLabel": "Pièce d'identité (verso) *",
+      "profilePhotoLabel": "Photo de profil *",
+      "uploadLabel": "Photo"
+    },
+    "recap": {
+      "title": "Récapitulatif",
+      "subtitle": "Vérifiez vos informations avant de soumettre votre candidature.",
+      "storeTitle": "Boutique",
+      "edit": "Modifier",
+      "identityTitle": "Identité",
+      "idType": "Type de pièce",
+      "idNumber": "Numéro",
+      "idCountry": "Pays de délivrance",
+      "dateOfBirth": "Date de naissance",
+      "fullName": "Nom complet",
+      "documentsTitle": "Documents",
+      "front": "Recto",
+      "frontPhoto": "Photo",
+      "back": "Verso",
+      "profile": "Profil"
+    },
+    "nav": {
+      "back": "Retour",
+      "next": "Suivant",
+      "submitting": "Envoi…",
+      "submit": "Confirmer et soumettre"
+    }
+  },
+  "listing": {
+    "form": {
+      "photosLabel": "Photos",
+      "uploadLabel": "Photo",
+      "brandLabel": "Marque *",
+      "nameLabel": "Nom / Modèle *",
+      "descriptionLabel": "Description",
+      "priceLabel": "Prix (€) *",
+      "stockLabel": "Stock",
+      "categoryLabel": "Catégorie",
+      "categoryPlaceholder": "— Choisir —",
+      "conditionLabel": "État",
+      "conditionPlaceholder": "Ex : Très bon état",
+      "sizeLabel": "Taille",
+      "sizePlaceholder": "Ex : 38, M…",
+      "locationLabel": "Origine",
+      "locationPlaceholder": "Ex : Paris",
+      "saving": "Sauvegarde…",
+      "update": "Mettre à jour",
+      "publish": "Publier l'annonce",
+      "cancel": "Annuler"
+    },
+    "errors": {
+      "nameRequired": "Nom requis",
+      "brandRequired": "Marque requise",
+      "priceInvalid": "Prix invalide",
+      "stockInvalid": "Stock invalide",
+      "uploadFailed": "Échec du téléversement",
+      "saveFailed": "Impossible de sauvegarder l'annonce"
+    },
+    "updateSuccess": "Annonce mise à jour",
+    "createSuccess": "Annonce créée !"
+  },
+  "myListings": {
+    "title": "Mes annonces",
+    "newListing": "Nouvelle annonce",
+    "loading": "Chargement…",
+    "empty": "Vous n'avez pas encore d'annonces.",
+    "createFirst": "Créer ma première annonce",
+    "stockLabel": "Stock :",
+    "edit": "Modifier",
+    "archiveConfirm": "Archiver \"{{name}}\" ?",
+    "archiveSuccess": "Article archivé",
+    "archiveFailed": "Impossible d'archiver l'article",
+    "listingStatus": { "active": "Actif", "draft": "Brouillon", "archived": "Archivé" }
+  },
+  "dashboard": {
+    "title": "Mon espace vendeur",
+    "stats": {
+      "activeListings": "Articles actifs",
+      "ordersReceived": "Commandes reçues",
+      "revenue": "Revenus (net estimé)"
+    },
+    "actions": {
+      "myListingsTitle": "Mes annonces",
+      "myListingsSubtitle": "Gérer mes articles en vente",
+      "newListingTitle": "Nouvelle annonce",
+      "newListingSubtitle": "Mettre un article en vente",
+      "ordersTitle": "Commandes reçues",
+      "ordersSubtitle": "Suivre les achats de mes articles"
+    }
+  },
+  "sellerOrders": {
+    "title": "Commandes reçues",
+    "loading": "Chargement…",
+    "empty": "Aucune commande pour le moment.",
+    "yourShare": "Votre part :",
+    "shippingLabel": "Livraison :"
+  },
+  "editListing": {
+    "backToListings": "Mes annonces",
+    "title": "Modifier l'annonce",
+    "loading": "Chargement…",
+    "notFound": "Annonce introuvable."
+  },
+  "createListing": {
+    "backToListings": "Mes annonces",
+    "title": "Nouvelle annonce"
+  }
+}

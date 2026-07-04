@@ -1,0 +1,162 @@
+{
+  "becomeSeller": {
+    "steps": { "store": "Negozio", "identity": "Identità", "documents": "Documenti", "recap": "Riepilogo" },
+    "stepIndicator": "Passaggio {{current}}/{{total}} — {{label}}",
+    "idTypeLabel": { "national_id": "Carta d'identità", "passport": "Passaporto" },
+    "errors": {
+      "storeNameRequired": "Nome del negozio obbligatorio",
+      "identityIncomplete": "Completa tutte le informazioni di identità",
+      "idDocumentRequired": "Carica il tuo documento d'identità",
+      "idDocumentBackRequired": "Carica il retro del tuo documento d'identità",
+      "profilePhotoRequired": "Carica la tua foto del profilo",
+      "submitFailed": "Impossibile inviare la tua candidatura",
+      "idDocumentUploadFailed": "Caricamento del documento d'identità non riuscito",
+      "idDocumentBackUploadFailed": "Caricamento del retro del documento d'identità non riuscito",
+      "profilePhotoUploadFailed": "Caricamento della foto del profilo non riuscito"
+    },
+    "submitSuccess": "Candidatura inviata: il tuo account è in fase di verifica.",
+    "pending": {
+      "title": "Candidatura in attesa",
+      "text": "La tua richiesta è in fase di esame. Sarai avvisato non appena approvata.",
+      "backHome": "Torna alla home"
+    },
+    "rejected": {
+      "title": "Candidatura rifiutata",
+      "text": "La tua candidatura non è stata accettata. Contatta l'assistenza per maggiori informazioni.",
+      "reasonLabel": "Motivo indicato dal nostro team:"
+    },
+    "heading": {
+      "title": "Diventa venditore",
+      "subtitle": "Unisciti al nostro marketplace e proponi i tuoi pezzi di lusso alla nostra community."
+    },
+    "store": {
+      "nameLabel": "Nome del tuo negozio *",
+      "namePlaceholder": "Es.: Eleganza Parigina",
+      "bioLabel": "Presentazione (facoltativo)",
+      "bioPlaceholder": "Descrivi il tuo negozio, la tua specialità…",
+      "benefitsTitle": "Cosa ottieni",
+      "benefit1": "Pubblicazione illimitata di articoli",
+      "benefit2": "Pagamento sicuro tramite deposito a garanzia",
+      "benefit3": "Dashboard venditore dedicata"
+    },
+    "identity": {
+      "title": "Verifica dell'identità",
+      "subtitle": "Necessaria per attivare il tuo account venditore.",
+      "idTypeLabel": "Tipo di documento *",
+      "idNumberLabel": "Numero del documento *",
+      "idCountryLabel": "Paese di rilascio *",
+      "idCountryPlaceholder": "Es.: Francia",
+      "dateOfBirthLabel": "Data di nascita *",
+      "fullNameLabel": "Nome completo (come indicato sul documento) *"
+    },
+    "documents": {
+      "idDocumentFrontNationalLabel": "Documento d'identità (fronte) *",
+      "idDocumentFrontPassportLabel": "Documento d'identità (foto) *",
+      "idDocumentBackLabel": "Documento d'identità (retro) *",
+      "profilePhotoLabel": "Foto del profilo *",
+      "uploadLabel": "Foto"
+    },
+    "recap": {
+      "title": "Riepilogo",
+      "subtitle": "Verifica le tue informazioni prima di inviare la candidatura.",
+      "storeTitle": "Negozio",
+      "edit": "Modifica",
+      "identityTitle": "Identità",
+      "idType": "Tipo di documento",
+      "idNumber": "Numero",
+      "idCountry": "Paese di rilascio",
+      "dateOfBirth": "Data di nascita",
+      "fullName": "Nome completo",
+      "documentsTitle": "Documenti",
+      "front": "Fronte",
+      "frontPhoto": "Foto",
+      "back": "Retro",
+      "profile": "Profilo"
+    },
+    "nav": {
+      "back": "Indietro",
+      "next": "Avanti",
+      "submitting": "Invio…",
+      "submit": "Conferma e invia"
+    }
+  },
+  "listing": {
+    "form": {
+      "photosLabel": "Foto",
+      "uploadLabel": "Foto",
+      "brandLabel": "Marca *",
+      "nameLabel": "Nome / Modello *",
+      "descriptionLabel": "Descrizione",
+      "priceLabel": "Prezzo (€) *",
+      "stockLabel": "Scorte",
+      "categoryLabel": "Categoria",
+      "categoryPlaceholder": "— Scegli —",
+      "conditionLabel": "Condizione",
+      "conditionPlaceholder": "Es.: Ottime condizioni",
+      "sizeLabel": "Taglia",
+      "sizePlaceholder": "Es.: 38, M…",
+      "locationLabel": "Provenienza",
+      "locationPlaceholder": "Es.: Parigi",
+      "saving": "Salvataggio…",
+      "update": "Aggiorna",
+      "publish": "Pubblica annuncio",
+      "cancel": "Annulla"
+    },
+    "errors": {
+      "nameRequired": "Nome obbligatorio",
+      "brandRequired": "Marca obbligatoria",
+      "priceInvalid": "Prezzo non valido",
+      "stockInvalid": "Scorte non valide",
+      "uploadFailed": "Caricamento non riuscito",
+      "saveFailed": "Impossibile salvare l'annuncio"
+    },
+    "updateSuccess": "Annuncio aggiornato",
+    "createSuccess": "Annuncio creato!"
+  },
+  "myListings": {
+    "title": "I miei annunci",
+    "newListing": "Nuovo annuncio",
+    "loading": "Caricamento…",
+    "empty": "Non hai ancora annunci.",
+    "createFirst": "Crea il mio primo annuncio",
+    "stockLabel": "Scorte:",
+    "edit": "Modifica",
+    "archiveConfirm": "Archiviare \"{{name}}\"?",
+    "archiveSuccess": "Articolo archiviato",
+    "archiveFailed": "Impossibile archiviare l'articolo",
+    "listingStatus": { "active": "Attivo", "draft": "Bozza", "archived": "Archiviato" }
+  },
+  "dashboard": {
+    "title": "Il mio spazio venditore",
+    "stats": {
+      "activeListings": "Articoli attivi",
+      "ordersReceived": "Ordini ricevuti",
+      "revenue": "Entrate (netto stimato)"
+    },
+    "actions": {
+      "myListingsTitle": "I miei annunci",
+      "myListingsSubtitle": "Gestisci i miei articoli in vendita",
+      "newListingTitle": "Nuovo annuncio",
+      "newListingSubtitle": "Metti in vendita un articolo",
+      "ordersTitle": "Ordini ricevuti",
+      "ordersSubtitle": "Segui gli acquisti dei miei articoli"
+    }
+  },
+  "sellerOrders": {
+    "title": "Ordini ricevuti",
+    "loading": "Caricamento…",
+    "empty": "Nessun ordine per ora.",
+    "yourShare": "La tua parte:",
+    "shippingLabel": "Spedizione:"
+  },
+  "editListing": {
+    "backToListings": "I miei annunci",
+    "title": "Modifica annuncio",
+    "loading": "Caricamento…",
+    "notFound": "Annuncio non trovato."
+  },
+  "createListing": {
+    "backToListings": "I miei annunci",
+    "title": "Nuovo annuncio"
+  }
+}

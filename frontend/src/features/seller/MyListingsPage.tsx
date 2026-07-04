@@ -1,14 +1,9 @@
 import { Link } from 'react-router-dom';
 import { PlusCircle, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useMyListings, useDeleteListing } from './hooks';
 import { formatPrice, cn } from '@/lib/utils';
-
-const STATUS_LABEL: Record<string, string> = {
-  active: 'Actif',
-  draft: 'Brouillon',
-  archived: 'Archivé',
-};
 
 const STATUS_COLOR: Record<string, string> = {
   active: 'bg-green-100 text-green-700',
@@ -17,35 +12,36 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 export function MyListingsPage() {
+  const { t } = useTranslation('seller');
   const { data: listings = [], isLoading } = useMyListings();
   const del = useDeleteListing();
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Archiver "${name}" ?`)) return;
+    if (!confirm(t('myListings.archiveConfirm', { name }))) return;
     try {
       await del.mutateAsync(id);
-      toast.success('Article archivé');
+      toast.success(t('myListings.archiveSuccess'));
     } catch {
-      toast.error('Impossible d\'archiver l\'article');
+      toast.error(t('myListings.archiveFailed'));
     }
   };
 
   return (
     <div className="container-app py-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Mes annonces</h1>
+        <h1 className="text-2xl font-bold">{t('myListings.title')}</h1>
         <Link to="/espace-vendeur/annonces/creer" className="btn-primary flex items-center gap-2">
-          <PlusCircle className="h-4 w-4" /> Nouvelle annonce
+          <PlusCircle className="h-4 w-4" /> {t('myListings.newListing')}
         </Link>
       </div>
 
       {isLoading ? (
-        <p className="text-muted">Chargement…</p>
+        <p className="text-muted">{t('myListings.loading')}</p>
       ) : listings.length === 0 ? (
         <div className="py-16 text-center">
-          <p className="text-muted">Vous n'avez pas encore d'annonces.</p>
+          <p className="text-muted">{t('myListings.empty')}</p>
           <Link to="/espace-vendeur/annonces/creer" className="btn-primary mt-4 inline-flex items-center gap-2">
-            <PlusCircle className="h-4 w-4" /> Créer ma première annonce
+            <PlusCircle className="h-4 w-4" /> {t('myListings.createFirst')}
           </Link>
         </div>
       ) : (
@@ -64,16 +60,16 @@ export function MyListingsPage() {
                     <p className="text-sm font-medium">{formatPrice(listing.price)}</p>
                   </div>
                   <span className={cn('shrink-0 rounded-full px-2 py-0.5 text-xs font-medium', STATUS_COLOR[listing.listingStatus ?? 'active'])}>
-                    {STATUS_LABEL[listing.listingStatus ?? 'active']}
+                    {t(`myListings.listingStatus.${listing.listingStatus ?? 'active'}`)}
                   </span>
                 </div>
-                <p className="text-xs text-muted">Stock : {listing.stock}</p>
+                <p className="text-xs text-muted">{t('myListings.stockLabel')} {listing.stock}</p>
                 <div className="mt-3 flex gap-2">
                   <Link
                     to={`/espace-vendeur/annonces/${listing.id}/modifier`}
                     className="btn-outline flex flex-1 items-center justify-center gap-1 py-1.5 text-sm"
                   >
-                    <Pencil className="h-3.5 w-3.5" /> Modifier
+                    <Pencil className="h-3.5 w-3.5" /> {t('myListings.edit')}
                   </Link>
                   <button
                     className="btn-outline flex items-center gap-1 px-3 py-1.5 text-sm text-sale"

@@ -1,0 +1,19 @@
+{
+  "empty": {
+    "message": "Il tuo carrello è vuoto.",
+    "continueShopping": "Continua lo shopping"
+  },
+  "title": "Il mio carrello",
+  "quantity": {
+    "decrease": "Diminuisci",
+    "increase": "Aumenta"
+  },
+  "remove": "Rimuovi",
+  "summary": {
+    "subtotal": "Subtotale",
+    "shipping": "Spedizione",
+    "shippingNote": "Calcolata al passaggio successivo",
+    "total": "Totale"
+  },
+  "checkoutButton": "Checkout"
+}

@@ -1,0 +1,13 @@
+{
+  "title": "My orders",
+  "empty": "No orders yet.",
+  "browseCatalog": "Browse the catalog",
+  "orderNumber": "Order #{{id}}",
+  "itemsCount_one": "{{count}} item",
+  "itemsCount_other": "{{count}} items",
+  "showTimeline": "Show tracking",
+  "hideTimeline": "Hide tracking",
+  "timeline": {
+    "upcoming": "Pending"
+  }
+}

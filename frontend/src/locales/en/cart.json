@@ -1,0 +1,19 @@
+{
+  "empty": {
+    "message": "Your cart is empty.",
+    "continueShopping": "Continue shopping"
+  },
+  "title": "My cart",
+  "quantity": {
+    "decrease": "Decrease",
+    "increase": "Increase"
+  },
+  "remove": "Remove",
+  "summary": {
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "shippingNote": "Calculated at next step",
+    "total": "Total"
+  },
+  "checkoutButton": "Checkout"
+}

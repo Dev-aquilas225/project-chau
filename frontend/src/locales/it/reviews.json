@@ -1,0 +1,17 @@
+{
+  "title": "Recensioni dei clienti",
+  "starsAriaLabel": "{{value}} su 5",
+  "averageSummary": "{{average}} / 5 · {{count}} recensioni",
+  "yourRating": "La tua valutazione",
+  "ratingAriaLabel_one": "{{count}} stella",
+  "ratingAriaLabel_other": "{{count}} stelle",
+  "comment": "Commento (facoltativo)",
+  "commentPlaceholder": "Condividi la tua esperienza con questo prodotto…",
+  "submit": "Pubblica la mia recensione",
+  "submitting": "Invio…",
+  "loginPrompt": "Accedi per lasciare una recensione.",
+  "loading": "Caricamento recensioni…",
+  "empty": "Ancora nessuna recensione per questo prodotto.",
+  "success": "Recensione pubblicata, grazie!",
+  "error": "Impossibile salvare la tua recensione."
+}

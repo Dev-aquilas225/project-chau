@@ -1,0 +1,70 @@
+{
+  "home": {
+    "hero": {
+      "title": "Luxury fashion, secondhand",
+      "subtitle": "Buy and sell authenticated exceptional pieces. Circular fashion, affordable prices.",
+      "cta": "Discover the catalog"
+    },
+    "favorites": {
+      "title": "Our favorites",
+      "seeMore": "See more"
+    },
+    "new": {
+      "title": "New arrivals",
+      "seeMore": "See more"
+    },
+    "journal": {
+      "title": "The Journal",
+      "items": [
+        {
+          "tag": "Fashion stories",
+          "title": "From Screen to Closet",
+          "description": "The looks from the new fashion show."
+        },
+        {
+          "tag": "Fashion stories",
+          "title": "Vintage Icons",
+          "description": "The signature pieces that stand the test of time."
+        }
+      ]
+    }
+  },
+  "catalog": {
+    "title": {
+      "default": "Catalog",
+      "results": "Results: “{{search}}”"
+    },
+    "itemsCount_one": "{{count}} item",
+    "itemsCount_other": "{{count}} items",
+    "filters": {
+      "allCategories": "All categories",
+      "minPricePlaceholder": "Min price",
+      "maxPricePlaceholder": "Max price"
+    },
+    "sort": {
+      "recent": "Most recent",
+      "priceAsc": "Price: low to high",
+      "priceDesc": "Price: high to low"
+    },
+    "error": "Unable to load products.",
+    "empty": "No items match your search."
+  },
+  "productDetail": {
+    "notFound": "Product not found.",
+    "size": "Size:",
+    "condition": "Condition:",
+    "origin": "Origin:",
+    "addToCart": "Add to cart",
+    "soldOut": "Sold",
+    "addedToCart": "Added to cart",
+    "favoriteAriaLabel": "Favorite",
+    "authenticity": {
+      "title": "Important information",
+      "text": "All authenticity verification services and quality checks are carried out independently by Occasion de luxe PJ international. Purchases of non-authentic items are fully refunded."
+    },
+    "seller": {
+      "viewAllListings": "View all their listings"
+    },
+    "backToCatalog": "← Back to catalog"
+  }
+}

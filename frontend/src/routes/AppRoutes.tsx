@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/layout/Layout';
 import { ProtectedRoute } from './ProtectedRoute';
 import { SellerProtectedRoute } from '@/features/seller/SellerProtectedRoute';
@@ -20,6 +21,7 @@ import { EditListingPage } from '@/features/seller/EditListingPage';
 import { SellerOrdersPage } from '@/features/seller/SellerOrdersPage';
 
 export function AppRoutes() {
+  const { t } = useTranslation('common');
   return (
     <Routes>
       <Route element={<Layout />}>
@@ -42,7 +44,7 @@ export function AppRoutes() {
         <Route path="espace-vendeur/annonces/:id/modifier" element={<SellerProtectedRoute><EditListingPage /></SellerProtectedRoute>} />
         <Route path="espace-vendeur/commandes" element={<SellerProtectedRoute><SellerOrdersPage /></SellerProtectedRoute>} />
 
-        <Route path="*" element={<div className="container-app py-20 text-center text-muted">Page introuvable.</div>} />
+        <Route path="*" element={<div className="container-app py-20 text-center text-muted">{t('notFound')}</div>} />
       </Route>
     </Routes>
   );

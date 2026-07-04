@@ -1,0 +1,35 @@
+{
+  "title": "Il mio account",
+  "profile": {
+    "heading": "Informazioni sul profilo",
+    "photoAlt": "Foto profilo",
+    "photoLabel": "La tua foto profilo",
+    "choosePhoto": "Scegli una foto",
+    "usernameLabel": "Nome utente",
+    "bioLabel": "Su di te",
+    "bioPlaceholder": "Presentati agli altri membri",
+    "positionLabel": "La mia posizione",
+    "countryPlaceholder": "Paese",
+    "cityPlaceholder": "Città",
+    "save": "Salva"
+  },
+  "addresses": {
+    "heading": "Indirizzi",
+    "empty": "Nessun indirizzo salvato.",
+    "fullNamePlaceholder": "Nome completo",
+    "addressPlaceholder": "Indirizzo",
+    "cityPlaceholder": "Città",
+    "zipPlaceholder": "CAP",
+    "add": "Aggiungi indirizzo"
+  },
+  "toasts": {
+    "profileUpdated": "Profilo aggiornato",
+    "updateError": "Errore durante l'aggiornamento",
+    "photoUpdated": "Foto profilo aggiornata",
+    "uploadFailed": "Caricamento non riuscito",
+    "addressAdded": "Indirizzo aggiunto",
+    "addressIncomplete": "Indirizzo incompleto",
+    "genericError": "Errore"
+  },
+  "logout": "Esci"
+}
