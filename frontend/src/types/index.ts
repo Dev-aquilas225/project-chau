@@ -5,6 +5,8 @@ export interface SellerProfile {
   storeName?: string;
   bio?: string;
   iban?: string;
+  reviewNote?: string;
+  reviewedAt?: string;
 }
 
 export interface Address {
@@ -20,9 +22,13 @@ export interface UserProfile {
   email: string;
   displayName: string;
   photoURL?: string;
+  bio?: string;
+  country?: string;
+  city?: string;
   role: Role;
   sellerStatus: SellerStatus;
   sellerProfile: SellerProfile;
+  identityVerified?: boolean;
   addresses: Address[];
   createdAt?: Date;
 }
@@ -134,4 +140,16 @@ export interface ProductReviews {
   items: Review[];
   average: number;
   count: number;
+}
+
+export type NotificationType = 'order_status' | 'seller_status';
+
+export interface AppNotification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  link?: string | null;
+  read: boolean;
+  createdAt: string;
 }

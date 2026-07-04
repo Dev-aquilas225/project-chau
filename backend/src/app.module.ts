@@ -14,6 +14,7 @@ import { AdminDashboardModule } from './admin/admin-dashboard.module';
 import { SeedModule } from './seed/seed.module';
 import { SellersModule } from './sellers/sellers.module';
 import { PlatformConfigModule } from './platform-config/platform-config.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { User } from './users/entities/user.entity';
 import { Product } from './products/entities/product.entity';
 import { Category } from './categories/entities/category.entity';
@@ -54,6 +55,7 @@ import { PlatformConfig } from './platform-config/entities/platform-config.entit
     SeedModule,
     SellersModule,
     PlatformConfigModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}

@@ -7,6 +7,7 @@ describe('OrdersService', () => {
   let historyRepo: { create: jest.Mock; save: jest.Mock; find: jest.Mock };
   let productsRepo: { findOne: jest.Mock };
   let platformConfig: { getValue: jest.Mock };
+  let notificationsService: { create: jest.Mock };
 
   beforeEach(() => {
     repo = {
@@ -22,7 +23,14 @@ describe('OrdersService', () => {
     };
     productsRepo = { findOne: jest.fn().mockResolvedValue({ sellerId: null }) };
     platformConfig = { getValue: jest.fn().mockResolvedValue(10) };
-    service = new OrdersService(repo as never, historyRepo as never, productsRepo as never, platformConfig as never);
+    notificationsService = { create: jest.fn() };
+    service = new OrdersService(
+      repo as never,
+      historyRepo as never,
+      productsRepo as never,
+      platformConfig as never,
+      notificationsService as never,
+    );
   });
 
   it("crée une commande avec status 'pending' et le userId du token, et insère l'historique", async () => {
@@ -63,10 +71,22 @@ describe('OrdersService', () => {
   });
 
   it('updateStatus change le statut et ajoute une entrée d\'historique avec note', async () => {
-    repo.findOne.mockResolvedValue({ id: 'order-1', status: 'pending' });
+    repo.findOne.mockResolvedValue({ id: 'order-1', userId: 'user-1', status: 'pending' });
     const result = await service.updateStatus('order-1', 'shipped', 'Expédié via Colissimo');
     expect(result.status).toBe('shipped');
     expect(historyRepo.create).toHaveBeenCalledWith({ orderId: 'order-1', status: 'shipped', note: 'Expédié via Colissimo' });
+  });
+
+  it('updateStatus notifie l\'acheteur (order.userId) du changement de statut', async () => {
+    repo.findOne.mockResolvedValue({ id: 'order-1', userId: 'user-1', status: 'pending' });
+    await service.updateStatus('order-1', 'shipped');
+    expect(notificationsService.create).toHaveBeenCalledWith(
+      'user-1',
+      'order_status',
+      'Commande mise à jour',
+      expect.stringContaining('Expédiée'),
+      '/commandes',
+    );
   });
 
   it('updateStatus lève NotFoundException si absent', async () => {

@@ -5,7 +5,16 @@ import { Order, OrderStatus } from './entities/order.entity';
 import { OrderStatusHistory } from './entities/order-status-history.entity';
 import { Product } from '../products/entities/product.entity';
 import { PlatformConfigService } from '../platform-config/platform-config.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { CreateOrderDto } from './dto/order.dto';
+
+const STATUS_LABEL_FR: Record<OrderStatus, string> = {
+  pending: 'En attente',
+  paid: 'Payée',
+  shipped: 'Expédiée',
+  delivered: 'Livrée',
+  cancelled: 'Annulée',
+};
 
 @Injectable()
 export class OrdersService {
@@ -14,6 +23,7 @@ export class OrdersService {
     @InjectRepository(OrderStatusHistory) private historyRepo: Repository<OrderStatusHistory>,
     @InjectRepository(Product) private productsRepo: Repository<Product>,
     private platformConfig: PlatformConfigService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(userId: string, dto: CreateOrderDto) {
@@ -79,6 +89,13 @@ export class OrdersService {
     order.status = status;
     const saved = await this.ordersRepo.save(order);
     await this.historyRepo.save(this.historyRepo.create({ orderId: id, status, note: note ?? null }));
+    await this.notificationsService.create(
+      order.userId,
+      'order_status',
+      'Commande mise à jour',
+      `Votre commande est maintenant : ${STATUS_LABEL_FR[status]}`,
+      '/commandes',
+    );
     return saved;
   }
 }
