@@ -21,6 +21,10 @@ build/
 *.egg-info/
 *.tsbuildinfo
 
+# Couverture de tests
+coverage/
+**/coverage/
+
 # Logs
 *.log
 logs/
@@ -43,3 +47,6 @@ ui-debug.log
 
 # Documents d'identité vendeurs — jamais commités
 backend/uploads-private/
+
+# Notes de travail personnelles
+thinking.md
