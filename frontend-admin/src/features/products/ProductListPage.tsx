@@ -8,11 +8,13 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useAdminProducts, useDeleteProduct } from './hooks';
 import { useCategories } from '@/features/categories/hooks';
+import { useHasPermission } from '@/features/auth/usePermission';
 import { formatCurrency } from '@/lib/format';
 import type { Product } from '@/types';
 
 export default function ProductListPage() {
   const navigate = useNavigate();
+  const canManage = useHasPermission('products', 'manage');
   const { data: products = [], isLoading } = useAdminProducts();
   const { data: categories = [] } = useCategories();
   const deleteMutation = useDeleteProduct();
@@ -67,38 +69,44 @@ export default function ProductListPage() {
       minWidth: 130,
       valueGetter: (_value, row) => (row.categoryId ? categoryNameById.get(row.categoryId) ?? '—' : '—'),
     },
-    {
-      field: 'actions',
-      headerName: '',
-      sortable: false,
-      filterable: false,
-      width: 100,
-      renderCell: (params) => (
-        <Stack direction="row">
-          <IconButton size="small" onClick={() => navigate(`/produits/${params.row.id}`)}>
-            <EditOutlinedIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            color="error"
-            onClick={() => {
-              if (confirm(`Supprimer "${params.row.name}" ?`)) deleteMutation.mutate(params.row.id);
-            }}
-          >
-            <DeleteOutlineIcon fontSize="small" />
-          </IconButton>
-        </Stack>
-      ),
-    },
+    ...(canManage
+      ? [
+          {
+            field: 'actions',
+            headerName: '',
+            sortable: false,
+            filterable: false,
+            width: 100,
+            renderCell: (params: { row: Product }) => (
+              <Stack direction="row">
+                <IconButton size="small" onClick={() => navigate(`/produits/${params.row.id}`)}>
+                  <EditOutlinedIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => {
+                    if (confirm(`Supprimer "${params.row.name}" ?`)) deleteMutation.mutate(params.row.id);
+                  }}
+                >
+                  <DeleteOutlineIcon fontSize="small" />
+                </IconButton>
+              </Stack>
+            ),
+          } satisfies GridColDef<Product>,
+        ]
+      : []),
   ];
 
   return (
     <Box>
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
         <Typography variant="h4">Produits</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/produits/nouveau')}>
-          Nouveau produit
-        </Button>
+        {canManage && (
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/produits/nouveau')}>
+            Nouveau produit
+          </Button>
+        )}
       </Stack>
 
       <TextField
@@ -117,8 +125,8 @@ export default function ProductListPage() {
           loading={isLoading}
           autoHeight
           disableRowSelectionOnClick
-          pageSizeOptions={[10, 25, 50]}
-          initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+          pageSizeOptions={[5, 10, 25, 50]}
+          initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
           sx={{ border: 'none' }}
         />
       </Box>

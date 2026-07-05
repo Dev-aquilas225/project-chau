@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   AppBar,
@@ -24,25 +24,62 @@ import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { usePermission } from '@/features/auth/usePermission';
 import { logout } from '@/features/auth/api';
+import NotificationBell from '@/features/notifications/NotificationBell';
+import type { ResourceKey } from '@/types';
 
 const DRAWER_WIDTH = 260;
 
-const NAV_ITEMS = [
+interface NavItem {
+  label: string;
+  to: string;
+  icon: ReactNode;
+  resource?: ResourceKey;
+  adminOnly?: boolean;
+}
+
+const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', to: '/', icon: <DashboardOutlinedIcon /> },
-  { label: 'Produits', to: '/produits', icon: <Inventory2OutlinedIcon /> },
-  { label: 'Catégories', to: '/categories', icon: <CategoryOutlinedIcon /> },
-  { label: 'Commandes', to: '/commandes', icon: <ReceiptLongOutlinedIcon /> },
-  { label: 'Utilisateurs', to: '/utilisateurs', icon: <PeopleAltOutlinedIcon /> },
-  { label: 'Codes promo', to: '/codes-promo', icon: <LocalOfferOutlinedIcon /> },
-  { label: 'Vendeurs', to: '/vendeurs', icon: <StorefrontOutlinedIcon /> },
-  { label: 'Paramètres', to: '/parametres', icon: <SettingsOutlinedIcon /> },
+  { label: 'Produits', to: '/produits', icon: <Inventory2OutlinedIcon />, resource: 'products' },
+  { label: 'Catégories', to: '/categories', icon: <CategoryOutlinedIcon />, resource: 'categories' },
+  { label: 'Commandes', to: '/commandes', icon: <ReceiptLongOutlinedIcon />, resource: 'orders' },
+  { label: 'Utilisateurs', to: '/utilisateurs', icon: <PeopleAltOutlinedIcon />, resource: 'users' },
+  { label: 'Codes promo', to: '/codes-promo', icon: <LocalOfferOutlinedIcon />, resource: 'promoCodes' },
+  { label: 'Vendeurs', to: '/vendeurs', icon: <StorefrontOutlinedIcon />, resource: 'sellers' },
+  { label: 'Paramètres', to: '/parametres', icon: <SettingsOutlinedIcon />, resource: 'platformConfig' },
+  { label: 'Rôles', to: '/roles', icon: <AdminPanelSettingsOutlinedIcon />, adminOnly: true },
 ];
 
+function useVisibleNavItems(): NavItem[] {
+  const { role } = useAuth();
+  // Les hooks de permission doivent être appelés inconditionnellement : on les calcule tous, puis on filtre.
+  const products = usePermission('products');
+  const categories = usePermission('categories');
+  const orders = usePermission('orders');
+  const users = usePermission('users');
+  const promoCodes = usePermission('promoCodes');
+  const sellers = usePermission('sellers');
+  const platformConfig = usePermission('platformConfig');
+  const levels: Record<ResourceKey, string> = { products, categories, orders, users, promoCodes, sellers, platformConfig };
+
+  return useMemo(
+    () =>
+      NAV_ITEMS.filter((item) => {
+        if (item.adminOnly) return role === 'admin';
+        if (!item.resource) return true;
+        return levels[item.resource] !== 'none';
+      }),
+    [role, products, categories, orders, users, promoCodes, sellers, platformConfig],
+  );
+}
+
 function DrawerContent({ onNavigate }: { onNavigate?: () => void }) {
+  const items = useVisibleNavItems();
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Toolbar sx={{ px: 3 }}>
@@ -52,7 +89,7 @@ function DrawerContent({ onNavigate }: { onNavigate?: () => void }) {
       </Toolbar>
       <Divider sx={{ borderColor: 'rgba(255,255,255,0.12)' }} />
       <List sx={{ px: 1.5, py: 2, flex: 1 }}>
-        {NAV_ITEMS.map((item) => (
+        {items.map((item) => (
           <ListItemButton
             key={item.to}
             component={NavLink}
@@ -123,7 +160,7 @@ export default function AdminLayout(): ReactNode {
 
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <AppBar position="sticky" elevation={0} sx={{ width: '100%' }}>
-          <Toolbar sx={{ gap: 2 }}>
+          <Toolbar sx={{ gap: 1.5 }}>
             <IconButton
               edge="start"
               sx={{ display: { xs: 'inline-flex', md: 'none' } }}
@@ -132,6 +169,7 @@ export default function AdminLayout(): ReactNode {
               <MenuIcon />
             </IconButton>
             <Box sx={{ flexGrow: 1 }} />
+            <NotificationBell />
             <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} size="small">
               <Avatar sx={{ width: 34, height: 34, bgcolor: 'primary.main', fontSize: 14 }}>
                 {user?.displayName?.[0]?.toUpperCase() ?? 'A'}

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { getSellers, updateSellerStatus } from './api';
+import { getSellers, updateSellerStatus, setSellerBlocked } from './api';
 import { ApiError } from '@/lib/http';
 import type { SellerStatus } from '@/types';
 
@@ -33,6 +33,20 @@ export function useUpdateSellerStatus() {
       queryClient.invalidateQueries({ queryKey: ['sellers'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       toast.success('Statut vendeur mis à jour');
+    },
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Erreur lors de la mise à jour'),
+  });
+}
+
+export function useSetSellerBlocked() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, blocked, reason }: { userId: string; blocked: boolean; reason?: string }) =>
+      setSellerBlocked(userId, blocked, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sellers'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      toast.success('Statut de blocage mis à jour');
     },
     onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Erreur lors de la mise à jour'),
   });

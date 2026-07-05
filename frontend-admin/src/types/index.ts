@@ -2,6 +2,46 @@ export type Role = 'customer' | 'admin';
 export type SellerStatus = 'none' | 'pending' | 'approved' | 'rejected';
 export type IdType = 'national_id' | 'passport';
 
+export type ResourceKey =
+  | 'products'
+  | 'categories'
+  | 'orders'
+  | 'users'
+  | 'promoCodes'
+  | 'sellers'
+  | 'platformConfig';
+
+export type PermissionLevel = 'none' | 'view' | 'manage';
+
+export const RESOURCE_KEYS: ResourceKey[] = [
+  'products',
+  'categories',
+  'orders',
+  'users',
+  'promoCodes',
+  'sellers',
+  'platformConfig',
+];
+
+export const RESOURCE_LABELS: Record<ResourceKey, string> = {
+  products: 'Produits',
+  categories: 'Catégories',
+  orders: 'Commandes',
+  users: 'Utilisateurs',
+  promoCodes: 'Codes promo',
+  sellers: 'Vendeurs',
+  platformConfig: 'Paramètres',
+};
+
+export interface CustomRole {
+  id: string;
+  name: string;
+  description?: string | null;
+  permissions: Partial<Record<ResourceKey, PermissionLevel>>;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface SellerProfile {
   storeName?: string;
   bio?: string;
@@ -40,6 +80,9 @@ export interface UserProfile {
   bio?: string;
   country?: string;
   city?: string;
+  blocked: boolean;
+  customRoleId?: string | null;
+  customRole: { id: string; name: string; permissions?: Partial<Record<ResourceKey, PermissionLevel>> } | null;
   createdAt: string;
 }
 
@@ -51,6 +94,9 @@ export interface SellerAdminView {
   role: Role;
   sellerStatus: SellerStatus;
   identityVerified: boolean;
+  blocked: boolean;
+  blockedAt: string | null;
+  blockReason: string | null;
   createdAt: string;
   sellerProfile: SellerProfile;
 }
@@ -145,9 +191,34 @@ export interface DashboardStats {
   outOfStockProducts: number;
   recentOrders: Order[];
   pendingSellerCount: number;
+  activeSellerCount: number;
+}
+
+export type AnalyticsPeriod = '7d' | '30d' | '90d';
+
+export interface AnalyticsData {
+  revenueTrend: { date: string; revenue: number }[];
+  userGrowth: { date: string; newUsers: number }[];
+  sellerGrowth: { date: string; newSellers: number }[];
+  topProducts: { productId: string; name: string; unitsSold: number; revenue: number }[];
+  topSellers: { sellerId: string; name: string; revenue: number; ordersCount: number }[];
+  avgOrderValue: number;
+  conversionRate: number;
+  newUsersCount: number;
 }
 
 export interface PlatformConfigMap {
   commissionRate: number;
   sellerRegistrationEnabled: boolean;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: 'order_status' | 'seller_status' | 'new_order' | 'new_seller_application' | 'low_stock';
+  title: string;
+  message: string;
+  link: string | null;
+  read: boolean;
+  createdAt: string;
 }

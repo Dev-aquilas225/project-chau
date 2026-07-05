@@ -12,3 +12,7 @@ export function updateSellerStatus(
 ): Promise<SellerAdminView> {
   return apiFetch<SellerAdminView>(`/sellers/${userId}/status`, { method: 'PATCH', body: { status, note } });
 }
+
+export function setSellerBlocked(userId: string, blocked: boolean, reason?: string): Promise<SellerAdminView> {
+  return apiFetch<SellerAdminView>(`/sellers/${userId}/block`, { method: 'PATCH', body: { blocked, reason } });
+}

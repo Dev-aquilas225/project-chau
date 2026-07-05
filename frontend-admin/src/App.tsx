@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
-import RequireAdmin from '@/components/layout/RequireAdmin';
+import RequireStaff from '@/components/layout/RequireStaff';
 import AdminLayout from '@/components/layout/AdminLayout';
 import LoginPage from '@/features/auth/LoginPage';
 
@@ -16,6 +16,7 @@ const PromoCodeListPage = lazy(() => import('@/features/promoCodes/PromoCodeList
 const SellerListPage = lazy(() => import('@/features/sellers/SellerListPage'));
 const SellerDetailPage = lazy(() => import('@/features/sellers/SellerDetailPage'));
 const PlatformConfigPage = lazy(() => import('@/features/platformConfig/PlatformConfigPage'));
+const RoleListPage = lazy(() => import('@/features/roles/RoleListPage'));
 
 function PageFallback() {
   return (
@@ -30,7 +31,7 @@ export default function App() {
     <Suspense fallback={<PageFallback />}>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route element={<RequireAdmin />}>
+        <Route element={<RequireStaff />}>
           <Route element={<AdminLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="produits" element={<ProductListPage />} />
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="vendeurs" element={<SellerListPage />} />
             <Route path="vendeurs/:userId" element={<SellerDetailPage />} />
             <Route path="parametres" element={<PlatformConfigPage />} />
+            <Route path="roles" element={<RoleListPage />} />
           </Route>
         </Route>
       </Routes>

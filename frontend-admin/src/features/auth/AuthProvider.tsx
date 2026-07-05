@@ -1,11 +1,13 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { getMe } from './api';
 import { getToken, setToken } from '@/lib/http';
-import type { Role, UserProfile } from '@/types';
+import type { CustomRole, Role, UserProfile } from '@/types';
 
 interface AuthState {
   user: UserProfile | null;
   role: Role | null;
+  customRole: CustomRole | null;
+  isStaff: boolean;
   loading: boolean;
   refresh: () => Promise<void>;
 }
@@ -13,6 +15,8 @@ interface AuthState {
 const AuthContext = createContext<AuthState>({
   user: null,
   role: null,
+  customRole: null,
+  isStaff: false,
   loading: true,
   refresh: async () => {},
 });
@@ -42,8 +46,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     load();
   }, []);
 
+  const customRole = (user?.customRole as CustomRole | null) ?? null;
+
   return (
-    <AuthContext.Provider value={{ user, role: user?.role ?? null, loading, refresh: load }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        role: user?.role ?? null,
+        customRole,
+        isStaff: user?.role === 'admin' || !!customRole,
+        loading,
+        refresh: load,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

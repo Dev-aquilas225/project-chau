@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Box,
   Card,
@@ -10,18 +11,24 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from '@mui/material';
 import EuroOutlinedIcon from '@mui/icons-material/EuroOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import { useNavigate } from 'react-router-dom';
-import { useDashboardStats } from './hooks';
+import { useDashboardStats, useAnalytics } from './hooks';
 import StatCard from './components/StatCard';
+import RevenueTrendChart from './components/RevenueTrendChart';
+import TopRankingList from './components/TopRankingList';
 import OrderStatusChip from '@/components/OrderStatusChip';
 import { formatCurrency, formatDate } from '@/lib/format';
-import type { OrderStatus } from '@/types';
+import type { AnalyticsPeriod, OrderStatus } from '@/types';
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   pending: 'En attente',
@@ -31,9 +38,13 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
   cancelled: 'Annulées',
 };
 
+const PERIOD_LABELS: Record<AnalyticsPeriod, string> = { '7d': '7 jours', '30d': '30 jours', '90d': '90 jours' };
+
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { data, isLoading } = useDashboardStats();
+  const [period, setPeriod] = useState<AnalyticsPeriod>('30d');
+  const { data: analytics, isLoading: isAnalyticsLoading } = useAnalytics(period);
 
   if (isLoading || !data) {
     return (
@@ -72,9 +83,17 @@ export default function DashboardPage() {
             accent="#6b21a8"
           />
         </Grid>
+        <Grid item xs={12} sm={6} lg={3}>
+          <StatCard
+            label="Vendeurs actifs"
+            value={String(data.activeSellerCount)}
+            icon={<CheckCircleOutlinedIcon />}
+            accent="#0ca30c"
+          />
+        </Grid>
       </Grid>
 
-      <Grid container spacing={2.5}>
+      <Grid container spacing={2.5} sx={{ mb: 3 }}>
         <Grid item xs={12} lg={4}>
           <Card>
             <CardContent>
@@ -142,6 +161,77 @@ export default function DashboardPage() {
           </Card>
         </Grid>
       </Grid>
+
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Typography variant="h5">Analyse détaillée</Typography>
+        <ToggleButtonGroup size="small" exclusive value={period} onChange={(_e, v) => v && setPeriod(v)}>
+          {(Object.keys(PERIOD_LABELS) as AnalyticsPeriod[]).map((p) => (
+            <ToggleButton key={p} value={p}>
+              {PERIOD_LABELS[p]}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+      </Box>
+
+      {isAnalyticsLoading || !analytics ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+          <CircularProgress size={28} />
+        </Box>
+      ) : (
+        <Grid container spacing={2.5}>
+          <Grid item xs={12} lg={8}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  Évolution du chiffre d'affaires
+                </Typography>
+                <RevenueTrendChart data={analytics.revenueTrend} />
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} sm={6} lg={4}>
+            <Stack spacing={2.5}>
+              <StatCard label="Panier moyen" value={formatCurrency(analytics.avgOrderValue)} icon={<EuroOutlinedIcon />} accent="#0288d1" />
+              <StatCard
+                label="Taux de conversion"
+                value={`${Math.round(analytics.conversionRate * 100)}%`}
+                icon={<CheckCircleOutlinedIcon />}
+                accent="#0ca30c"
+              />
+              <StatCard label="Nouveaux clients" value={String(analytics.newUsersCount)} icon={<ReceiptLongOutlinedIcon />} accent="#6b21a8" />
+            </Stack>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Top produits
+                </Typography>
+                <TopRankingList
+                  items={analytics.topProducts.map((p) => ({ key: p.productId, label: p.name, value: p.revenue }))}
+                  emptyLabel="Aucune vente sur cette période"
+                />
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Top vendeurs
+                </Typography>
+                <TopRankingList
+                  items={analytics.topSellers.map((s) => ({ key: s.sellerId, label: s.name, value: s.revenue }))}
+                  emptyLabel="Aucune vente vendeur sur cette période"
+                />
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      )}
     </Box>
   );
 }

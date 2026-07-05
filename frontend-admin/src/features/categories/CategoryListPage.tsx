@@ -16,6 +16,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   TextField,
   Typography,
@@ -25,6 +26,8 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from './hooks';
 import { categorySchema, type CategoryFormValues } from './schemas';
+import { useHasPermission } from '@/features/auth/usePermission';
+import { usePagination } from '@/hooks/usePagination';
 import type { Category } from '@/types';
 
 function CategoryDialog({
@@ -109,6 +112,7 @@ function CategoryDialog({
 }
 
 export default function CategoryListPage() {
+  const canManage = useHasPermission('categories', 'manage');
   const { data: categories = [], isLoading } = useCategories();
   const deleteMutation = useDeleteCategory();
   const [dialogState, setDialogState] = useState<{ open: boolean; category: Category | null }>({
@@ -117,18 +121,21 @@ export default function CategoryListPage() {
   });
 
   const sorted = useMemo(() => [...categories].sort((a, b) => a.name.localeCompare(b.name)), [categories]);
+  const { paginated, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, count } = usePagination(sorted);
 
   return (
     <Box>
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
         <Typography variant="h4">Catégories</Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setDialogState({ open: true, category: null })}
-        >
-          Nouvelle catégorie
-        </Button>
+        {canManage && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setDialogState({ open: true, category: null })}
+          >
+            Nouvelle catégorie
+          </Button>
+        )}
       </Stack>
 
       <TableContainer sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
@@ -138,40 +145,52 @@ export default function CategoryListPage() {
               <TableCell>Nom</TableCell>
               <TableCell>Slug</TableCell>
               <TableCell>Parente</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              {canManage && <TableCell align="right">Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
-            {sorted.map((category) => (
+            {paginated.map((category) => (
               <TableRow key={category.id} hover>
                 <TableCell>{category.name}</TableCell>
                 <TableCell sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>{category.slug}</TableCell>
                 <TableCell>{category.parent?.name ?? '—'}</TableCell>
-                <TableCell align="right">
-                  <IconButton size="small" onClick={() => setDialogState({ open: true, category })}>
-                    <EditOutlinedIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => {
-                      if (confirm(`Supprimer la catégorie "${category.name}" ?`)) deleteMutation.mutate(category.id);
-                    }}
-                  >
-                    <DeleteOutlineIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
+                {canManage && (
+                  <TableCell align="right">
+                    <IconButton size="small" onClick={() => setDialogState({ open: true, category })}>
+                      <EditOutlinedIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => {
+                        if (confirm(`Supprimer la catégorie "${category.name}" ?`)) deleteMutation.mutate(category.id);
+                      }}
+                    >
+                      <DeleteOutlineIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
             {!isLoading && sorted.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} align="center" sx={{ color: 'text.secondary', py: 4 }}>
+                <TableCell colSpan={canManage ? 4 : 3} align="center" sx={{ color: 'text.secondary', py: 4 }}>
                   Aucune catégorie
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
+        <TablePagination
+          component="div"
+          count={count}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25]}
+          labelRowsPerPage="Lignes par page"
+        />
       </TableContainer>
 
       <CategoryDialog

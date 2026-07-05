@@ -14,16 +14,20 @@ import {
   Typography,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useSeller, useUpdateSellerStatus } from './hooks';
+import { useSeller, useUpdateSellerStatus, useSetSellerBlocked } from './hooks';
 import IdentityDocViewer from './components/IdentityDocViewer';
+import { useHasPermission } from '@/features/auth/usePermission';
 import { formatDate } from '@/lib/format';
 
 export default function SellerDetailPage() {
+  const canManage = useHasPermission('sellers', 'manage');
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const { data: seller, isLoading } = useSeller(userId);
   const updateStatusMutation = useUpdateSellerStatus();
+  const setBlockedMutation = useSetSellerBlocked();
   const [note, setNote] = useState('');
+  const [blockReason, setBlockReason] = useState('');
 
   if (isLoading || !seller) {
     return (
@@ -45,6 +49,14 @@ export default function SellerDetailPage() {
     navigate('/vendeurs');
   };
 
+  const handleToggleBlocked = async () => {
+    if (!userId) return;
+    const nextBlocked = !seller.blocked;
+    if (nextBlocked && !confirm(`Bloquer le compte de ${seller.displayName} ?`)) return;
+    await setBlockedMutation.mutateAsync({ userId, blocked: nextBlocked, reason: nextBlocked ? blockReason.trim() || undefined : undefined });
+    setBlockReason('');
+  };
+
   return (
     <Box>
       <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/vendeurs')} sx={{ color: 'text.secondary', mb: 1.5 }}>
@@ -56,6 +68,7 @@ export default function SellerDetailPage() {
           label={seller.sellerStatus}
           color={seller.sellerStatus === 'approved' ? 'success' : seller.sellerStatus === 'pending' ? 'warning' : 'error'}
         />
+        {seller.blocked && <Chip label="Bloqué" color="error" variant="filled" />}
       </Stack>
 
       <Grid container spacing={2.5}>
@@ -99,55 +112,103 @@ export default function SellerDetailPage() {
         </Grid>
 
         <Grid item xs={12} md={5}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                Décision
-              </Typography>
-              {profile.reviewedAt && (
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Dernière décision : {formatDate(profile.reviewedAt)}
-                  {profile.reviewNote ? ` — ${profile.reviewNote}` : ''}
-                </Typography>
-              )}
-              {isPending ? (
-                <Stack spacing={2}>
-                  <TextField
-                    label="Note (motif de rejet, optionnel pour une approbation)"
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    multiline
-                    minRows={3}
-                    fullWidth
-                  />
-                  <Stack direction="row" spacing={1.5}>
-                    <Button
-                      variant="contained"
-                      color="success"
+          <Stack spacing={2.5}>
+            {canManage && isPending && (
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    Décision
+                  </Typography>
+                  <Stack spacing={2}>
+                    <TextField
+                      label="Note (motif de rejet, optionnel pour une approbation)"
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      multiline
+                      minRows={3}
                       fullWidth
-                      disabled={updateStatusMutation.isPending}
-                      onClick={() => handleDecision('approved')}
-                    >
-                      Approuver
-                    </Button>
+                    />
+                    <Stack direction="row" spacing={1.5}>
+                      <Button
+                        variant="contained"
+                        color="success"
+                        fullWidth
+                        disabled={updateStatusMutation.isPending}
+                        onClick={() => handleDecision('approved')}
+                      >
+                        Approuver
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        fullWidth
+                        disabled={updateStatusMutation.isPending}
+                        onClick={() => handleDecision('rejected')}
+                      >
+                        Rejeter
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </CardContent>
+              </Card>
+            )}
+
+            {!isPending && (
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    Décision
+                  </Typography>
+                  {profile.reviewedAt && (
+                    <Typography variant="body2" color="text.secondary">
+                      Dernière décision : {formatDate(profile.reviewedAt)}
+                      {profile.reviewNote ? ` — ${profile.reviewNote}` : ''}
+                    </Typography>
+                  )}
+                  {!profile.reviewedAt && (
+                    <Typography variant="body2" color="text.secondary">
+                      Cette candidature n'a pas encore été traitée.
+                    </Typography>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {canManage && seller.sellerStatus !== 'none' && (
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    Modération
+                  </Typography>
+                  {seller.blocked && seller.blockReason && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      Motif du blocage : {seller.blockReason}
+                    </Typography>
+                  )}
+                  <Stack spacing={2}>
+                    {!seller.blocked && (
+                      <TextField
+                        label="Motif du blocage (optionnel)"
+                        value={blockReason}
+                        onChange={(e) => setBlockReason(e.target.value)}
+                        multiline
+                        minRows={2}
+                        fullWidth
+                      />
+                    )}
                     <Button
-                      variant="outlined"
+                      variant={seller.blocked ? 'contained' : 'outlined'}
                       color="error"
-                      fullWidth
-                      disabled={updateStatusMutation.isPending}
-                      onClick={() => handleDecision('rejected')}
+                      disabled={setBlockedMutation.isPending}
+                      onClick={handleToggleBlocked}
                     >
-                      Rejeter
+                      {seller.blocked ? 'Débloquer le compte' : 'Bloquer le compte'}
                     </Button>
                   </Stack>
-                </Stack>
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  Cette candidature a déjà été traitée.
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            )}
+          </Stack>
         </Grid>
       </Grid>
     </Box>

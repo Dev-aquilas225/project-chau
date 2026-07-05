@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Tab, Typography, CircularProgress } from '@mui/material';
+import { Box, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tabs, Tab, Typography, CircularProgress } from '@mui/material';
 import { useSellers } from './hooks';
+import { usePagination } from '@/hooks/usePagination';
 import { formatDateShort } from '@/lib/format';
 import type { SellerStatus } from '@/types';
 
@@ -23,6 +24,7 @@ export default function SellerListPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<SellerStatus | 'all'>('pending');
   const { data: sellers = [], isLoading } = useSellers(tab === 'all' ? undefined : tab);
+  const { paginated, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, count } = usePagination(sellers);
 
   return (
     <Box>
@@ -52,7 +54,7 @@ export default function SellerListPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {sellers.map((seller) => (
+              {paginated.map((seller) => (
                 <TableRow key={seller.id} hover onClick={() => navigate(`/vendeurs/${seller.id}`)} sx={{ cursor: 'pointer' }}>
                   <TableCell>{seller.sellerProfile.storeName || '—'}</TableCell>
                   <TableCell>
@@ -63,7 +65,8 @@ export default function SellerListPage() {
                   </TableCell>
                   <TableCell>{seller.sellerProfile.submittedAt ? formatDateShort(seller.sellerProfile.submittedAt) : '—'}</TableCell>
                   <TableCell>
-                    <Chip size="small" label={seller.sellerStatus} color={STATUS_COLOR[seller.sellerStatus]} />
+                    <Chip size="small" label={seller.sellerStatus} color={STATUS_COLOR[seller.sellerStatus]} sx={{ mr: 0.5 }} />
+                    {seller.blocked && <Chip size="small" label="Bloqué" color="error" />}
                   </TableCell>
                 </TableRow>
               ))}
@@ -76,6 +79,16 @@ export default function SellerListPage() {
               )}
             </TableBody>
           </Table>
+          <TablePagination
+            component="div"
+            count={count}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[5, 10, 25]}
+            labelRowsPerPage="Lignes par page"
+          />
         </TableContainer>
       )}
     </Box>

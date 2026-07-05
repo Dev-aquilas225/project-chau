@@ -2,8 +2,8 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
 import { useAuth } from '@/features/auth/AuthProvider';
 
-export default function RequireAdmin() {
-  const { user, role, loading } = useAuth();
+export default function RequireStaff() {
+  const { user, isStaff, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -14,7 +14,7 @@ export default function RequireAdmin() {
     );
   }
 
-  if (!user || role !== 'admin') {
+  if (!user || !isStaff) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 

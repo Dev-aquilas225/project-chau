@@ -21,12 +21,14 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useOrder, useUpdateOrderStatus } from './hooks';
 import OrderStatusChip from '@/components/OrderStatusChip';
+import { useHasPermission } from '@/features/auth/usePermission';
 import { formatCurrency, formatDate } from '@/lib/format';
 import type { OrderStatus } from '@/types';
 
 const STATUS_OPTIONS: OrderStatus[] = ['pending', 'paid', 'shipped', 'delivered', 'cancelled'];
 
 export default function OrderDetailPage() {
+  const canManage = useHasPermission('orders', 'manage');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: order, isLoading } = useOrder(id);
@@ -161,6 +163,7 @@ export default function OrderDetailPage() {
               </CardContent>
             </Card>
 
+            {canManage && (
             <Card>
               <CardContent>
                 <Typography variant="h6" sx={{ mb: 2 }}>
@@ -198,6 +201,7 @@ export default function OrderDetailPage() {
                 </Stack>
               </CardContent>
             </Card>
+            )}
           </Stack>
         </Grid>
       </Grid>

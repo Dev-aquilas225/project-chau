@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Tab, Typography, CircularProgress } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tabs, Tab, Typography, CircularProgress } from '@mui/material';
 import { useOrders } from './hooks';
 import OrderStatusChip from '@/components/OrderStatusChip';
+import { usePagination } from '@/hooks/usePagination';
 import { formatCurrency, formatDate } from '@/lib/format';
 import type { OrderStatus } from '@/types';
 
@@ -19,6 +20,7 @@ export default function OrderListPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<OrderStatus | 'all'>('all');
   const { data: orders = [], isLoading } = useOrders(tab === 'all' ? undefined : tab);
+  const { paginated, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, count } = usePagination(orders);
 
   return (
     <Box>
@@ -54,7 +56,7 @@ export default function OrderListPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders.map((order) => (
+              {paginated.map((order) => (
                 <TableRow
                   key={order.id}
                   hover
@@ -80,6 +82,16 @@ export default function OrderListPage() {
               )}
             </TableBody>
           </Table>
+          <TablePagination
+            component="div"
+            count={count}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[5, 10, 25]}
+            labelRowsPerPage="Lignes par page"
+          />
         </TableContainer>
       )}
     </Box>

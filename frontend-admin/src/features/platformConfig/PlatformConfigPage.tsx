@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Box, Button, Card, CardContent, CircularProgress, FormControlLabel, InputAdornment, Stack, Switch, TextField, Typography } from '@mui/material';
 import { usePlatformConfig, useUpdatePlatformConfig } from './hooks';
+import { useHasPermission } from '@/features/auth/usePermission';
 
 export default function PlatformConfigPage() {
+  const canManage = useHasPermission('platformConfig', 'manage');
   const { data, isLoading } = usePlatformConfig();
   const updateMutation = useUpdatePlatformConfig();
   const [commissionRate, setCommissionRate] = useState(0);
@@ -45,19 +47,23 @@ export default function PlatformConfigPage() {
               InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }}
               helperText="Pourcentage prélevé sur chaque vente réalisée par un vendeur"
               fullWidth
+              disabled={!canManage}
             />
             <FormControlLabel
               control={
                 <Switch
                   checked={sellerRegistrationEnabled}
                   onChange={(e) => setSellerRegistrationEnabled(e.target.checked)}
+                  disabled={!canManage}
                 />
               }
               label="Autoriser les nouvelles candidatures vendeur"
             />
-            <Button variant="contained" onClick={handleSave} disabled={updateMutation.isPending} sx={{ alignSelf: 'flex-start' }}>
-              Enregistrer
-            </Button>
+            {canManage && (
+              <Button variant="contained" onClick={handleSave} disabled={updateMutation.isPending} sx={{ alignSelf: 'flex-start' }}>
+                Enregistrer
+              </Button>
+            )}
           </Stack>
         </CardContent>
       </Card>
