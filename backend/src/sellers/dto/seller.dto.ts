@@ -1,4 +1,4 @@
-import { IsDateString, IsIn, IsOptional, IsString, Length, MaxLength, ValidateIf } from 'class-validator';
+import { IsBoolean, IsDateString, IsIn, IsOptional, IsString, Length, MaxLength, ValidateIf } from 'class-validator';
 import type { IdType, SellerStatus } from '../../users/entities/user.entity';
 
 export class ApplySellerDto {
@@ -63,4 +63,14 @@ export class UpdateSellerStatusDto {
   @IsOptional()
   @IsString()
   note?: string;
+}
+
+export class UpdateSellerBlockDto {
+  @IsBoolean()
+  blocked: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  reason?: string;
 }

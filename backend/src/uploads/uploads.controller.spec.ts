@@ -25,8 +25,17 @@ describe('UploadsController', () => {
     email: `${sub}@test.com`,
     role: 'customer',
     sellerStatus: 'approved',
+    blocked: false,
+    customRole: null,
   });
-  const adminToken: JwtPayload = { sub: 'admin-1', email: 'admin@test.com', role: 'admin', sellerStatus: 'none' };
+  const adminToken: JwtPayload = {
+    sub: 'admin-1',
+    email: 'admin@test.com',
+    role: 'admin',
+    sellerStatus: 'none',
+    blocked: false,
+    customRole: null,
+  };
 
   beforeEach(() => {
     controller = new UploadsController();
@@ -105,13 +114,27 @@ describe('UploadsController', () => {
 
   describe('POST /uploads/product-image (non-régression)', () => {
     it('refuse un customer qui n\'est pas vendeur approuvé', () => {
-      const user: JwtPayload = { sub: 'user-1', email: 'x@test.com', role: 'customer', sellerStatus: 'pending' };
+      const user: JwtPayload = {
+        sub: 'user-1',
+        email: 'x@test.com',
+        role: 'customer',
+        sellerStatus: 'pending',
+        blocked: false,
+        customRole: null,
+      };
       const file = { filename: 'abc.jpg' } as Express.Multer.File;
       expect(() => controller.uploadProductImage(user, file)).toThrow(ForbiddenException);
     });
 
     it('autorise un vendeur approuvé', () => {
-      const user: JwtPayload = { sub: 'user-1', email: 'x@test.com', role: 'customer', sellerStatus: 'approved' };
+      const user: JwtPayload = {
+        sub: 'user-1',
+        email: 'x@test.com',
+        role: 'customer',
+        sellerStatus: 'approved',
+        blocked: false,
+        customRole: null,
+      };
       const file = { filename: 'abc.jpg' } as Express.Multer.File;
       expect(controller.uploadProductImage(user, file)).toEqual({ url: '/uploads/products/abc.jpg' });
     });

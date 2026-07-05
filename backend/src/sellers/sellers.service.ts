@@ -6,7 +6,7 @@ import { join } from 'path';
 import { User, SellerStatus } from '../users/entities/user.entity';
 import { AuthService } from '../auth/auth.service';
 import { NotificationsService } from '../notifications/notifications.service';
-import { ApplySellerDto, UpdateSellerProfileDto, UpdateSellerStatusDto } from './dto/seller.dto';
+import { ApplySellerDto, UpdateSellerBlockDto, UpdateSellerProfileDto, UpdateSellerStatusDto } from './dto/seller.dto';
 
 const IDENTITY_UPLOAD_DIR = join(process.cwd(), 'uploads-private', 'identity');
 
@@ -26,6 +26,9 @@ export class SellersService {
       role: user.role,
       sellerStatus: user.sellerStatus,
       identityVerified: user.sellerStatus === 'approved',
+      blocked: user.blocked,
+      blockedAt: user.blockedAt,
+      blockReason: user.blockReason,
       createdAt: user.createdAt,
     };
   }
@@ -103,6 +106,12 @@ export class SellersService {
       submittedAt: now,
     };
     const saved = await this.usersRepo.save(user);
+    await this.notificationsService.notifyAdmins(
+      'new_seller_application',
+      'Nouvelle candidature vendeur',
+      `${dto.storeName} a soumis une demande de vérification`,
+      `/vendeurs/${saved.id}`,
+    );
     return { accessToken: this.authService.signToken(saved), user: this.sanitizeSelf(saved) };
   }
 
@@ -154,6 +163,31 @@ export class SellersService {
       "Vérification d'identité",
       message,
       dto.status === 'approved' ? '/espace-vendeur' : '/devenir-vendeur',
+    );
+
+    return this.sanitizeAdmin(saved);
+  }
+
+  async setBlocked(targetUserId: string, dto: UpdateSellerBlockDto) {
+    const user = await this.usersRepo.findOne({ where: { id: targetUserId } });
+    if (!user) throw new NotFoundException('Utilisateur introuvable');
+    if (user.sellerStatus === 'none') {
+      throw new BadRequestException("Cet utilisateur n'a pas de profil vendeur");
+    }
+
+    user.blocked = dto.blocked;
+    user.blockedAt = dto.blocked ? new Date() : null;
+    user.blockReason = dto.blocked ? dto.reason?.trim() || null : null;
+    const saved = await this.usersRepo.save(user);
+
+    await this.notificationsService.create(
+      targetUserId,
+      'seller_status',
+      dto.blocked ? 'Compte suspendu' : 'Compte réactivé',
+      dto.blocked
+        ? `Votre compte vendeur a été suspendu.${dto.reason ? ` Motif : ${dto.reason}` : ''}`
+        : 'Votre compte vendeur a été réactivé.',
+      '/espace-vendeur',
     );
 
     return this.sanitizeAdmin(saved);

@@ -6,6 +6,7 @@ import { Product } from './products/entities/product.entity';
 import { Category } from './categories/entities/category.entity';
 import { Order } from './orders/entities/order.entity';
 import { PlatformConfig } from './platform-config/entities/platform-config.entity';
+import { Role } from './roles/entities/role.entity';
 
 config();
 
@@ -16,7 +17,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'aquilas',
-  entities: [User, Product, Category, Order, PlatformConfig],
+  entities: [User, Product, Category, Order, PlatformConfig, Role],
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
   synchronize: false,
 });

@@ -8,6 +8,9 @@ export class SellerGuard implements CanActivate {
     if (req.user?.sellerStatus !== 'approved') {
       throw new ForbiddenException('Compte vendeur approuvé requis');
     }
+    if (req.user?.blocked) {
+      throw new ForbiddenException('Compte vendeur bloqué');
+    }
     return true;
   }
 }

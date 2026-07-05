@@ -3,11 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto, ProductFiltersDto, UpdateProductDto } from './dto/product.dto';
+import { hasPermission } from '../auth/permissions.util';
+import { NotificationsService } from '../notifications/notifications.service';
 import type { JwtPayload } from '../auth/strategies/jwt.strategy';
 
 @Injectable()
 export class ProductsService {
-  constructor(@InjectRepository(Product) private productsRepo: Repository<Product>) {}
+  constructor(
+    @InjectRepository(Product) private productsRepo: Repository<Product>,
+    private notificationsService: NotificationsService,
+  ) {}
 
   async findAll(filters: ProductFiltersDto = {}): Promise<Product[]> {
     const qb = this.productsRepo
@@ -66,12 +71,12 @@ export class ProductsService {
   }
 
   create(dto: CreateProductDto, caller: JwtPayload) {
-    const isAdmin = caller.role === 'admin';
+    const isStaff = hasPermission(caller, 'products', 'manage');
     const product = this.productsRepo.create({
       ...dto,
       categoryId: dto.categoryId ?? null,
-      sellerId: isAdmin ? null : caller.sub,
-      listingStatus: isAdmin ? 'active' : 'active',
+      sellerId: isStaff ? null : caller.sub,
+      listingStatus: 'active',
     });
     return this.productsRepo.save(product);
   }
@@ -79,14 +84,24 @@ export class ProductsService {
   async update(id: string, dto: UpdateProductDto, caller: JwtPayload) {
     const product = await this.findOne(id);
     this.assertOwnerOrAdmin(product, caller);
+    const wasOutOfStock = product.stock === 0;
     Object.assign(product, dto);
-    return this.productsRepo.save(product);
+    const saved = await this.productsRepo.save(product);
+    if (dto.stock === 0 && !wasOutOfStock) {
+      await this.notificationsService.notifyAdmins(
+        'low_stock',
+        'Rupture de stock',
+        `"${saved.name}" est en rupture de stock`,
+        `/produits/${saved.id}`,
+      );
+    }
+    return saved;
   }
 
   async remove(id: string, caller: JwtPayload) {
     const product = await this.findOne(id);
     this.assertOwnerOrAdmin(product, caller);
-    if (caller.role === 'admin') {
+    if (hasPermission(caller, 'products', 'manage')) {
       await this.productsRepo.remove(product);
       return { deleted: true };
     }
@@ -97,7 +112,7 @@ export class ProductsService {
   }
 
   private assertOwnerOrAdmin(product: Product, caller: JwtPayload) {
-    if (caller.role === 'admin') return;
+    if (hasPermission(caller, 'products', 'manage')) return;
     if (product.sellerId !== caller.sub) throw new ForbiddenException('Accès refusé');
   }
 }

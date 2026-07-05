@@ -7,7 +7,7 @@ describe('OrdersService', () => {
   let historyRepo: { create: jest.Mock; save: jest.Mock; find: jest.Mock };
   let productsRepo: { findOne: jest.Mock };
   let platformConfig: { getValue: jest.Mock };
-  let notificationsService: { create: jest.Mock };
+  let notificationsService: { create: jest.Mock; notifyAdmins: jest.Mock };
 
   beforeEach(() => {
     repo = {
@@ -23,7 +23,7 @@ describe('OrdersService', () => {
     };
     productsRepo = { findOne: jest.fn().mockResolvedValue({ sellerId: null }) };
     platformConfig = { getValue: jest.fn().mockResolvedValue(10) };
-    notificationsService = { create: jest.fn() };
+    notificationsService = { create: jest.fn(), notifyAdmins: jest.fn() };
     service = new OrdersService(
       repo as never,
       historyRepo as never,

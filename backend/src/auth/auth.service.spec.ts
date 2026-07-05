@@ -47,6 +47,7 @@ describe('AuthService', () => {
     it("refuse si l'utilisateur n'existe pas", async () => {
       repo.createQueryBuilder.mockReturnValue({
         addSelect: jest.fn().mockReturnThis(),
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
         getOne: jest.fn().mockResolvedValue(null),
       });
@@ -60,6 +61,7 @@ describe('AuthService', () => {
       const passwordHash = await bcrypt.hash('correct-password', 10);
       repo.createQueryBuilder.mockReturnValue({
         addSelect: jest.fn().mockReturnThis(),
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
         getOne: jest.fn().mockResolvedValue({ id: 'user-1', email: 'alice@test.com', passwordHash, role: 'customer' }),
       });
@@ -73,6 +75,7 @@ describe('AuthService', () => {
       const passwordHash = await bcrypt.hash('correct-password', 10);
       repo.createQueryBuilder.mockReturnValue({
         addSelect: jest.fn().mockReturnThis(),
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
         getOne: jest.fn().mockResolvedValue({
           id: 'user-1',

@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Order } from '../../orders/entities/order.entity';
+import { Role as CustomRole } from '../../roles/entities/role.entity';
 
 export type Role = 'customer' | 'admin';
 export type SellerStatus = 'none' | 'pending' | 'approved' | 'rejected';
@@ -61,6 +62,22 @@ export class User {
 
   @Column({ type: 'varchar', nullable: true })
   city?: string;
+
+  @ManyToOne(() => CustomRole, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'customRoleId' })
+  customRole: CustomRole | null;
+
+  @Column({ nullable: true })
+  customRoleId: string | null;
+
+  @Column({ default: false })
+  blocked: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  blockedAt: Date | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  blockReason: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

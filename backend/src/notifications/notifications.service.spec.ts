@@ -3,6 +3,8 @@ import { NotificationsService } from './notifications.service';
 describe('NotificationsService', () => {
   let service: NotificationsService;
   let repo: { create: jest.Mock; save: jest.Mock; find: jest.Mock; count: jest.Mock; update: jest.Mock };
+  let usersRepo: { find: jest.Mock };
+  let gateway: { emitToUser: jest.Mock };
 
   beforeEach(() => {
     repo = {
@@ -12,7 +14,9 @@ describe('NotificationsService', () => {
       count: jest.fn(),
       update: jest.fn(),
     };
-    service = new NotificationsService(repo as never);
+    usersRepo = { find: jest.fn().mockResolvedValue([]) };
+    gateway = { emitToUser: jest.fn() };
+    service = new NotificationsService(repo as never, usersRepo as never, gateway as never);
   });
 
   describe('create', () => {

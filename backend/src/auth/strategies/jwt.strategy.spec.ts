@@ -20,24 +20,54 @@ describe('JwtStrategy', () => {
       email: 'user@test.com',
       role: 'customer',
       sellerStatus: 'approved',
+      blocked: false,
+      customRole: null,
     } as User;
     repo.findOne.mockResolvedValue(dbUser);
 
     // Le payload décodé porte un sellerStatus périmé ('pending') : la stratégie doit ignorer
     // cette valeur et retourner l'état courant de la base (ici 'approved', suite à une
     // validation admin survenue après l'émission du token).
-    const stalePayload = { sub: 'user-1', email: 'user@test.com', role: 'customer' as const, sellerStatus: 'pending' as const };
+    const stalePayload = {
+      sub: 'user-1',
+      email: 'user@test.com',
+      role: 'customer' as const,
+      sellerStatus: 'pending' as const,
+      blocked: false,
+      customRole: null,
+    };
 
     const result = await strategy.validate(stalePayload);
 
-    expect(result).toEqual({ sub: 'user-1', email: 'user@test.com', role: 'customer', sellerStatus: 'approved' });
+    expect(result).toEqual({
+      sub: 'user-1',
+      email: 'user@test.com',
+      role: 'customer',
+      sellerStatus: 'approved',
+      blocked: false,
+      customRole: null,
+    });
   });
 
   it("relit également le rôle depuis la base (promotion admin prise en compte immédiatement)", async () => {
-    const dbUser = { id: 'user-1', email: 'user@test.com', role: 'admin', sellerStatus: 'none' } as User;
+    const dbUser = {
+      id: 'user-1',
+      email: 'user@test.com',
+      role: 'admin',
+      sellerStatus: 'none',
+      blocked: false,
+      customRole: null,
+    } as User;
     repo.findOne.mockResolvedValue(dbUser);
 
-    const stalePayload = { sub: 'user-1', email: 'user@test.com', role: 'customer' as const, sellerStatus: 'none' as const };
+    const stalePayload = {
+      sub: 'user-1',
+      email: 'user@test.com',
+      role: 'customer' as const,
+      sellerStatus: 'none' as const,
+      blocked: false,
+      customRole: null,
+    };
 
     const result = await strategy.validate(stalePayload);
 
@@ -46,7 +76,36 @@ describe('JwtStrategy', () => {
 
   it("rejette avec UnauthorizedException si l'utilisateur n'existe plus", async () => {
     repo.findOne.mockResolvedValue(null);
-    const payload = { sub: 'missing', email: 'ghost@test.com', role: 'customer' as const, sellerStatus: 'none' as const };
+    const payload = {
+      sub: 'missing',
+      email: 'ghost@test.com',
+      role: 'customer' as const,
+      sellerStatus: 'none' as const,
+      blocked: false,
+      customRole: null,
+    };
+
+    await expect(strategy.validate(payload)).rejects.toThrow(UnauthorizedException);
+  });
+
+  it('rejette avec UnauthorizedException si le compte est bloqué', async () => {
+    const dbUser = {
+      id: 'user-1',
+      email: 'user@test.com',
+      role: 'customer',
+      sellerStatus: 'approved',
+      blocked: true,
+      customRole: null,
+    } as User;
+    repo.findOne.mockResolvedValue(dbUser);
+    const payload = {
+      sub: 'user-1',
+      email: 'user@test.com',
+      role: 'customer' as const,
+      sellerStatus: 'approved' as const,
+      blocked: false,
+      customRole: null,
+    };
 
     await expect(strategy.validate(payload)).rejects.toThrow(UnauthorizedException);
   });

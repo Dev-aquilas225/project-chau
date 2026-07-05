@@ -52,6 +52,12 @@ export class OrdersService {
     });
     const saved = await this.ordersRepo.save(order);
     await this.historyRepo.save(this.historyRepo.create({ orderId: saved.id, status: 'pending' }));
+    await this.notificationsService.notifyAdmins(
+      'new_order',
+      'Nouvelle commande',
+      `Commande de ${total.toFixed(2)} € reçue`,
+      `/commandes/${saved.id}`,
+    );
     return saved;
   }
 

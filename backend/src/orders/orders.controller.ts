@@ -2,14 +2,15 @@ import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, Query, U
 import { OrdersService } from './orders.service';
 import { CreateOrderDto, UpdateOrderStatusDto } from './dto/order.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
+import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { SellerGuard } from '../auth/guards/seller.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+import { RequirePermission } from '../auth/decorators/require-permission.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { hasPermission } from '../auth/permissions.util';
 import type { JwtPayload } from '../auth/strategies/jwt.strategy';
 import type { OrderStatus } from './entities/order.entity';
 
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('orders')
 export class OrdersController {
   constructor(private ordersService: OrdersService) {}
@@ -30,7 +31,8 @@ export class OrdersController {
     return this.ordersService.findSeller(user.sub);
   }
 
-  @Roles('admin')
+  @UseGuards(PermissionsGuard)
+  @RequirePermission('orders', 'view')
   @Get()
   findAll(@Query('status') status?: OrderStatus) {
     return this.ordersService.findAll(status);
@@ -39,13 +41,14 @@ export class OrdersController {
   @Get(':id')
   async findOne(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
     const order = await this.ordersService.findOne(id);
-    if (order.userId !== user.sub && order.sellerId !== user.sub && user.role !== 'admin') {
+    if (order.userId !== user.sub && order.sellerId !== user.sub && !hasPermission(user, 'orders', 'view')) {
       throw new ForbiddenException();
     }
     return order;
   }
 
-  @Roles('admin')
+  @UseGuards(PermissionsGuard)
+  @RequirePermission('orders', 'manage')
   @Patch(':id/status')
   updateStatus(@Param('id') id: string, @Body() dto: UpdateOrderStatusDto) {
     return this.ordersService.updateStatus(id, dto.status, dto.note);

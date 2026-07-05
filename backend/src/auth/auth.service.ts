@@ -27,6 +27,8 @@ export class AuthService {
       bio: user.bio,
       country: user.country,
       city: user.city,
+      blocked: user.blocked,
+      customRole: user.customRole ? { id: user.customRole.id, name: user.customRole.name, permissions: user.customRole.permissions } : null,
       createdAt: user.createdAt,
     };
   }
@@ -61,6 +63,7 @@ export class AuthService {
     const user = await this.usersRepo
       .createQueryBuilder('user')
       .addSelect('user.passwordHash')
+      .leftJoinAndSelect('user.customRole', 'customRole')
       .where('user.email = :email', { email: dto.email })
       .getOne();
 
@@ -69,11 +72,13 @@ export class AuthService {
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) throw new UnauthorizedException('Identifiants invalides');
 
+    if (user.blocked) throw new UnauthorizedException('Compte bloqué');
+
     return { accessToken: this.signToken(user), user: this.sanitize(user) };
   }
 
   async me(userId: string) {
-    const user = await this.usersRepo.findOne({ where: { id: userId } });
+    const user = await this.usersRepo.findOne({ where: { id: userId }, relations: ['customRole'] });
     if (!user) throw new UnauthorizedException();
     return this.sanitize(user);
   }

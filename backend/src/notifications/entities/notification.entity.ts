@@ -1,7 +1,12 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
-export type NotificationType = 'order_status' | 'seller_status';
+export type NotificationType =
+  | 'order_status'
+  | 'seller_status'
+  | 'new_order'
+  | 'new_seller_application'
+  | 'low_stock';
 
 @Entity('notifications')
 export class Notification {

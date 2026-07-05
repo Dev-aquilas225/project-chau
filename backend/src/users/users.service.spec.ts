@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 describe('UsersService', () => {
   let service: UsersService;
   let repo: { find: jest.Mock; findOne: jest.Mock; save: jest.Mock };
+  let rolesService: { findOne: jest.Mock };
 
   const baseUser = (overrides: Partial<User> = {}): User =>
     ({
@@ -25,7 +26,8 @@ describe('UsersService', () => {
       findOne: jest.fn(),
       save: jest.fn(async (u) => u),
     };
-    service = new UsersService(repo as never);
+    rolesService = { findOne: jest.fn() };
+    service = new UsersService(repo as never, rolesService as never);
   });
 
   describe('updateProfile', () => {

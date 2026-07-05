@@ -2,10 +2,11 @@ import { Body, Controller, Delete, ForbiddenException, Get, Param, Patch, Post, 
 import { ProductsService } from './products.service';
 import { CreateProductDto, ProductFiltersDto, UpdateProductDto } from './dto/product.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
+import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { SellerGuard } from '../auth/guards/seller.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+import { RequirePermission } from '../auth/decorators/require-permission.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { hasPermission } from '../auth/permissions.util';
 import type { JwtPayload } from '../auth/strategies/jwt.strategy';
 
 @Controller('products')
@@ -17,8 +18,8 @@ export class ProductsController {
     return this.productsService.findAll(filters);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @RequirePermission('products', 'view')
   @Get('admin/all')
   listAll() {
     return this.productsService.listAll();
@@ -44,8 +45,8 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@CurrentUser() user: JwtPayload, @Body() dto: CreateProductDto) {
-    if (user.role !== 'admin' && user.sellerStatus !== 'approved') {
-      throw new ForbiddenException('Compte vendeur approuvé ou rôle admin requis');
+    if (user.sellerStatus !== 'approved' && !hasPermission(user, 'products', 'manage')) {
+      throw new ForbiddenException('Compte vendeur approuvé ou permission "products: manage" requise');
     }
     return this.productsService.create(dto, user);
   }
