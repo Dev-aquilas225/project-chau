@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  InputAdornment,
   MenuItem,
   Stack,
   Table,
@@ -22,6 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from './hooks';
@@ -120,8 +122,15 @@ export default function CategoryListPage() {
     category: null,
   });
 
+  const [search, setSearch] = useState('');
+
   const sorted = useMemo(() => [...categories].sort((a, b) => a.name.localeCompare(b.name)), [categories]);
-  const { paginated, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, count } = usePagination(sorted);
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return sorted;
+    return sorted.filter((c) => c.name.toLowerCase().includes(term) || c.slug.toLowerCase().includes(term));
+  }, [sorted, search]);
+  const { paginated, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, count } = usePagination(filtered);
 
   return (
     <Box>
@@ -137,6 +146,15 @@ export default function CategoryListPage() {
           </Button>
         )}
       </Stack>
+
+      <TextField
+        placeholder="Rechercher par nom ou slug…"
+        size="small"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        sx={{ mb: 2, width: 320, bgcolor: 'background.paper' }}
+        InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
+      />
 
       <TableContainer sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
         <Table>
@@ -172,7 +190,7 @@ export default function CategoryListPage() {
                 )}
               </TableRow>
             ))}
-            {!isLoading && sorted.length === 0 && (
+            {!isLoading && filtered.length === 0 && (
               <TableRow>
                 <TableCell colSpan={canManage ? 4 : 3} align="center" sx={{ color: 'text.secondary', py: 4 }}>
                   Aucune catégorie

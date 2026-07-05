@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { Box, Button, Chip, IconButton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import { useMemo, useState } from 'react';
+import { Box, Button, Chip, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useRoles, useDeleteRole } from './hooks';
@@ -11,7 +12,13 @@ import type { CustomRole } from '@/types';
 
 export default function RoleListPage() {
   const { data: roles = [], isLoading } = useRoles();
-  const { paginated, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, count } = usePagination(roles);
+  const [search, setSearch] = useState('');
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return roles;
+    return roles.filter((r) => r.name.toLowerCase().includes(term) || (r.description ?? '').toLowerCase().includes(term));
+  }, [roles, search]);
+  const { paginated, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, count } = usePagination(filtered);
   const deleteMutation = useDeleteRole();
   const [dialogState, setDialogState] = useState<{ open: boolean; role: CustomRole | null }>({
     open: false,
@@ -29,6 +36,15 @@ export default function RoleListPage() {
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Un rôle donne un accès délégué et limité au back-office à un utilisateur qui n'est pas administrateur.
       </Typography>
+
+      <TextField
+        placeholder="Rechercher par nom ou description…"
+        size="small"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        sx={{ mb: 2, width: 320, bgcolor: 'background.paper' }}
+        InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
+      />
 
       <TableContainer sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
         <Table>
@@ -73,7 +89,7 @@ export default function RoleListPage() {
                 </TableCell>
               </TableRow>
             ))}
-            {!isLoading && roles.length === 0 && (
+            {!isLoading && filtered.length === 0 && (
               <TableRow>
                 <TableCell colSpan={4} align="center" sx={{ color: 'text.secondary', py: 4 }}>
                   Aucun rôle personnalisé

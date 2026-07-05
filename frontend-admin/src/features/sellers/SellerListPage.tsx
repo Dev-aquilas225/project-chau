@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tabs, Tab, Typography, CircularProgress } from '@mui/material';
+import { Box, Chip, InputAdornment, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tabs, Tab, TextField, Typography, CircularProgress } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import { useSellers } from './hooks';
 import { usePagination } from '@/hooks/usePagination';
 import { formatDateShort } from '@/lib/format';
@@ -23,8 +24,19 @@ const STATUS_COLOR: Record<SellerStatus, 'default' | 'warning' | 'success' | 'er
 export default function SellerListPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<SellerStatus | 'all'>('pending');
+  const [search, setSearch] = useState('');
   const { data: sellers = [], isLoading } = useSellers(tab === 'all' ? undefined : tab);
-  const { paginated, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, count } = usePagination(sellers);
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return sellers;
+    return sellers.filter(
+      (s) =>
+        (s.sellerProfile.storeName ?? '').toLowerCase().includes(term) ||
+        s.displayName.toLowerCase().includes(term) ||
+        s.email.toLowerCase().includes(term),
+    );
+  }, [sellers, search]);
+  const { paginated, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, count } = usePagination(filtered);
 
   return (
     <Box>
@@ -37,6 +49,15 @@ export default function SellerListPage() {
           <Tab key={t.value} label={t.label} value={t.value} />
         ))}
       </Tabs>
+
+      <TextField
+        placeholder="Rechercher par boutique, nom ou email…"
+        size="small"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        sx={{ mb: 2, width: 320, bgcolor: 'background.paper' }}
+        InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
+      />
 
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
@@ -70,7 +91,7 @@ export default function SellerListPage() {
                   </TableCell>
                 </TableRow>
               ))}
-              {sellers.length === 0 && (
+              {filtered.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} align="center" sx={{ color: 'text.secondary', py: 4 }}>
                     Aucune candidature
