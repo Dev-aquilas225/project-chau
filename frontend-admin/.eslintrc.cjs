@@ -4,6 +4,10 @@ module.exports = {
   extends: ['eslint:recommended'],
   parser: '@typescript-eslint/parser',
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+  settings: { react: { version: '18.3' } },
   ignorePatterns: ['dist', '.eslintrc.cjs'],
-  rules: { 'no-unused-vars': 'off', 'no-undef': 'off' },
+  rules: {
+    'no-unused-vars': 'off',
+    'no-undef': 'off',
+  },
 };

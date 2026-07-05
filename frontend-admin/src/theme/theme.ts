@@ -1,81 +1,73 @@
 import { createTheme } from '@mui/material/styles';
-import { colors } from './tokens';
+import { frFR } from '@mui/material/locale';
+import { frFR as dataGridFrFR } from '@mui/x-data-grid/locales';
 
-export const theme = createTheme({
-  palette: {
-    primary: { main: colors.primary },
-    background: { default: colors.contentBg, paper: colors.cardBg },
-  },
-  shape: { borderRadius: 12 },
-  typography: {
-    fontFamily: ['Inter', 'system-ui', 'sans-serif'].join(','),
-    h4: { letterSpacing: '-0.02em' },
-    h5: { letterSpacing: '-0.01em' },
-  },
-  components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: { backgroundColor: colors.contentBg },
-      },
+export const theme = createTheme(
+  {
+    palette: {
+      mode: 'light',
+      primary: { main: '#111111', contrastText: '#ffffff' },
+      secondary: { main: '#6b7280' },
+      error: { main: '#b71c1c' },
+      background: { default: '#f7f7f5', paper: '#ffffff' },
+      text: { primary: '#111111', secondary: '#6b7280' },
+      divider: '#e5e7eb',
     },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04)',
-          borderRadius: 12,
-          border: '1px solid rgba(15,23,42,0.04)',
+    shape: { borderRadius: 10 },
+    typography: {
+      fontFamily: '"Inter", system-ui, sans-serif',
+      h1: { fontFamily: '"Playfair Display", Georgia, serif' },
+      h2: { fontFamily: '"Playfair Display", Georgia, serif' },
+      h3: { fontFamily: '"Playfair Display", Georgia, serif' },
+      h4: { fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 600 },
+      h5: { fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 600 },
+      h6: { fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 600 },
+      button: { textTransform: 'none', fontWeight: 600 },
+    },
+    components: {
+      MuiPaper: {
+        styleOverrides: {
+          root: { backgroundImage: 'none' },
         },
       },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: { borderRadius: 12 },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: { borderRadius: 8, textTransform: 'none', fontWeight: 600 },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: { fontWeight: 600 },
-      },
-    },
-    MuiTableCell: {
-      styleOverrides: {
-        head: { fontWeight: 700, color: '#64748B', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.04em' },
-      },
-    },
-    RaAppBar: {
-      styleOverrides: {
-        root: {
-          backgroundColor: '#fff',
-          color: '#0F172A',
-        },
-      },
-    },
-    RaMenuItemLink: {
-      styleOverrides: {
-        root: {
-          color: colors.sidebarText,
-          borderLeft: '3px solid transparent',
-          borderRadius: '0 10px 10px 0',
-          margin: '2px 8px 2px 0',
-          paddingLeft: 20,
-          transition: 'background-color 0.15s ease, color 0.15s ease',
-          '&:hover': {
-            backgroundColor: 'rgba(255,255,255,0.06)',
-            color: '#fff',
-          },
-          '&.RaMenuItemLink-active': {
-            backgroundColor: colors.sidebarBgActive,
-            borderLeft: `3px solid ${colors.primary}`,
-            color: '#fff',
-            fontWeight: 600,
+      MuiAppBar: {
+        styleOverrides: {
+          root: {
+            backgroundColor: '#ffffff',
+            color: '#111111',
+            boxShadow: '0 1px 0 0 #e5e7eb',
           },
         },
       },
+      MuiDrawer: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: '#111111',
+            color: '#ffffff',
+            borderRight: 'none',
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: { borderRadius: 8 },
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            border: '1px solid #e5e7eb',
+            boxShadow: 'none',
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: { fontWeight: 600 },
+        },
+      },
     },
   },
-});
+  frFR,
+  dataGridFrFR,
+);

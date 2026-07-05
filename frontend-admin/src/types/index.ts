@@ -1,15 +1,12 @@
 export type Role = 'customer' | 'admin';
-export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
 export type SellerStatus = 'none' | 'pending' | 'approved' | 'rejected';
-export type PayoutStatus = 'pending' | 'processing' | 'paid';
-export type ListingStatus = 'draft' | 'active' | 'archived';
-export type DiscountType = 'percentage' | 'fixed';
+export type IdType = 'national_id' | 'passport';
 
 export interface SellerProfile {
   storeName?: string;
   bio?: string;
   iban?: string;
-  idType?: 'national_id' | 'passport';
+  idType?: IdType;
   idNumber?: string;
   idCountry?: string;
   fullNameOnId?: string;
@@ -18,8 +15,17 @@ export interface SellerProfile {
   idDocumentBackRef?: string;
   profilePhotoRef?: string;
   submittedAt?: string;
+  verifiedAt?: string;
   reviewNote?: string;
   reviewedAt?: string;
+}
+
+export interface Address {
+  fullName: string;
+  line1: string;
+  city: string;
+  zip: string;
+  country: string;
 }
 
 export interface UserProfile {
@@ -27,26 +33,45 @@ export interface UserProfile {
   email: string;
   displayName: string;
   role: Role;
-  sellerStatus?: SellerStatus;
+  sellerStatus: SellerStatus;
   sellerProfile?: SellerProfile;
-  identityVerified?: boolean;
+  addresses: Record<string, unknown>[];
   photoURL?: string;
-  createdAt?: string;
+  bio?: string;
+  country?: string;
+  city?: string;
+  createdAt: string;
 }
 
-export interface PlatformConfig {
-  commissionRate: number;
-  sellerRegistrationEnabled: boolean;
+/** Vue admin d'un vendeur (retournée par GET /sellers) — sous-ensemble sanitizé de UserProfile. */
+export interface SellerAdminView {
+  id: string;
+  email: string;
+  displayName: string;
+  role: Role;
+  sellerStatus: SellerStatus;
+  identityVerified: boolean;
+  createdAt: string;
+  sellerProfile: SellerProfile;
 }
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  parent: { id: string; name: string; slug: string } | null;
+}
+
+export type ListingStatus = 'draft' | 'active' | 'archived';
 
 export interface Product {
   id: string;
   name: string;
   brand: string;
   description: string;
-  price: number | string;
+  price: number;
+  category: Category | null;
   categoryId: string | null;
-  seller?: UserProfile | null;
   sellerId: string | null;
   listingStatus: ListingStatus;
   images: string[];
@@ -55,16 +80,13 @@ export interface Product {
   size?: string;
   location?: string;
   active: boolean;
-  weLove?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  weLove: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-}
+export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+export type PayoutStatus = 'pending' | 'processing' | 'paid';
 
 export interface OrderItem {
   productId: string;
@@ -86,22 +108,24 @@ export interface OrderStatusHistoryEntry {
 export interface Order {
   id: string;
   userId: string;
-  sellerId?: string | null;
+  sellerId: string | null;
   items: OrderItem[];
   subtotal: number;
   discount: number;
   total: number;
-  platformFee?: number;
-  sellerPayout?: number;
-  payoutStatus?: PayoutStatus;
-  promoCode?: string | null;
+  platformFee: number;
+  sellerPayout: number;
+  payoutStatus: PayoutStatus;
+  promoCode: string | null;
   status: OrderStatus;
-  shippingAddress?: { fullName: string; line1: string; city: string; zip: string; country: string };
+  shippingAddress: Address;
   paymentMethod: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
   statusHistory?: OrderStatusHistoryEntry[];
 }
+
+export type DiscountType = 'percentage' | 'fixed';
 
 export interface PromoCode {
   id: string;
@@ -111,5 +135,19 @@ export interface PromoCode {
   minAmount: number;
   expiresAt: string | null;
   active: boolean;
-  createdAt?: string;
+  createdAt: string;
+}
+
+export interface DashboardStats {
+  totalRevenue: number;
+  ordersByStatus: Record<OrderStatus, number>;
+  totalOrders: number;
+  outOfStockProducts: number;
+  recentOrders: Order[];
+  pendingSellerCount: number;
+}
+
+export interface PlatformConfigMap {
+  commissionRate: number;
+  sellerRegistrationEnabled: boolean;
 }

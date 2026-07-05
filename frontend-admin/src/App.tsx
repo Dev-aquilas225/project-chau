@@ -1,51 +1,52 @@
-import { Admin, CustomRoutes, Resource } from 'react-admin';
-import { Route } from 'react-router-dom';
-import { authProvider } from './authProvider';
-import { dataProvider } from './dataProvider';
-import { i18nProvider } from './i18n/fr';
-import { Layout } from './layout/Layout';
-import { LoginPage } from './layout/LoginPage';
-import { theme } from './theme/theme';
+import { Suspense, lazy } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { Box, CircularProgress } from '@mui/material';
+import RequireAdmin from '@/components/layout/RequireAdmin';
+import AdminLayout from '@/components/layout/AdminLayout';
+import LoginPage from '@/features/auth/LoginPage';
 
-import { DashboardPage } from './resources/dashboard/DashboardPage';
-import { ConfigPage } from './resources/config/ConfigPage';
-import { OrderList } from './resources/orders/OrderList';
-import { OrderShow } from './resources/orders/OrderShow';
-import { PaymentsDashboardPage } from './resources/payments/PaymentsDashboardPage';
-import { ProductCreate } from './resources/products/ProductCreate';
-import { ProductEdit } from './resources/products/ProductEdit';
-import { ProductList } from './resources/products/ProductList';
-import { PromotionCreate } from './resources/promotions/PromotionCreate';
-import { PromotionEdit } from './resources/promotions/PromotionEdit';
-import { PromotionList } from './resources/promotions/PromotionList';
-import { SellerList } from './resources/sellers/SellerList';
-import { SellerShow } from './resources/sellers/SellerShow';
-import { StockList } from './resources/stock/StockList';
-import { UserEdit } from './resources/users/UserEdit';
-import { UserList } from './resources/users/UserList';
+const DashboardPage = lazy(() => import('@/features/dashboard/DashboardPage'));
+const ProductListPage = lazy(() => import('@/features/products/ProductListPage'));
+const ProductFormPage = lazy(() => import('@/features/products/ProductFormPage'));
+const CategoryListPage = lazy(() => import('@/features/categories/CategoryListPage'));
+const OrderListPage = lazy(() => import('@/features/orders/OrderListPage'));
+const OrderDetailPage = lazy(() => import('@/features/orders/OrderDetailPage'));
+const UserListPage = lazy(() => import('@/features/users/UserListPage'));
+const PromoCodeListPage = lazy(() => import('@/features/promoCodes/PromoCodeListPage'));
+const SellerListPage = lazy(() => import('@/features/sellers/SellerListPage'));
+const SellerDetailPage = lazy(() => import('@/features/sellers/SellerDetailPage'));
+const PlatformConfigPage = lazy(() => import('@/features/platformConfig/PlatformConfigPage'));
+
+function PageFallback() {
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+      <CircularProgress size={28} />
+    </Box>
+  );
+}
 
 export default function App() {
   return (
-    <Admin
-      dataProvider={dataProvider}
-      authProvider={authProvider}
-      i18nProvider={i18nProvider}
-      theme={theme}
-      layout={Layout}
-      loginPage={LoginPage}
-      dashboard={DashboardPage}
-      requireAuth
-    >
-      <Resource name="sellers" list={SellerList} show={SellerShow} />
-      <Resource name="products" list={ProductList} edit={ProductEdit} create={ProductCreate} />
-      <Resource name="orders" list={OrderList} show={OrderShow} />
-      <Resource name="users" list={UserList} edit={UserEdit} />
-      <Resource name="promotions" list={PromotionList} edit={PromotionEdit} create={PromotionCreate} />
-      <CustomRoutes>
-        <Route path="/stock" element={<StockList />} />
-        <Route path="/payments" element={<PaymentsDashboardPage />} />
-        <Route path="/config" element={<ConfigPage />} />
-      </CustomRoutes>
-    </Admin>
+    <Suspense fallback={<PageFallback />}>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route element={<RequireAdmin />}>
+          <Route element={<AdminLayout />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="produits" element={<ProductListPage />} />
+            <Route path="produits/nouveau" element={<ProductFormPage />} />
+            <Route path="produits/:id" element={<ProductFormPage />} />
+            <Route path="categories" element={<CategoryListPage />} />
+            <Route path="commandes" element={<OrderListPage />} />
+            <Route path="commandes/:id" element={<OrderDetailPage />} />
+            <Route path="utilisateurs" element={<UserListPage />} />
+            <Route path="codes-promo" element={<PromoCodeListPage />} />
+            <Route path="vendeurs" element={<SellerListPage />} />
+            <Route path="vendeurs/:userId" element={<SellerDetailPage />} />
+            <Route path="parametres" element={<PlatformConfigPage />} />
+          </Route>
+        </Route>
+      </Routes>
+    </Suspense>
   );
 }
