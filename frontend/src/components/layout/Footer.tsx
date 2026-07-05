@@ -29,13 +29,20 @@ export function Footer() {
   const sectionLinks: { to: string; label: string }[][] = [
     [],
     [
-      { to: '/catalogue', label: t('header.all') },
-      { to: '/favoris', label: t('header.favorites') },
-      { to: '/panier', label: t('header.cart') },
-      { to: '/commandes', label: t('accountMenu.myOrders') },
+      { to: '/commandes', label: t('footer.acheter.trackOrder') },
+      { to: '/authenticite', label: t('footer.acheter.authenticity') },
+      { to: '/retours', label: t('footer.acheter.returns') },
     ],
-    [{ to: sellerLink, label: t('header.sell') }],
-    [],
+    [
+      { to: '/comment-vendre', label: t('footer.vendre.howToSell') },
+      { to: '/conseils-vente', label: t('footer.vendre.tips') },
+      { to: sellerLink, label: t('footer.vendre.sellItem') },
+      { to: '/vendeurs-professionnels', label: t('footer.vendre.proSellers') },
+    ],
+    [
+      { to: '/aide', label: t('footer.aide.helpCenter') },
+      { to: '/contact', label: t('footer.aide.contactUs') },
+    ],
     [],
   ];
 

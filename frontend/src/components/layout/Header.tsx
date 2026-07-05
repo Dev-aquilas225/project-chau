@@ -80,7 +80,9 @@ export function Header() {
               <Link to={sellerLink} className="btn-primary hidden px-5 py-2 text-sm md:inline-flex">
                 {t('header.sell')}
               </Link>
-              <LanguageSelector />
+              <div className="hidden md:block">
+                <LanguageSelector />
+              </div>
               <Link to="/panier" className="relative" aria-label={t('header.cart')} data-testid="cart-link">
                 <ShoppingBag />
                 {count > 0 && (
@@ -110,7 +112,7 @@ export function Header() {
 
             <div className="flex shrink-0 items-center gap-3 sm:gap-6 md:flex-1 md:justify-end">
               <Link to={sellerLink} className="btn-primary hidden px-5 py-2 text-sm md:inline-flex">
-                {t('header.sellGuest')}
+                {t('header.sell')}
               </Link>
               <Link to="/login" className="hidden text-sm font-medium hover:underline md:inline">
                 {t('header.login')}
@@ -208,6 +210,23 @@ export function Header() {
               );
             })}
           </nav>
+
+          <div className="flex flex-col gap-4 border-t border-line p-4">
+            {!user && (
+              <div className="flex gap-3">
+                <Link to="/login" onClick={closeMenu} className="btn-outline flex-1 text-center text-sm">
+                  {t('header.login')}
+                </Link>
+                <Link to="/register" onClick={closeMenu} className="btn-primary flex-1 text-center text-sm">
+                  {t('header.register')}
+                </Link>
+              </div>
+            )}
+            <Link to={sellerLink} onClick={closeMenu} className="btn-primary px-5 py-2 text-center text-sm">
+              {t('header.sell')}
+            </Link>
+            <LanguageSelector />
+          </div>
         </div>
       )}
     </header>

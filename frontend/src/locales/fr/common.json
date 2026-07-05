@@ -5,7 +5,6 @@
     "searchPlaceholder": "Rechercher une marque, un article…",
     "searchPlaceholderMobile": "Rechercher par marque, article…",
     "sell": "Vendre",
-    "sellGuest": "Vendre un article",
     "login": "Se connecter",
     "register": "S'inscrire",
     "favorites": "Favoris",
@@ -15,7 +14,22 @@
   },
   "footer": {
     "sections": ["Nos services", "Acheter", "Vendre", "Aide", "Occasion de luxe PJ international"],
-    "copyright": "©{{year}} Occasion de luxe PJ international"
+    "copyright": "©{{year}} Occasion de luxe PJ international",
+    "acheter": {
+      "trackOrder": "Suivre sa commande",
+      "authenticity": "Vérification d'Authenticité & Qualité",
+      "returns": "Politique de retours"
+    },
+    "vendre": {
+      "howToSell": "Comment vendre ?",
+      "tips": "Nos conseils pour vendre",
+      "sellItem": "Vendre un article",
+      "proSellers": "Vendeurs professionnels"
+    },
+    "aide": {
+      "helpCenter": "Centre d'aide",
+      "contactUs": "Nous contacter"
+    }
   },
   "bottomNav": {
     "home": "Accueil",

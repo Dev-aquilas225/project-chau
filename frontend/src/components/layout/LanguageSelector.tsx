@@ -20,7 +20,7 @@ export function LanguageSelector() {
   };
 
   return (
-    <div className="relative hidden md:block" ref={ref}>
+    <div className="relative" ref={ref}>
       <button
         type="button"
         aria-label={t('common:languageSelector.ariaLabel')}
