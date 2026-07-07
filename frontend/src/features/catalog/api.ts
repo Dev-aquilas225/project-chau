@@ -31,6 +31,12 @@ export async function getProductsByIds(ids: string[]): Promise<Product[]> {
   return items.map(mapProduct);
 }
 
+// L'API renvoie `parent: { id, ... } | null` ; on l'aplatit en `parentId` pour le frontend.
+function mapCategory(c: Category & { parent?: { id: string } | null }): Category {
+  return { ...c, parentId: c.parent?.id ?? undefined };
+}
+
 export async function getCategories(): Promise<Category[]> {
-  return apiFetch<Category[]>('/categories');
+  const items = await apiFetch<Category[]>('/categories');
+  return items.map(mapCategory);
 }

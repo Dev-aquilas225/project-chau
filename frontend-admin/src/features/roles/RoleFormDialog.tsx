@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import {
   Box,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
@@ -14,12 +15,11 @@ import {
   TableHead,
   TableRow,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
+  Typography,
 } from '@mui/material';
 import { useCreateRole, useUpdateRole } from './hooks';
-import { RESOURCE_KEYS, RESOURCE_LABELS } from '@/types';
-import type { CustomRole, PermissionLevel, ResourceKey } from '@/types';
+import { RESOURCE_KEYS, RESOURCE_LABELS, PERMISSION_ACTIONS, ACTION_LABELS } from '@/types';
+import type { CustomRole, PermissionAction, ResourceKey } from '@/types';
 
 interface RoleFormDialogProps {
   open: boolean;
@@ -35,7 +35,8 @@ interface FormValues {
 export default function RoleFormDialog({ open, onClose, role }: RoleFormDialogProps) {
   const createMutation = useCreateRole();
   const updateMutation = useUpdateRole();
-  const [permissions, setPermissions] = useState<Partial<Record<ResourceKey, PermissionLevel>>>({});
+  const [permissions, setPermissions] = useState<Partial<Record<ResourceKey, PermissionAction[]>>>({});
+  const isSystem = role?.isSystem ?? false;
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormValues>({
     values: { name: role?.name ?? '', description: role?.description ?? '' },
@@ -45,8 +46,16 @@ export default function RoleFormDialog({ open, onClose, role }: RoleFormDialogPr
     setPermissions(role?.permissions ?? {});
   }, [role, open]);
 
-  const setLevel = (resource: ResourceKey, level: PermissionLevel | null) => {
-    setPermissions((prev) => ({ ...prev, [resource]: level ?? 'none' }));
+  const toggleAction = (resource: ResourceKey, action: PermissionAction, checked: boolean) => {
+    setPermissions((prev) => {
+      const current = prev[resource] ?? [];
+      const next = checked ? [...new Set([...current, action])] : current.filter((a) => a !== action);
+      return { ...prev, [resource]: next };
+    });
+  };
+
+  const toggleAllForResource = (resource: ResourceKey, checked: boolean) => {
+    setPermissions((prev) => ({ ...prev, [resource]: checked ? [...PERMISSION_ACTIONS] : [] }));
   };
 
   const onSubmit = async (values: FormValues) => {
@@ -61,7 +70,7 @@ export default function RoleFormDialog({ open, onClose, role }: RoleFormDialogPr
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>{role ? 'Modifier le rôle' : 'Nouveau rôle'}</DialogTitle>
       <Box component="form" onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
@@ -69,9 +78,10 @@ export default function RoleFormDialog({ open, onClose, role }: RoleFormDialogPr
             <TextField
               label="Nom du rôle"
               fullWidth
+              disabled={isSystem}
+              helperText={isSystem ? 'Rôle de base : le nom ne peut pas être modifié.' : errors.name?.message}
               {...register('name', { required: 'Le nom est requis' })}
               error={!!errors.name}
-              helperText={errors.name?.message}
             />
             <TextField label="Description" fullWidth multiline minRows={2} {...register('description')} />
           </Stack>
@@ -80,29 +90,46 @@ export default function RoleFormDialog({ open, onClose, role }: RoleFormDialogPr
             <TableHead>
               <TableRow>
                 <TableCell>Ressource</TableCell>
-                <TableCell align="right">Niveau d'accès</TableCell>
+                {PERMISSION_ACTIONS.map((action) => (
+                  <TableCell key={action} align="center">{ACTION_LABELS[action]}</TableCell>
+                ))}
+                <TableCell align="center">Tout</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {RESOURCE_KEYS.map((resource) => (
-                <TableRow key={resource}>
-                  <TableCell>{RESOURCE_LABELS[resource]}</TableCell>
-                  <TableCell align="right">
-                    <ToggleButtonGroup
-                      size="small"
-                      exclusive
-                      value={permissions[resource] ?? 'none'}
-                      onChange={(_e, value) => setLevel(resource, value)}
-                    >
-                      <ToggleButton value="none">Aucun</ToggleButton>
-                      <ToggleButton value="view">Voir</ToggleButton>
-                      <ToggleButton value="manage">Gérer</ToggleButton>
-                    </ToggleButtonGroup>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {RESOURCE_KEYS.map((resource) => {
+                const granted = permissions[resource] ?? [];
+                const allChecked = granted.length === PERMISSION_ACTIONS.length;
+                return (
+                  <TableRow key={resource}>
+                    <TableCell>{RESOURCE_LABELS[resource]}</TableCell>
+                    {PERMISSION_ACTIONS.map((action) => (
+                      <TableCell key={action} align="center" sx={{ p: 0.5 }}>
+                        <Checkbox
+                          size="small"
+                          checked={granted.includes(action)}
+                          onChange={(e) => toggleAction(resource, action, e.target.checked)}
+                        />
+                      </TableCell>
+                    ))}
+                    <TableCell align="center" sx={{ p: 0.5 }}>
+                      <Checkbox
+                        size="small"
+                        checked={allChecked}
+                        indeterminate={granted.length > 0 && !allChecked}
+                        onChange={(e) => toggleAllForResource(resource, e.target.checked)}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
+          {isSystem && (
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.5 }}>
+              Ce rôle de base peut avoir ses permissions ajustées, mais ne peut pas être renommé ni supprimé.
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={onClose}>Annuler</Button>

@@ -1,15 +1,17 @@
 import { useAuth } from './AuthProvider';
-import type { PermissionLevel, ResourceKey } from '@/types';
+import type { PermissionAction, ResourceKey } from '@/types';
 
-const LEVEL_RANK: Record<PermissionLevel, number> = { none: 0, view: 1, manage: 2 };
-
-export function usePermission(resource: ResourceKey): PermissionLevel {
+export function usePermission(resource: ResourceKey): PermissionAction[] {
   const { role, customRole } = useAuth();
-  if (role === 'admin') return 'manage';
-  return customRole?.permissions?.[resource] ?? 'none';
+  if (role === 'admin') return ['view_any', 'view', 'create', 'update', 'delete'];
+  return customRole?.permissions?.[resource] ?? [];
 }
 
-export function useHasPermission(resource: ResourceKey, level: PermissionLevel): boolean {
+export function useHasPermission(resource: ResourceKey, action: PermissionAction): boolean {
+  return usePermission(resource).includes(action);
+}
+
+export function useHasAnyPermission(resource: ResourceKey, actions: PermissionAction[]): boolean {
   const granted = usePermission(resource);
-  return LEVEL_RANK[granted] >= LEVEL_RANK[level];
+  return actions.some((action) => granted.includes(action));
 }

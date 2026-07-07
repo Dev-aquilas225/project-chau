@@ -6,13 +6,15 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { usePromoCodes, useDeletePromoCode } from './hooks';
 import PromoCodeFormDialog from './PromoCodeFormDialog';
-import { useHasPermission } from '@/features/auth/usePermission';
+import { useHasAnyPermission } from '@/features/auth/usePermission';
+import { useConfirm } from '@/components/ConfirmDialogProvider';
 import { usePagination } from '@/hooks/usePagination';
 import { formatCurrency, formatDateShort } from '@/lib/format';
 import type { PromoCode } from '@/types';
 
 export default function PromoCodeListPage() {
-  const canManage = useHasPermission('promoCodes', 'manage');
+  const confirm = useConfirm();
+  const canManage = useHasAnyPermission('promoCodes', ['create', 'update', 'delete']);
   const { data: promoCodes = [], isLoading } = usePromoCodes();
   const [search, setSearch] = useState('');
   const filtered = useMemo(() => {
@@ -85,8 +87,10 @@ export default function PromoCodeListPage() {
                     <IconButton
                       size="small"
                       color="error"
-                      onClick={() => {
-                        if (confirm(`Supprimer le code "${code.code}" ?`)) deleteMutation.mutate(code.id);
+                      onClick={async () => {
+                        if (await confirm({ title: `Supprimer le code "${code.code}" ?`, destructive: true })) {
+                          deleteMutation.mutate(code.id);
+                        }
                       }}
                     >
                       <DeleteOutlineIcon fontSize="small" />

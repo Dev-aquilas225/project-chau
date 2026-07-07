@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from './entities/role.entity';
@@ -37,6 +37,9 @@ export class RolesService {
 
   async update(id: string, dto: UpdateRoleDto) {
     const role = await this.findOne(id);
+    if (role.isSystem && dto.name !== undefined && dto.name !== role.name) {
+      throw new ForbiddenException('Ce rôle de base ne peut pas être renommé');
+    }
     if (dto.permissions !== undefined) {
       try {
         assertValidPermissions(dto.permissions);
@@ -52,6 +55,7 @@ export class RolesService {
 
   async remove(id: string) {
     const role = await this.findOne(id);
+    if (role.isSystem) throw new ForbiddenException('Ce rôle de base ne peut pas être supprimé');
     await this.rolesRepo.remove(role);
     return { deleted: true };
   }

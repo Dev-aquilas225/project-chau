@@ -17,10 +17,12 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useSeller, useUpdateSellerStatus, useSetSellerBlocked } from './hooks';
 import IdentityDocViewer from './components/IdentityDocViewer';
 import { useHasPermission } from '@/features/auth/usePermission';
+import { useConfirm } from '@/components/ConfirmDialogProvider';
 import { formatDate } from '@/lib/format';
 
 export default function SellerDetailPage() {
-  const canManage = useHasPermission('sellers', 'manage');
+  const confirm = useConfirm();
+  const canManage = useHasPermission('sellers', 'update');
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const { data: seller, isLoading } = useSeller(userId);
@@ -43,7 +45,7 @@ export default function SellerDetailPage() {
   const handleDecision = async (status: 'approved' | 'rejected') => {
     if (!userId) return;
     if (status === 'rejected' && !note.trim()) {
-      if (!confirm('Rejeter sans indiquer de motif ?')) return;
+      if (!(await confirm('Rejeter sans indiquer de motif ?'))) return;
     }
     await updateStatusMutation.mutateAsync({ userId, status, note: note.trim() || undefined });
     navigate('/vendeurs');
@@ -52,7 +54,7 @@ export default function SellerDetailPage() {
   const handleToggleBlocked = async () => {
     if (!userId) return;
     const nextBlocked = !seller.blocked;
-    if (nextBlocked && !confirm(`Bloquer le compte de ${seller.displayName} ?`)) return;
+    if (nextBlocked && !(await confirm({ title: `Bloquer le compte de ${seller.displayName} ?`, destructive: true }))) return;
     await setBlockedMutation.mutateAsync({ userId, blocked: nextBlocked, reason: nextBlocked ? blockReason.trim() || undefined : undefined });
     setBlockReason('');
   };

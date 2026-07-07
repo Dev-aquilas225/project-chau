@@ -20,7 +20,9 @@ export function Header() {
   const { user, sellerStatus } = useAuth();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
-  const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
+  const [expandedTopId, setExpandedTopId] = useState<string | null>(null);
+  const [expandedSubId, setExpandedSubId] = useState<string | null>(null);
+  const [hoveredTopId, setHoveredTopId] = useState<string | null>(null);
 
   const sellerLink = sellerStatus === 'approved' ? '/espace-vendeur' : '/devenir-vendeur';
   const topCategories = categories?.filter((c) => !c.parentId) ?? [];
@@ -33,7 +35,8 @@ export function Header() {
 
   const closeMenu = () => {
     setOpen(false);
-    setExpandedCategoryId(null);
+    setExpandedTopId(null);
+    setExpandedSubId(null);
   };
 
   const submitSearch = (e: React.FormEvent) => {
@@ -133,16 +136,56 @@ export function Header() {
         )}
       </div>
 
-      {/* Catégories desktop */}
-      <nav className="hidden border-t border-line md:block">
+      {/* Catégories desktop (mega-menu) */}
+      <nav
+        className="relative hidden border-t border-line md:block"
+        onMouseLeave={() => setHoveredTopId(null)}
+      >
         <div className="container-app flex gap-6 overflow-x-auto py-2 text-sm no-scrollbar">
           <Link to="/catalogue" className="whitespace-nowrap hover:underline">{t('header.all')}</Link>
-          {categories?.map((c) => (
-            <Link key={c.id} to={`/catalogue?category=${c.id}`} className="whitespace-nowrap hover:underline">
-              {c.name}
+          {topCategories.map((top) => (
+            <Link
+              key={top.id}
+              to={`/catalogue?category=${top.id}`}
+              className={cn('whitespace-nowrap hover:underline', hoveredTopId === top.id && 'underline')}
+              onMouseEnter={() => setHoveredTopId(top.id)}
+              onFocus={() => setHoveredTopId(top.id)}
+            >
+              {top.name}
             </Link>
           ))}
         </div>
+
+        {hoveredTopId && childrenOf(hoveredTopId).length > 0 && (
+          <div className="absolute inset-x-0 top-full z-30 border-t border-line bg-paper shadow-lg">
+            <div className="container-app grid grid-cols-4 gap-x-8 gap-y-6 py-6">
+              {childrenOf(hoveredTopId).map((sub) => (
+                <div key={sub.id}>
+                  <Link
+                    to={`/catalogue?category=${sub.id}`}
+                    onClick={() => setHoveredTopId(null)}
+                    className="mb-3 block text-sm font-semibold hover:underline"
+                  >
+                    {sub.name}
+                  </Link>
+                  <ul className="space-y-2">
+                    {childrenOf(sub.id).map((type) => (
+                      <li key={type.id}>
+                        <Link
+                          to={`/catalogue?category=${type.id}`}
+                          onClick={() => setHoveredTopId(null)}
+                          className="text-sm text-muted hover:text-ink hover:underline"
+                        >
+                          {type.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Menu mobile plein écran */}
@@ -175,35 +218,67 @@ export function Header() {
             >
               {t('header.all')}
             </Link>
-            {topCategories.map((c) => {
-              const children = childrenOf(c.id);
-              const isExpanded = expandedCategoryId === c.id;
+            {topCategories.map((top) => {
+              const subs = childrenOf(top.id);
+              const isTopExpanded = expandedTopId === top.id;
               return (
-                <div key={c.id} className="border-b border-line">
-                  {children.length > 0 ? (
+                <div key={top.id} className="border-b border-line">
+                  {subs.length > 0 ? (
                     <button
                       type="button"
-                      className="flex w-full items-center justify-between px-4 py-4 text-left text-base"
-                      onClick={() => setExpandedCategoryId(isExpanded ? null : c.id)}
+                      className="flex w-full items-center justify-between px-4 py-4 text-left text-base font-medium"
+                      onClick={() => {
+                        setExpandedTopId(isTopExpanded ? null : top.id);
+                        setExpandedSubId(null);
+                      }}
                     >
-                      {c.name}
-                      <ChevronDown className={cn('h-4 w-4 text-muted transition-transform', isExpanded && 'rotate-180')} />
+                      {top.name}
+                      <ChevronDown className={cn('h-4 w-4 text-muted transition-transform', isTopExpanded && 'rotate-180')} />
                     </button>
                   ) : (
-                    <Link to={`/catalogue?category=${c.id}`} onClick={closeMenu} className="flex items-center justify-between px-4 py-4 text-base">
-                      {c.name}
+                    <Link to={`/catalogue?category=${top.id}`} onClick={closeMenu} className="flex items-center justify-between px-4 py-4 text-base font-medium">
+                      {top.name}
                     </Link>
                   )}
-                  {isExpanded && (
+                  {isTopExpanded && (
                     <div className="bg-gray-50 pb-2">
-                      <Link to={`/catalogue?category=${c.id}`} onClick={closeMenu} className="block px-8 py-2 text-sm font-medium">
-                        {t('header.viewAllIn', { name: c.name })}
+                      <Link to={`/catalogue?category=${top.id}`} onClick={closeMenu} className="block px-6 py-2 text-sm font-semibold">
+                        {t('header.viewAllIn', { name: top.name })}
                       </Link>
-                      {children.map((child) => (
-                        <Link key={child.id} to={`/catalogue?category=${child.id}`} onClick={closeMenu} className="block px-8 py-2 text-sm">
-                          {child.name}
-                        </Link>
-                      ))}
+                      {subs.map((sub) => {
+                        const types = childrenOf(sub.id);
+                        const isSubExpanded = expandedSubId === sub.id;
+                        return (
+                          <div key={sub.id}>
+                            {types.length > 0 ? (
+                              <button
+                                type="button"
+                                className="flex w-full items-center justify-between px-6 py-2 text-left text-sm font-medium"
+                                onClick={() => setExpandedSubId(isSubExpanded ? null : sub.id)}
+                              >
+                                {sub.name}
+                                <ChevronDown className={cn('h-3.5 w-3.5 text-muted transition-transform', isSubExpanded && 'rotate-180')} />
+                              </button>
+                            ) : (
+                              <Link to={`/catalogue?category=${sub.id}`} onClick={closeMenu} className="block px-6 py-2 text-sm font-medium">
+                                {sub.name}
+                              </Link>
+                            )}
+                            {isSubExpanded && (
+                              <div className="bg-gray-100 pb-1">
+                                <Link to={`/catalogue?category=${sub.id}`} onClick={closeMenu} className="block px-8 py-1.5 text-xs font-semibold">
+                                  {t('header.viewAllIn', { name: sub.name })}
+                                </Link>
+                                {types.map((type) => (
+                                  <Link key={type.id} to={`/catalogue?category=${type.id}`} onClick={closeMenu} className="block px-8 py-1.5 text-xs">
+                                    {type.name}
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

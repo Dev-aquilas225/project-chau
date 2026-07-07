@@ -46,6 +46,10 @@
       "priceAsc": "Price: low to high",
       "priceDesc": "Price: high to low"
     },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
     "error": "Unable to load products.",
     "empty": "No items match your search."
   },

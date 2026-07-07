@@ -20,6 +20,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { productSchema, type ProductFormValues } from './schemas';
 import { useProduct, useCreateProduct, useUpdateProduct } from './hooks';
 import { useCategories } from '@/features/categories/hooks';
+import { flattenCategoryTree } from '@/features/categories/utils';
 import ImageUploader from './components/ImageUploader';
 
 const DEFAULT_VALUES: ProductFormValues = {
@@ -42,6 +43,7 @@ export default function ProductFormPage() {
   const navigate = useNavigate();
   const { data: product, isLoading: isLoadingProduct } = useProduct(id);
   const { data: categories = [] } = useCategories();
+  const categoryTree = flattenCategoryTree(categories);
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
   const [images, setImages] = useState<string[]>([]);
@@ -125,8 +127,12 @@ export default function ProductFormPage() {
                       {...register('categoryId')}
                     >
                       <MenuItem value="">Aucune</MenuItem>
-                      {categories.map((c) => (
-                        <MenuItem key={c.id} value={c.id}>
+                      {categoryTree.map((c) => (
+                        <MenuItem
+                          key={c.id}
+                          value={c.id}
+                          sx={{ pl: 2 + c.depth * 2, fontWeight: c.depth === 0 ? 700 : 400 }}
+                        >
                           {c.name}
                         </MenuItem>
                       ))}

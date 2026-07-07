@@ -26,11 +26,13 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { usePermission } from '@/features/auth/usePermission';
 import { logout } from '@/features/auth/api';
 import NotificationBell from '@/features/notifications/NotificationBell';
+import { resolveImageUrl } from '@/lib/media';
 import type { ResourceKey } from '@/types';
 
 const DRAWER_WIDTH = 260;
@@ -65,14 +67,14 @@ function useVisibleNavItems(): NavItem[] {
   const promoCodes = usePermission('promoCodes');
   const sellers = usePermission('sellers');
   const platformConfig = usePermission('platformConfig');
-  const levels: Record<ResourceKey, string> = { products, categories, orders, users, promoCodes, sellers, platformConfig };
+  const grants: Record<ResourceKey, string[]> = { products, categories, orders, users, promoCodes, sellers, platformConfig };
 
   return useMemo(
     () =>
       NAV_ITEMS.filter((item) => {
         if (item.adminOnly) return role === 'admin';
         if (!item.resource) return true;
-        return levels[item.resource] !== 'none';
+        return grants[item.resource].length > 0;
       }),
     [role, products, categories, orders, users, promoCodes, sellers, platformConfig],
   );
@@ -171,7 +173,10 @@ export default function AdminLayout(): ReactNode {
             <Box sx={{ flexGrow: 1 }} />
             <NotificationBell />
             <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} size="small">
-              <Avatar sx={{ width: 34, height: 34, bgcolor: 'primary.main', fontSize: 14 }}>
+              <Avatar
+                src={user?.photoURL ? resolveImageUrl(user.photoURL) : undefined}
+                sx={{ width: 34, height: 34, bgcolor: 'primary.main', fontSize: 14 }}
+              >
                 {user?.displayName?.[0]?.toUpperCase() ?? 'A'}
               </Avatar>
             </IconButton>
@@ -185,6 +190,12 @@ export default function AdminLayout(): ReactNode {
                 </Typography>
               </Box>
               <Divider />
+              <MenuItem onClick={() => { setAnchorEl(null); navigate('/profil'); }}>
+                <ListItemIcon>
+                  <PersonOutlineIcon fontSize="small" />
+                </ListItemIcon>
+                Mon profil
+              </MenuItem>
               <MenuItem onClick={handleLogout}>
                 <ListItemIcon>
                   <LogoutOutlinedIcon fontSize="small" />

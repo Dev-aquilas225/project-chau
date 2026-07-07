@@ -46,6 +46,10 @@
       "priceAsc": "Prezzo crescente",
       "priceDesc": "Prezzo decrescente"
     },
+    "pagination": {
+      "previous": "Precedente",
+      "next": "Successivo"
+    },
     "error": "Impossibile caricare i prodotti.",
     "empty": "Nessun articolo corrisponde alla tua ricerca."
   },

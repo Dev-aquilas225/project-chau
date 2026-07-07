@@ -1,10 +1,10 @@
 import { apiFetch } from '@/lib/http';
-import type { CustomRole, PermissionLevel, ResourceKey } from '@/types';
+import type { CustomRole, PermissionAction, ResourceKey } from '@/types';
 
 export interface RoleInput {
   name: string;
   description?: string;
-  permissions: Partial<Record<ResourceKey, PermissionLevel>>;
+  permissions: Partial<Record<ResourceKey, PermissionAction[]>>;
 }
 
 export function getRoles(): Promise<CustomRole[]> {

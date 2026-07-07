@@ -19,7 +19,7 @@ export class ProductsController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @RequirePermission('products', 'view')
+  @RequirePermission('products', 'view_any')
   @Get('admin/all')
   listAll() {
     return this.productsService.listAll();
@@ -45,8 +45,8 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@CurrentUser() user: JwtPayload, @Body() dto: CreateProductDto) {
-    if (user.sellerStatus !== 'approved' && !hasPermission(user, 'products', 'manage')) {
-      throw new ForbiddenException('Compte vendeur approuvé ou permission "products: manage" requise');
+    if (user.sellerStatus !== 'approved' && !hasPermission(user, 'products', 'create')) {
+      throw new ForbiddenException('Compte vendeur approuvé ou permission "products: create" requise');
     }
     return this.productsService.create(dto, user);
   }

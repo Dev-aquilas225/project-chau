@@ -9,7 +9,9 @@ export type ResourceKey =
   | 'sellers'
   | 'platformConfig';
 
-export type PermissionLevel = 'none' | 'view' | 'manage';
+// Modèle inspiré de Filament Shield : chaque ressource accorde une liste d'actions,
+// plutôt qu'un niveau unique none/view/manage.
+export type PermissionAction = 'view_any' | 'view' | 'create' | 'update' | 'delete';
 
 export const RESOURCE_KEYS: ResourceKey[] = [
   'products',
@@ -20,6 +22,8 @@ export const RESOURCE_KEYS: ResourceKey[] = [
   'sellers',
   'platformConfig',
 ];
+
+export const PERMISSION_ACTIONS: PermissionAction[] = ['view_any', 'view', 'create', 'update', 'delete'];
 
 @Entity('roles')
 export class Role {
@@ -33,7 +37,11 @@ export class Role {
   description: string | null;
 
   @Column({ type: 'jsonb', default: {} })
-  permissions: Partial<Record<ResourceKey, PermissionLevel>>;
+  permissions: Partial<Record<ResourceKey, PermissionAction[]>>;
+
+  // Rôles de base ("Admin", "Client") : non supprimables et non renommables.
+  @Column({ default: false })
+  isSystem: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

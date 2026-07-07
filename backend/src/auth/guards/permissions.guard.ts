@@ -20,8 +20,8 @@ export class PermissionsGuard implements CanActivate {
     const user = request.user;
     if (!user) throw new ForbiddenException('Non authentifié');
 
-    if (!hasPermission(user, required.resource, required.level)) {
-      throw new ForbiddenException(`Permission requise sur "${required.resource}": ${required.level}`);
+    if (!hasPermission(user, required.resource, required.action)) {
+      throw new ForbiddenException(`Permission requise sur "${required.resource}": ${required.action}`);
     }
     return true;
   }

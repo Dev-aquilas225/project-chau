@@ -32,7 +32,7 @@ export class OrdersController {
   }
 
   @UseGuards(PermissionsGuard)
-  @RequirePermission('orders', 'view')
+  @RequirePermission('orders', 'view_any')
   @Get()
   findAll(@Query('status') status?: OrderStatus) {
     return this.ordersService.findAll(status);
@@ -48,7 +48,7 @@ export class OrdersController {
   }
 
   @UseGuards(PermissionsGuard)
-  @RequirePermission('orders', 'manage')
+  @RequirePermission('orders', 'update')
   @Patch(':id/status')
   updateStatus(@Param('id') id: string, @Body() dto: UpdateOrderStatusDto) {
     return this.ordersService.updateStatus(id, dto.status, dto.note);

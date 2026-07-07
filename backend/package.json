@@ -15,7 +15,8 @@
     "migration:run": "npm run typeorm -- migration:run -d src/data-source.ts",
     "migration:run:prod": "node ./node_modules/typeorm/cli.js migration:run -d dist/src/data-source.js",
     "migration:revert": "npm run typeorm -- migration:revert -d src/data-source.ts",
-    "seed": "ts-node -r tsconfig-paths/register src/seed.ts"
+    "seed": "ts-node -r tsconfig-paths/register src/seed.ts",
+    "seed:products": "ts-node -r tsconfig-paths/register src/seed-products.ts"
   },
   "jest": {
     "moduleFileExtensions": [

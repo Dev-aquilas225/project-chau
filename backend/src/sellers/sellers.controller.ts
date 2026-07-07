@@ -31,21 +31,21 @@ export class SellersController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @RequirePermission('sellers', 'view')
+  @RequirePermission('sellers', 'view_any')
   @Get()
   listSellers(@Query('status') status?: SellerStatus) {
     return this.sellersService.listSellers(status);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @RequirePermission('sellers', 'manage')
+  @RequirePermission('sellers', 'update')
   @Patch(':userId/status')
   updateStatus(@Param('userId') userId: string, @Body() dto: UpdateSellerStatusDto) {
     return this.sellersService.updateStatus(userId, dto);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @RequirePermission('sellers', 'manage')
+  @RequirePermission('sellers', 'update')
   @Patch(':userId/block')
   setBlocked(@Param('userId') userId: string, @Body() dto: UpdateSellerBlockDto) {
     return this.sellersService.setBlocked(userId, dto);

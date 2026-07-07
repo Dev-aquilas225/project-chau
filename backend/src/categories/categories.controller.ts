@@ -20,21 +20,21 @@ export class CategoriesController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @RequirePermission('categories', 'manage')
+  @RequirePermission('categories', 'create')
   @Post()
   create(@Body() dto: CreateCategoryDto) {
     return this.categoriesService.create(dto);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @RequirePermission('categories', 'manage')
+  @RequirePermission('categories', 'update')
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateCategoryDto) {
     return this.categoriesService.update(id, dto);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @RequirePermission('categories', 'manage')
+  @RequirePermission('categories', 'delete')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(id);

@@ -8,13 +8,15 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useAdminProducts, useDeleteProduct } from './hooks';
 import { useCategories } from '@/features/categories/hooks';
-import { useHasPermission } from '@/features/auth/usePermission';
+import { useHasAnyPermission } from '@/features/auth/usePermission';
+import { useConfirm } from '@/components/ConfirmDialogProvider';
 import { formatCurrency } from '@/lib/format';
 import type { Product } from '@/types';
 
 export default function ProductListPage() {
   const navigate = useNavigate();
-  const canManage = useHasPermission('products', 'manage');
+  const confirm = useConfirm();
+  const canManage = useHasAnyPermission('products', ['create', 'update', 'delete']);
   const { data: products = [], isLoading } = useAdminProducts();
   const { data: categories = [] } = useCategories();
   const deleteMutation = useDeleteProduct();
@@ -85,8 +87,10 @@ export default function ProductListPage() {
                 <IconButton
                   size="small"
                   color="error"
-                  onClick={() => {
-                    if (confirm(`Supprimer "${params.row.name}" ?`)) deleteMutation.mutate(params.row.id);
+                  onClick={async () => {
+                    if (await confirm({ title: `Supprimer "${params.row.name}" ?`, destructive: true })) {
+                      deleteMutation.mutate(params.row.id);
+                    }
                   }}
                 >
                   <DeleteOutlineIcon fontSize="small" />

@@ -11,7 +11,8 @@ export type ResourceKey =
   | 'sellers'
   | 'platformConfig';
 
-export type PermissionLevel = 'none' | 'view' | 'manage';
+// Modèle inspiré de Filament Shield : chaque ressource accorde une liste d'actions.
+export type PermissionAction = 'view_any' | 'view' | 'create' | 'update' | 'delete';
 
 export const RESOURCE_KEYS: ResourceKey[] = [
   'products',
@@ -33,11 +34,22 @@ export const RESOURCE_LABELS: Record<ResourceKey, string> = {
   platformConfig: 'Paramètres',
 };
 
+export const PERMISSION_ACTIONS: PermissionAction[] = ['view_any', 'view', 'create', 'update', 'delete'];
+
+export const ACTION_LABELS: Record<PermissionAction, string> = {
+  view_any: 'Voir (liste)',
+  view: 'Voir (détail)',
+  create: 'Créer',
+  update: 'Modifier',
+  delete: 'Supprimer',
+};
+
 export interface CustomRole {
   id: string;
   name: string;
   description?: string | null;
-  permissions: Partial<Record<ResourceKey, PermissionLevel>>;
+  permissions: Partial<Record<ResourceKey, PermissionAction[]>>;
+  isSystem: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -82,7 +94,7 @@ export interface UserProfile {
   city?: string;
   blocked: boolean;
   customRoleId?: string | null;
-  customRole: { id: string; name: string; permissions?: Partial<Record<ResourceKey, PermissionLevel>> } | null;
+  customRole: { id: string; name: string; permissions?: Partial<Record<ResourceKey, PermissionAction[]>> } | null;
   createdAt: string;
 }
 

@@ -4,13 +4,7 @@ import { Box, CircularProgress, IconButton, Stack, Typography } from '@mui/mater
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { useUploadProductImage } from '../hooks';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-const ORIGIN = API_URL.replace(/\/api\/?$/, '');
-
-function resolveImageUrl(url: string): string {
-  return url.startsWith('http') ? url : `${ORIGIN}${url}`;
-}
+import { resolveImageUrl } from '@/lib/media';
 
 interface ImageUploaderProps {
   images: string[];

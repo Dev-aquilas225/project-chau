@@ -1,8 +1,11 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { AssignCustomRoleDto } from './dto/assign-custom-role.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
@@ -26,8 +29,13 @@ export class UsersController {
     return this.usersService.updateProfile(user.sub, dto);
   }
 
+  @Patch('me/password')
+  changeMyPassword(@CurrentUser() user: JwtPayload, @Body() dto: ChangePasswordDto) {
+    return this.usersService.changePassword(user.sub, dto);
+  }
+
   @UseGuards(PermissionsGuard)
-  @RequirePermission('users', 'view')
+  @RequirePermission('users', 'view_any')
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -50,9 +58,30 @@ export class UsersController {
   }
 
   @UseGuards(PermissionsGuard)
-  @RequirePermission('users', 'manage')
+  @RequirePermission('users', 'update')
   @Patch(':id/custom-role')
   assignCustomRole(@Param('id') id: string, @Body() dto: AssignCustomRoleDto) {
     return this.usersService.assignCustomRole(id, dto.roleId);
+  }
+
+  @UseGuards(PermissionsGuard)
+  @RequirePermission('users', 'create')
+  @Post()
+  create(@Body() dto: CreateUserDto) {
+    return this.usersService.create(dto);
+  }
+
+  @UseGuards(PermissionsGuard)
+  @RequirePermission('users', 'update')
+  @Patch(':id')
+  adminUpdate(@Param('id') id: string, @Body() dto: AdminUpdateUserDto) {
+    return this.usersService.adminUpdate(id, dto);
+  }
+
+  @UseGuards(PermissionsGuard)
+  @RequirePermission('users', 'delete')
+  @Delete(':id')
+  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.usersService.remove(id, user.sub);
   }
 }

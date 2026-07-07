@@ -17,6 +17,7 @@ const SellerListPage = lazy(() => import('@/features/sellers/SellerListPage'));
 const SellerDetailPage = lazy(() => import('@/features/sellers/SellerDetailPage'));
 const PlatformConfigPage = lazy(() => import('@/features/platformConfig/PlatformConfigPage'));
 const RoleListPage = lazy(() => import('@/features/roles/RoleListPage'));
+const ProfilePage = lazy(() => import('@/features/profile/ProfilePage'));
 
 function PageFallback() {
   return (
@@ -28,27 +29,124 @@ function PageFallback() {
 
 export default function App() {
   return (
-    <Suspense fallback={<PageFallback />}>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route element={<RequireStaff />}>
-          <Route element={<AdminLayout />}>
-            <Route index element={<DashboardPage />} />
-            <Route path="produits" element={<ProductListPage />} />
-            <Route path="produits/nouveau" element={<ProductFormPage />} />
-            <Route path="produits/:id" element={<ProductFormPage />} />
-            <Route path="categories" element={<CategoryListPage />} />
-            <Route path="commandes" element={<OrderListPage />} />
-            <Route path="commandes/:id" element={<OrderDetailPage />} />
-            <Route path="utilisateurs" element={<UserListPage />} />
-            <Route path="codes-promo" element={<PromoCodeListPage />} />
-            <Route path="vendeurs" element={<SellerListPage />} />
-            <Route path="vendeurs/:userId" element={<SellerDetailPage />} />
-            <Route path="parametres" element={<PlatformConfigPage />} />
-            <Route path="roles" element={<RoleListPage />} />
-          </Route>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<RequireStaff />}>
+        <Route element={<AdminLayout />}>
+          <Route
+            index
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <DashboardPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="produits"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <ProductListPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="produits/nouveau"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <ProductFormPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="produits/:id"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <ProductFormPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="categories"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <CategoryListPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="commandes"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <OrderListPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="commandes/:id"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <OrderDetailPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="utilisateurs"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <UserListPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="codes-promo"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <PromoCodeListPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="vendeurs"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <SellerListPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="vendeurs/:userId"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <SellerDetailPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="parametres"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <PlatformConfigPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="roles"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <RoleListPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="profil"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <ProfilePage />
+              </Suspense>
+            }
+          />
         </Route>
-      </Routes>
-    </Suspense>
+      </Route>
+    </Routes>
   );
 }

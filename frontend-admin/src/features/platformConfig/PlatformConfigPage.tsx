@@ -4,7 +4,7 @@ import { usePlatformConfig, useUpdatePlatformConfig } from './hooks';
 import { useHasPermission } from '@/features/auth/usePermission';
 
 export default function PlatformConfigPage() {
-  const canManage = useHasPermission('platformConfig', 'manage');
+  const canManage = useHasPermission('platformConfig', 'update');
   const { data, isLoading } = usePlatformConfig();
   const updateMutation = useUpdatePlatformConfig();
   const [commissionRate, setCommissionRate] = useState(0);

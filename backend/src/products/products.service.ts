@@ -6,6 +6,7 @@ import { CreateProductDto, ProductFiltersDto, UpdateProductDto } from './dto/pro
 import { hasPermission } from '../auth/permissions.util';
 import { NotificationsService } from '../notifications/notifications.service';
 import type { JwtPayload } from '../auth/strategies/jwt.strategy';
+import type { PermissionAction } from '../roles/entities/role.entity';
 
 @Injectable()
 export class ProductsService {
@@ -71,7 +72,7 @@ export class ProductsService {
   }
 
   create(dto: CreateProductDto, caller: JwtPayload) {
-    const isStaff = hasPermission(caller, 'products', 'manage');
+    const isStaff = hasPermission(caller, 'products', 'create');
     const product = this.productsRepo.create({
       ...dto,
       categoryId: dto.categoryId ?? null,
@@ -83,7 +84,7 @@ export class ProductsService {
 
   async update(id: string, dto: UpdateProductDto, caller: JwtPayload) {
     const product = await this.findOne(id);
-    this.assertOwnerOrAdmin(product, caller);
+    this.assertOwnerOrAdmin(product, caller, 'update');
     const wasOutOfStock = product.stock === 0;
     Object.assign(product, dto);
     const saved = await this.productsRepo.save(product);
@@ -100,8 +101,8 @@ export class ProductsService {
 
   async remove(id: string, caller: JwtPayload) {
     const product = await this.findOne(id);
-    this.assertOwnerOrAdmin(product, caller);
-    if (hasPermission(caller, 'products', 'manage')) {
+    this.assertOwnerOrAdmin(product, caller, 'delete');
+    if (hasPermission(caller, 'products', 'delete')) {
       await this.productsRepo.remove(product);
       return { deleted: true };
     }
@@ -111,8 +112,8 @@ export class ProductsService {
     return { archived: true };
   }
 
-  private assertOwnerOrAdmin(product: Product, caller: JwtPayload) {
-    if (hasPermission(caller, 'products', 'manage')) return;
+  private assertOwnerOrAdmin(product: Product, caller: JwtPayload, action: PermissionAction) {
+    if (hasPermission(caller, 'products', action)) return;
     if (product.sellerId !== caller.sub) throw new ForbiddenException('Accès refusé');
   }
 }

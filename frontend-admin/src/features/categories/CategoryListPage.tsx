@@ -28,7 +28,9 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from './hooks';
 import { categorySchema, type CategoryFormValues } from './schemas';
-import { useHasPermission } from '@/features/auth/usePermission';
+import { flattenCategoryTree } from './utils';
+import { useHasAnyPermission } from '@/features/auth/usePermission';
+import { useConfirm } from '@/components/ConfirmDialogProvider';
 import { usePagination } from '@/hooks/usePagination';
 import type { Category } from '@/types';
 
@@ -92,10 +94,10 @@ function CategoryDialog({
             />
             <TextField label="Catégorie parente" select fullWidth defaultValue={category?.parent?.id ?? ''} {...register('parentId')}>
               <MenuItem value="">Aucune</MenuItem>
-              {categories
+              {flattenCategoryTree(categories)
                 .filter((c) => c.id !== category?.id)
                 .map((c) => (
-                  <MenuItem key={c.id} value={c.id}>
+                  <MenuItem key={c.id} value={c.id} sx={{ pl: 2 + c.depth * 2, fontWeight: c.depth === 0 ? 700 : 400 }}>
                     {c.name}
                   </MenuItem>
                 ))}
@@ -114,7 +116,8 @@ function CategoryDialog({
 }
 
 export default function CategoryListPage() {
-  const canManage = useHasPermission('categories', 'manage');
+  const confirm = useConfirm();
+  const canManage = useHasAnyPermission('categories', ['create', 'update', 'delete']);
   const { data: categories = [], isLoading } = useCategories();
   const deleteMutation = useDeleteCategory();
   const [dialogState, setDialogState] = useState<{ open: boolean; category: Category | null }>({
@@ -124,12 +127,12 @@ export default function CategoryListPage() {
 
   const [search, setSearch] = useState('');
 
-  const sorted = useMemo(() => [...categories].sort((a, b) => a.name.localeCompare(b.name)), [categories]);
+  const tree = useMemo(() => flattenCategoryTree(categories), [categories]);
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return sorted;
-    return sorted.filter((c) => c.name.toLowerCase().includes(term) || c.slug.toLowerCase().includes(term));
-  }, [sorted, search]);
+    if (!term) return tree;
+    return tree.filter((c) => c.name.toLowerCase().includes(term) || c.slug.toLowerCase().includes(term));
+  }, [tree, search]);
   const { paginated, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, count } = usePagination(filtered);
 
   return (
@@ -169,7 +172,9 @@ export default function CategoryListPage() {
           <TableBody>
             {paginated.map((category) => (
               <TableRow key={category.id} hover>
-                <TableCell>{category.name}</TableCell>
+                <TableCell sx={{ pl: 2 + category.depth * 3, fontWeight: category.depth === 0 ? 700 : 400 }}>
+                  {category.name}
+                </TableCell>
                 <TableCell sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>{category.slug}</TableCell>
                 <TableCell>{category.parent?.name ?? '—'}</TableCell>
                 {canManage && (
@@ -180,8 +185,10 @@ export default function CategoryListPage() {
                     <IconButton
                       size="small"
                       color="error"
-                      onClick={() => {
-                        if (confirm(`Supprimer la catégorie "${category.name}" ?`)) deleteMutation.mutate(category.id);
+                      onClick={async () => {
+                        if (await confirm({ title: `Supprimer la catégorie "${category.name}" ?`, destructive: true })) {
+                          deleteMutation.mutate(category.id);
+                        }
                       }}
                     >
                       <DeleteOutlineIcon fontSize="small" />

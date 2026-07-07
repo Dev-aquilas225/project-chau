@@ -1,16 +1,19 @@
 import { useMemo, useState } from 'react';
-import { Box, Button, Chip, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import { Box, Button, Chip, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Tooltip, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useRoles, useDeleteRole } from './hooks';
 import RoleFormDialog from './RoleFormDialog';
 import { usePagination } from '@/hooks/usePagination';
+import { useConfirm } from '@/components/ConfirmDialogProvider';
 import { RESOURCE_KEYS, RESOURCE_LABELS } from '@/types';
 import type { CustomRole } from '@/types';
 
 export default function RoleListPage() {
+  const confirm = useConfirm();
   const { data: roles = [], isLoading } = useRoles();
   const [search, setSearch] = useState('');
   const filtered = useMemo(() => {
@@ -59,18 +62,31 @@ export default function RoleListPage() {
           <TableBody>
             {paginated.map((role) => (
               <TableRow key={role.id} hover>
-                <TableCell sx={{ fontWeight: 600 }}>{role.name}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>
+                  <Stack direction="row" alignItems="center" gap={0.75}>
+                    {role.name}
+                    {role.isSystem && (
+                      <Tooltip title="Rôle de base : non renommable, non supprimable">
+                        <LockOutlinedIcon sx={{ fontSize: 15, color: 'text.secondary' }} />
+                      </Tooltip>
+                    )}
+                  </Stack>
+                </TableCell>
                 <TableCell sx={{ color: 'text.secondary' }}>{role.description || '—'}</TableCell>
                 <TableCell>
                   <Stack direction="row" flexWrap="wrap" gap={0.5}>
-                    {RESOURCE_KEYS.filter((r) => (role.permissions[r] ?? 'none') !== 'none').map((r) => (
-                      <Chip
-                        key={r}
-                        size="small"
-                        label={`${RESOURCE_LABELS[r]}: ${role.permissions[r] === 'manage' ? 'Gérer' : 'Voir'}`}
-                        color={role.permissions[r] === 'manage' ? 'primary' : 'default'}
-                      />
-                    ))}
+                    {RESOURCE_KEYS.filter((r) => (role.permissions[r]?.length ?? 0) > 0).map((r) => {
+                      const actions = role.permissions[r] ?? [];
+                      const isFull = actions.length === 5;
+                      return (
+                        <Chip
+                          key={r}
+                          size="small"
+                          label={`${RESOURCE_LABELS[r]}${isFull ? '' : ` (${actions.length})`}`}
+                          color={isFull ? 'primary' : 'default'}
+                        />
+                      );
+                    })}
                   </Stack>
                 </TableCell>
                 <TableCell align="right">
@@ -80,8 +96,11 @@ export default function RoleListPage() {
                   <IconButton
                     size="small"
                     color="error"
-                    onClick={() => {
-                      if (confirm(`Supprimer le rôle "${role.name}" ?`)) deleteMutation.mutate(role.id);
+                    disabled={role.isSystem}
+                    onClick={async () => {
+                      if (await confirm({ title: `Supprimer le rôle "${role.name}" ?`, destructive: true })) {
+                        deleteMutation.mutate(role.id);
+                      }
                     }}
                   >
                     <DeleteOutlineIcon fontSize="small" />

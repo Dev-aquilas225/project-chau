@@ -16,7 +16,7 @@ export class PlatformConfigController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @RequirePermission('platformConfig', 'manage')
+  @RequirePermission('platformConfig', 'update')
   @Patch()
   update(@Body() dto: UpdatePlatformConfigDto) {
     return this.configService.update(dto);

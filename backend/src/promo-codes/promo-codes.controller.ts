@@ -15,28 +15,28 @@ export class PromoCodesController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @RequirePermission('promoCodes', 'view')
+  @RequirePermission('promoCodes', 'view_any')
   @Get()
   findAll() {
     return this.promoCodesService.findAll();
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @RequirePermission('promoCodes', 'manage')
+  @RequirePermission('promoCodes', 'create')
   @Post()
   create(@Body() dto: CreatePromoCodeDto) {
     return this.promoCodesService.create(dto);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @RequirePermission('promoCodes', 'manage')
+  @RequirePermission('promoCodes', 'update')
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdatePromoCodeDto) {
     return this.promoCodesService.update(id, dto);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @RequirePermission('promoCodes', 'manage')
+  @RequirePermission('promoCodes', 'delete')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.promoCodesService.remove(id);

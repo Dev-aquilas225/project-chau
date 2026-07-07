@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import type { Role, SellerStatus } from '../../users/entities/user.entity';
-import type { PermissionLevel, ResourceKey } from '../../roles/entities/role.entity';
+import type { PermissionAction, ResourceKey } from '../../roles/entities/role.entity';
 
 export interface JwtPayload {
   sub: string;
@@ -14,7 +14,7 @@ export interface JwtPayload {
   role: Role;
   sellerStatus: SellerStatus;
   blocked: boolean;
-  customRole: { id: string; permissions: Partial<Record<ResourceKey, PermissionLevel>> } | null;
+  customRole: { id: string; permissions: Partial<Record<ResourceKey, PermissionAction[]>> } | null;
 }
 
 @Injectable()
