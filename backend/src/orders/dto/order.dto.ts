@@ -48,3 +48,35 @@ export class UpdateOrderStatusDto {
 
   @IsOptional() @IsString() note?: string;
 }
+
+export class CreateCheckoutSessionDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OrderItemDto)
+  items: OrderItemDto[];
+
+  @IsNumber() @Min(0) subtotal: number;
+
+  @IsOptional() @IsNumber() @Min(0) discount?: number;
+
+  @IsNumber() @Min(0) total: number;
+
+  @IsOptional() @IsString() promoCode?: string;
+
+  @ValidateNested()
+  @Type(() => AddressDto)
+  shippingAddress: AddressDto;
+
+  @IsString() paymentMethod: string;
+
+  @IsNumber() @Min(0) shippingFee: number;
+
+  @IsString() carrierName: string;
+
+  @IsString() currency: string;
+
+  @IsNumber() @Min(0) exchangeRate: number;
+
+  @IsOptional() @IsString() offerId?: string;
+}
+

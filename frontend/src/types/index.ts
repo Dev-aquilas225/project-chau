@@ -30,6 +30,7 @@ export interface UserProfile {
   sellerProfile: SellerProfile;
   identityVerified?: boolean;
   addresses: Address[];
+  walletBalance?: number;
   createdAt?: Date;
 }
 
@@ -103,6 +104,7 @@ export interface Order {
   status: OrderStatus;
   shippingAddress: Address;
   paymentMethod: string;
+  buyerConfirmed?: boolean;
   createdAt?: Date;
   statusHistory?: OrderStatusHistoryEntry[];
 }

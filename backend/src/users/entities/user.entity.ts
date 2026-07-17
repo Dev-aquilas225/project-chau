@@ -47,6 +47,15 @@ export class User {
   @Column({ type: 'jsonb', default: {} })
   sellerProfile: SellerProfile;
 
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0, transformer: {
+    to: (value: number) => value,
+    from: (value: string) => parseFloat(value) || 0
+  } })
+  walletBalance: number;
+
+  @Column({ type: 'jsonb', default: [] })
+  bundleDiscounts: { minItems: number; discountPercent: number }[];
+
   @Column({ type: 'jsonb', default: [] })
   addresses: Record<string, unknown>[];
 

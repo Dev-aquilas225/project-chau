@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Package, ChevronDown, ChevronUp } from 'lucide-react';
+import { Package, ChevronDown, ChevronUp, Star, Loader2, X, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { apiFetch } from '@/lib/http';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useMyOrders, useOrder } from './hooks';
 import { OrderTimeline } from './components/OrderTimeline';
@@ -22,10 +24,59 @@ const statusColor: Record<OrderStatus, string> = {
 export function OrdersPage() {
   const { t } = useTranslation(['orders', 'common']);
   const { user } = useAuth();
-  const { data: orders, isLoading } = useMyOrders(user?.id);
+  const { data: orders, isLoading, refetch } = useMyOrders(user?.id);
   const [params] = useSearchParams();
   const last = params.get('last');
   const [expanded, setExpanded] = useState<string | null>(null);
+
+  // Review and confirmation state
+  const [confirmingOrderId, setConfirmingOrderId] = useState<string | null>(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewSellerId, setReviewSellerId] = useState<string | null>(null);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [confirmingLoading, setConfirmingLoading] = useState<string | null>(null);
+
+  const handleConfirmReceipt = async (order: any) => {
+    setConfirmingLoading(order.id);
+    try {
+      await apiFetch(`/orders/${order.id}/confirm-receipt`, { method: 'POST' });
+      toast.success('Réception confirmée avec succès !');
+      refetch();
+      if (order.sellerId) {
+        setConfirmingOrderId(order.id);
+        setReviewSellerId(order.sellerId);
+        setShowReviewModal(true);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Erreur lors de la confirmation.');
+    } finally {
+      setConfirmingLoading(null);
+    }
+  };
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewSellerId || !confirmingOrderId) return;
+    setSubmittingReview(true);
+    try {
+      await apiFetch(`/users/${reviewSellerId}/reviews`, {
+        method: 'POST',
+        body: { rating, comment: comment.trim(), orderId: confirmingOrderId },
+      });
+      toast.success('Merci pour votre évaluation !');
+      setShowReviewModal(false);
+      setComment('');
+      setRating(5);
+      setConfirmingOrderId(null);
+      setReviewSellerId(null);
+    } catch (err: any) {
+      toast.error(err.message || 'Impossible d\'enregistrer votre avis.');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   if (isLoading) return <div className="flex justify-center py-16"><Spinner /></div>;
 
@@ -79,10 +130,32 @@ export function OrdersPage() {
                 ))}
               </ul>
 
-              <div className="mt-3 flex justify-between border-t border-line pt-3 text-sm">
+              <div className="mt-3 flex justify-between border-t border-line pt-3 text-sm items-center">
                 <span className="text-muted">{t('itemsCount', { count: o.items.reduce((n, i) => n + i.qty, 0) })}</span>
                 <span className="font-semibold">{formatPrice(o.total)}</span>
               </div>
+
+              {/* confirm receipt action */}
+              {!o.buyerConfirmed && (o.status === 'shipped' || o.status === 'paid') && (
+                <button
+                  type="button"
+                  disabled={confirmingLoading === o.id}
+                  onClick={() => handleConfirmReceipt(o)}
+                  className="btn-primary w-full py-2.5 rounded-xl font-bold text-xs mt-3 flex items-center justify-center gap-2"
+                >
+                  {confirmingLoading === o.id ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Confirmation en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4 stroke-[3px]" />
+                      Tout est OK - Valider la réception
+                    </>
+                  )}
+                </button>
+              )}
 
               <button
                 type="button"
@@ -98,6 +171,70 @@ export function OrdersPage() {
           );
         })}
       </div>
+
+      {/* User Review C2C Modal */}
+      {showReviewModal && (
+        <div className="fixed inset-0 z-50 bg-ink/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-paper p-6 rounded-2xl border border-line shadow-xl max-w-sm w-full animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-ink text-base">Évaluer le vendeur</h3>
+              <button type="button" onClick={() => setShowReviewModal(false)} className="text-muted hover:text-ink">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={handleReviewSubmit} className="space-y-4">
+              <div className="text-left">
+                <p className="text-xs text-muted leading-relaxed mb-4">
+                  Veuillez laisser une note et un avis pour évaluer la transaction avec le vendeur de cet article.
+                </p>
+                
+                <label className="label text-xs font-semibold mb-2">Note (de 1 à 5 étoiles)</label>
+                <div className="flex gap-1.5 mb-4">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setRating(n)}
+                      className="focus:outline-none transition"
+                    >
+                      <Star className={cn("h-6 w-6 transition", n <= rating ? "fill-amber-400 text-amber-400" : "text-gray-200")} />
+                    </button>
+                  ))}
+                </div>
+
+                <label className="label text-xs font-semibold mb-1">Votre commentaire (optionnel)</label>
+                <textarea
+                  className="input rounded-xl text-sm"
+                  placeholder="Comment s'est passée la transaction ? Rapidité d'envoi, état du colis..."
+                  rows={3}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  className="btn-outline flex-1 rounded-xl py-2.5 text-xs font-semibold border-gray-200"
+                  onClick={() => setShowReviewModal(false)}
+                >
+                  Passer
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingReview}
+                  className="btn-primary flex-1 rounded-xl py-2.5 text-xs font-bold shadow-md flex items-center justify-center gap-1.5"
+                >
+                  {submittingReview ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    'Valider l\'avis'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

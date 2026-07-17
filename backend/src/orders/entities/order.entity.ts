@@ -67,6 +67,30 @@ export class Order {
   @Column({ type: 'varchar', default: 'pending' })
   status: OrderStatus;
 
+  @Column({ default: false })
+  buyerConfirmed: boolean;
+
+  @Column({ nullable: true })
+  stripePaymentIntentId: string;
+
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0, transformer: {
+    to: (value: number) => value,
+    from: (value: string) => parseFloat(value) || 0
+  } })
+  shippingFee: number;
+
+  @Column({ default: '' })
+  carrierName: string;
+
+  @Column({ default: 'EUR' })
+  currency: string;
+
+  @Column({ type: 'numeric', precision: 10, scale: 6, default: 1.0, transformer: {
+    to: (value: number) => value,
+    from: (value: string) => parseFloat(value) || 1.0
+  } })
+  exchangeRate: number;
+
   @Column({ type: 'jsonb' })
   shippingAddress: Address;
 

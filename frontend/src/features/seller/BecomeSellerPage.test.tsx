@@ -134,7 +134,7 @@ describe('BecomeSellerPage', () => {
     clickNext(); // aucun document téléversé
 
     expect(toastErrorMock).toHaveBeenCalledWith("Merci de téléverser votre pièce d'identité");
-    expect(screen.queryByText('Récapitulatif')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /récapitulatif/i })).not.toBeInTheDocument();
   });
 
   it("bloque le passage au récapitulatif (CNI) si le verso n'est pas téléversé", async () => {
@@ -152,7 +152,7 @@ describe('BecomeSellerPage', () => {
     clickNext();
 
     expect(toastErrorMock).toHaveBeenCalledWith("Merci de téléverser le verso de votre pièce d'identité");
-    expect(screen.queryByText('Récapitulatif')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /récapitulatif/i })).not.toBeInTheDocument();
   });
 
   it('parcourt les 4 étapes puis soumet le payload complet à applyAsSeller, stocke le token et affiche le succès', async () => {
@@ -163,7 +163,7 @@ describe('BecomeSellerPage', () => {
     fillIdentityStepAndNext();
     await uploadDocumentsStepAndNext(container);
 
-    expect(screen.getByText('Récapitulatif')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /récapitulatif/i })).toBeInTheDocument();
     clickFinalSubmit();
 
     await waitFor(() => expect(mutateAsyncMock).toHaveBeenCalledTimes(1));

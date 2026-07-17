@@ -28,6 +28,9 @@ describe('OrdersService', () => {
       repo as never,
       historyRepo as never,
       productsRepo as never,
+      null as any,
+      null as any,
+      null as any,
       platformConfig as never,
       notificationsService as never,
     );

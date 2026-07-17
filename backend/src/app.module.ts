@@ -16,14 +16,21 @@ import { SellersModule } from './sellers/sellers.module';
 import { PlatformConfigModule } from './platform-config/platform-config.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { RolesModule } from './roles/roles.module';
+import { StripeModule } from './stripe/stripe.module';
+import { OffersModule } from './offers/offers.module';
+import { PayoutsModule } from './payouts/payouts.module';
 import { User } from './users/entities/user.entity';
 import { Product } from './products/entities/product.entity';
 import { Category } from './categories/entities/category.entity';
 import { Order } from './orders/entities/order.entity';
 import { Review } from './reviews/entities/review.entity';
+import { UserReview } from './reviews/entities/user-review.entity';
 import { Favorite } from './favorites/entities/favorite.entity';
 import { PromoCode } from './promo-codes/entities/promo-code.entity';
 import { PlatformConfig } from './platform-config/entities/platform-config.entity';
+import { Offer } from './offers/entities/offer.entity';
+import { PayoutRequest } from './payouts/entities/payout-request.entity';
+
 
 @Module({
   imports: [
@@ -38,7 +45,7 @@ import { PlatformConfig } from './platform-config/entities/platform-config.entit
         username: config.get<string>('DB_USERNAME', 'postgres'),
         password: config.get<string>('DB_PASSWORD', 'postgres'),
         database: config.get<string>('DB_NAME', 'aquilas'),
-        entities: [User, Product, Category, Order, Review, Favorite, PromoCode, PlatformConfig],
+        entities: [User, Product, Category, Order, Review, UserReview, Favorite, PromoCode, PlatformConfig, Offer, PayoutRequest],
         synchronize: false,
         autoLoadEntities: true,
       }),
@@ -58,6 +65,9 @@ import { PlatformConfig } from './platform-config/entities/platform-config.entit
     PlatformConfigModule,
     NotificationsModule,
     RolesModule,
+    StripeModule,
+    OffersModule,
+    PayoutsModule,
   ],
 })
 export class AppModule {}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Heart, Leaf, ShieldCheck, Store } from 'lucide-react';
+import { Heart, Leaf, ShieldCheck, Store, X, Loader2 } from 'lucide-react';
+import { apiFetch } from '@/lib/http';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useProduct } from './hooks';
@@ -22,6 +23,35 @@ export function ProductDetailPage() {
   const isFav = useFavoritesStore((s) => s.ids.includes(id));
   const toggle = useFavoritesStore((s) => s.toggle);
   const [active, setActive] = useState(0);
+  const [showOfferModal, setShowOfferModal] = useState(false);
+  const [offerPrice, setOfferPrice] = useState('');
+  const [submittingOffer, setSubmittingOffer] = useState(false);
+  
+  const handleMakeOffer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product) return;
+    const price = parseFloat(offerPrice);
+    if (isNaN(price) || price <= 0) {
+      toast.error('Veuillez entrer un prix valide.');
+      return;
+    }
+
+    setSubmittingOffer(true);
+    try {
+      await apiFetch('/offers', {
+        method: 'POST',
+        body: { productId: product.id, suggestedPrice: price },
+      });
+      toast.success('Votre offre a bien été envoyée au vendeur !');
+      setShowOfferModal(false);
+      setOfferPrice('');
+      navigate('/offres');
+    } catch (err: any) {
+      toast.error(err.message || 'Impossible d\'envoyer l\'offre.');
+    } finally {
+      setSubmittingOffer(false);
+    }
+  };
 
   const handleToggleFavorite = () => {
     if (!user) {
@@ -91,6 +121,77 @@ export function ProductDetailPage() {
               <Heart className={cn('h-5 w-5', isFav && 'fill-sale text-sale')} />
             </button>
           </div>
+
+          {!soldOut && user?.id !== product.sellerId && (
+            <button
+              type="button"
+              onClick={() => {
+                if (!user) {
+                  navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+                  return;
+                }
+                setShowOfferModal(true);
+              }}
+              className="btn-outline w-full rounded-xl font-bold py-3 mt-3 border-gray-200 transition"
+            >
+              Faire une offre
+            </button>
+          )}
+
+          {/* Offer Modal Overlay */}
+          {showOfferModal && (
+            <div className="fixed inset-0 z-50 bg-ink/50 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-paper p-6 rounded-2xl border border-line shadow-xl max-w-sm w-full animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold text-ink text-base">Faire une offre de prix</h3>
+                  <button type="button" onClick={() => setShowOfferModal(false)} className="text-muted hover:text-ink">
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                <form onSubmit={handleMakeOffer} className="space-y-4">
+                  <div className="text-left">
+                    <p className="text-xs text-muted leading-relaxed mb-3">
+                      Proposez un prix d'achat au vendeur pour "{product.name}". Prix initial : <span className="font-bold text-ink">{formatPrice(product.price)}</span>.
+                    </p>
+                    <label className="label text-xs font-semibold mb-1">Votre offre (EUR)</label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="1"
+                        className="input rounded-xl pr-10 py-2.5 font-semibold text-sm"
+                        placeholder="Ex: 80"
+                        value={offerPrice}
+                        onChange={(e) => setOfferPrice(e.target.value)}
+                        required
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-muted text-xs">EUR</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      className="btn-outline flex-1 rounded-xl py-2 text-xs font-semibold border-gray-200"
+                      onClick={() => setShowOfferModal(false)}
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submittingOffer}
+                      className="btn-primary flex-1 rounded-xl py-2 text-xs font-bold shadow-md flex items-center justify-center gap-1.5"
+                    >
+                      {submittingOffer ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        'Envoyer l\'offre'
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
           <p className="mt-6 whitespace-pre-line text-sm leading-relaxed text-muted">{product.description}</p>
 

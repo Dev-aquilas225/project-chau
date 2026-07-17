@@ -10,6 +10,7 @@ import { NotificationsBell } from '@/features/notifications/NotificationsBell';
 import { cn } from '@/lib/utils';
 import { AccountMenu } from './AccountMenu';
 import { LanguageSelector } from './LanguageSelector';
+import { CurrencySelector } from './CurrencySelector';
 
 export function Header() {
   const { t } = useTranslation('common');
@@ -83,8 +84,10 @@ export function Header() {
               <Link to={sellerLink} className="btn-primary hidden px-5 py-2 text-sm md:inline-flex">
                 {t('header.sell')}
               </Link>
-              <div className="hidden md:block">
+              <div className="hidden md:flex items-center gap-3">
                 <LanguageSelector />
+                <span className="text-gray-300">|</span>
+                <CurrencySelector />
               </div>
               <Link to="/panier" className="relative" aria-label={t('header.cart')} data-testid="cart-link">
                 <ShoppingBag />
@@ -123,6 +126,11 @@ export function Header() {
               <Link to="/register" className="hidden text-sm font-medium hover:underline md:inline">
                 {t('header.register')}
               </Link>
+              <div className="hidden md:flex items-center gap-3">
+                <LanguageSelector />
+                <span className="text-gray-300">|</span>
+                <CurrencySelector />
+              </div>
               <Link to="/panier" className="relative" aria-label={t('header.cart')} data-testid="cart-link">
                 <ShoppingBag />
                 {count > 0 && (
@@ -300,7 +308,10 @@ export function Header() {
             <Link to={sellerLink} onClick={closeMenu} className="btn-primary px-5 py-2 text-center text-sm">
               {t('header.sell')}
             </Link>
-            <LanguageSelector />
+            <div className="flex justify-between items-center border-t border-line pt-4 mt-2">
+              <LanguageSelector />
+              <CurrencySelector />
+            </div>
           </div>
         </div>
       )}

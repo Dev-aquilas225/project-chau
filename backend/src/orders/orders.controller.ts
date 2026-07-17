@@ -1,6 +1,6 @@
 import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto, UpdateOrderStatusDto } from './dto/order.dto';
+import { CreateOrderDto, UpdateOrderStatusDto, CreateCheckoutSessionDto } from './dto/order.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { SellerGuard } from '../auth/guards/seller.guard';
@@ -18,6 +18,16 @@ export class OrdersController {
   @Post()
   create(@CurrentUser() user: JwtPayload, @Body() dto: CreateOrderDto) {
     return this.ordersService.create(user.sub, dto);
+  }
+
+  @Post('checkout-session')
+  createCheckoutSession(@CurrentUser() user: JwtPayload, @Body() dto: CreateCheckoutSessionDto) {
+    return this.ordersService.createCheckoutSession(user.sub, dto);
+  }
+
+  @Post(':id/confirm-receipt')
+  confirmReceipt(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    return this.ordersService.confirmReceipt(id, user.sub);
   }
 
   @Get('mine')

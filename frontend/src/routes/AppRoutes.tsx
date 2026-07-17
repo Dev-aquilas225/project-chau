@@ -19,6 +19,8 @@ import { MyListingsPage } from '@/features/seller/MyListingsPage';
 import { CreateListingPage } from '@/features/seller/CreateListingPage';
 import { EditListingPage } from '@/features/seller/EditListingPage';
 import { SellerOrdersPage } from '@/features/seller/SellerOrdersPage';
+import { WalletPage } from '@/features/wallet/WalletPage';
+import { OffersPage } from '@/features/offers/OffersPage';
 
 export function AppRoutes() {
   const { t } = useTranslation('common');
@@ -35,6 +37,8 @@ export function AppRoutes() {
         <Route path="checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
         <Route path="commandes" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
         <Route path="compte" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="portefeuille" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
+        <Route path="offres" element={<ProtectedRoute><OffersPage /></ProtectedRoute>} />
 
         {/* Seller routes */}
         <Route path="devenir-vendeur" element={<ProtectedRoute><BecomeSellerPage /></ProtectedRoute>} />
