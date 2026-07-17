@@ -1,3 +1,6 @@
+/* ── Google Fonts ─────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,39 +8,94 @@
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   body {
-    @apply bg-paper text-ink font-sans;
+    @apply bg-paper text-luxury-dark font-sans;
   }
-  h1, h2, h3 {
-    @apply font-serif;
+  h1, h2, h3, h4, .font-serif {
+    font-family: 'Playfair Display', Georgia, serif;
   }
 }
 
 @layer components {
+  /* ── Brand ───────────────────────────────────────────────────────── */
   .brand-logo {
     @apply font-serif font-bold tracking-tight;
   }
+
+  /* ── Containers ──────────────────────────────────────────────────── */
   .container-app {
-    @apply mx-auto w-full max-w-6xl px-4;
+    @apply mx-auto w-full max-w-8xl px-4 md:px-8;
   }
+  .container-custom {
+    @apply mx-auto w-full max-w-8xl px-4 md:px-8;
+  }
+
+  /* ── Buttons ─────────────────────────────────────────────────────── */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-primary {
-    @apply btn bg-ink text-paper hover:bg-black;
+    @apply btn bg-luxury-dark text-white hover:bg-black tracking-widest uppercase text-xs;
   }
   .btn-outline {
-    @apply btn border border-ink bg-transparent text-ink hover:bg-ink hover:text-paper;
+    @apply btn border border-luxury-dark text-luxury-dark bg-transparent hover:bg-luxury-dark hover:text-white tracking-widest uppercase text-xs;
   }
+  .btn-gold {
+    @apply btn bg-luxury-gold text-white hover:bg-amber-700 tracking-widest uppercase text-xs;
+  }
+
+  /* ── Form Fields ─────────────────────────────────────────────────── */
   .input {
-    @apply w-full rounded-md border border-line bg-paper px-4 py-3 text-sm outline-none focus:border-ink;
+    @apply w-full border border-line bg-paper px-4 py-3 text-sm outline-none focus:border-luxury-dark transition-colors duration-200;
   }
+  .label {
+    @apply block text-xs uppercase tracking-widest text-luxury-muted mb-2 font-medium;
+  }
+
+  /* ── Badges ──────────────────────────────────────────────────────── */
   .badge {
-    @apply inline-block bg-gray-100 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-ink;
+    @apply inline-block bg-white/90 px-2 py-1 text-[10px] font-bold uppercase tracking-tight text-luxury-dark;
+  }
+  .badge-gold {
+    @apply inline-block bg-luxury-gold px-2 py-1 text-[10px] font-bold uppercase tracking-tight text-white;
+  }
+
+  /* ── Card hover effect ───────────────────────────────────────────── */
+  .card-hover {
+    @apply transition-all duration-[400ms] ease-[cubic-bezier(0.165,0.84,0.44,1)];
+  }
+  .card-hover:hover {
+    transform: translateY(-4px);
+  }
+
+  /* ── Luxury utilities ────────────────────────────────────────────── */
+  .letter-luxury {
+    letter-spacing: 0.3em;
+  }
+  .letter-wide {
+    letter-spacing: 0.2em;
+  }
+  .transition-luxury {
+    @apply transition-all duration-[400ms] ease-[cubic-bezier(0.165,0.84,0.44,1)];
+  }
+  .section-title {
+    @apply font-serif text-3xl md:text-4xl mb-2;
+  }
+  .section-subtitle {
+    @apply text-luxury-muted text-xs uppercase tracking-[0.2em] font-medium;
+  }
+
+  /* ── Gold underline link ─────────────────────────────────────────── */
+  .link-gold {
+    @apply text-[11px] uppercase tracking-widest font-bold border-b border-luxury-gold pb-1 hover:text-luxury-gold transition-colors duration-200;
+  }
+  .link-see-more {
+    @apply flex items-center gap-2 text-xs uppercase tracking-widest font-semibold border-b border-black pb-1 hover:border-luxury-gold hover:text-luxury-gold transition-colors duration-200;
   }
 }
 
-/* Masquer la scrollbar des carrousels horizontaux */
+/* ── Scrollbar hiding for carousels ──────────────────────────────────── */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

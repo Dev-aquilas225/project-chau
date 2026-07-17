@@ -53,7 +53,8 @@
       "idDocumentFrontNationalLabel": "ID document (front) *",
       "idDocumentFrontPassportLabel": "ID document (photo) *",
       "idDocumentBackLabel": "ID document (back) *",
-      "profilePhotoLabel": "Profile photo *",
+      "profilePhotoLabel": "Profile photo or Company logo",
+      "profilePhotoHelpText": "Profile photo or Company logo",
       "uploadLabel": "Photo"
     },
     "recap": {

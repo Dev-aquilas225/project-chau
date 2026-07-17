@@ -45,11 +45,11 @@ function makeFile(name: string) {
 // Les champs du formulaire n'associent pas <label>/<input> via htmlFor/id (ils sont
 // simplement adjacents dans le DOM) : getByLabelText ne peut donc pas les trouver.
 // On retrouve l'input à partir du texte du label, en remontant à son conteneur commun.
-function getFieldByLabelText(text: string): HTMLInputElement {
+function getFieldByLabelText(text: string): HTMLInputElement | HTMLSelectElement {
   const label = screen.getByText(text);
-  const input = label.parentElement?.querySelector('input');
-  if (!input) throw new Error(`Aucun input trouvé à côté du label "${text}"`);
-  return input as HTMLInputElement;
+  const input = label.parentElement?.querySelector('input, select');
+  if (!input) throw new Error(`Aucun input/select trouvé à côté du label "${text}"`);
+  return input as HTMLInputElement | HTMLSelectElement;
 }
 
 function clickNext() {
@@ -65,7 +65,7 @@ function fillStoreStepAndNext(storeName = 'Ma Boutique') {
 // Étape 1 (Identité) -> remplit et passe à l'étape 2 (Documents).
 function fillIdentityStepAndNext() {
   fireEvent.change(getFieldByLabelText('Numéro de la pièce *'), { target: { value: 'ID123456' } });
-  fireEvent.change(screen.getByPlaceholderText('Ex : France'), { target: { value: 'France' } });
+  fireEvent.change(getFieldByLabelText('Pays de délivrance *'), { target: { value: 'France' } });
   fireEvent.change(getFieldByLabelText('Date de naissance *'), { target: { value: '1990-01-01' } });
   fireEvent.change(getFieldByLabelText("Nom complet (tel qu'indiqué sur la pièce) *"), { target: { value: 'Jean Dupont' } });
   clickNext();

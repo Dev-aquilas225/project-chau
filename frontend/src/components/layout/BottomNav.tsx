@@ -18,7 +18,10 @@ export function BottomNav() {
   const lastItems = [{ to: '/compte', label: t('bottomNav.me'), icon: User, end: false }];
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper md:hidden">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-100 bg-white lg:hidden"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       <div className="flex items-stretch justify-around">
         {items.map(({ to, label, icon: Icon, end }) => (
           <NavLink
@@ -26,7 +29,10 @@ export function BottomNav() {
             to={to}
             end={end}
             className={({ isActive }) =>
-              cn('flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px]', isActive ? 'text-ink' : 'text-muted')
+              cn(
+                'flex flex-1 flex-col items-center gap-0.5 py-3 text-[10px] uppercase tracking-wider transition-colors',
+                isActive ? 'text-luxury-gold font-semibold' : 'text-luxury-muted'
+              )
             }
           >
             <Icon className="h-5 w-5" />
@@ -40,7 +46,10 @@ export function BottomNav() {
             to={to}
             end={end}
             className={({ isActive }) =>
-              cn('flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px]', isActive ? 'text-ink' : 'text-muted')
+              cn(
+                'flex flex-1 flex-col items-center gap-0.5 py-3 text-[10px] uppercase tracking-wider transition-colors',
+                isActive ? 'text-luxury-gold font-semibold' : 'text-luxury-muted'
+              )
             }
           >
             <Icon className="h-5 w-5" />

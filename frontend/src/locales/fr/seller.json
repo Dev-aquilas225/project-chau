@@ -53,7 +53,8 @@
       "idDocumentFrontNationalLabel": "Pièce d'identité (recto) *",
       "idDocumentFrontPassportLabel": "Pièce d'identité (photo) *",
       "idDocumentBackLabel": "Pièce d'identité (verso) *",
-      "profilePhotoLabel": "Photo de profil *",
+      "profilePhotoLabel": "Photo de profil ou Logo de l'entreprise",
+      "profilePhotoHelpText": "Photo de profil ou logo d'entreprise",
       "uploadLabel": "Photo"
     },
     "recap": {

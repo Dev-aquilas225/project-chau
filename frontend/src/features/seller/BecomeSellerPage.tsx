@@ -9,6 +9,29 @@ import { uploadIdentityDocument } from './api';
 import { FullPageSpinner } from '@/components/ui/Spinner';
 import { cn } from '@/lib/utils';
 
+const COUNTRIES = [
+  'France',
+  'Allemagne',
+  'Autriche',
+  'Belgique',
+  'Canada',
+  'Danemark',
+  'Espagne',
+  'États-Unis',
+  'Finlande',
+  'Grèce',
+  'Irlande',
+  'Italie',
+  'Luxembourg',
+  'Norvège',
+  'Pays-Bas',
+  'Pologne',
+  'Portugal',
+  'Royaume-Uni',
+  'Suède',
+  'Suisse'
+];
+
 export function BecomeSellerPage() {
   const { t } = useTranslation('seller');
   const STEPS = [
@@ -29,7 +52,7 @@ export function BecomeSellerPage() {
   const [bio, setBio] = useState('');
   const [idType, setIdType] = useState<'national_id' | 'passport'>('national_id');
   const [idNumber, setIdNumber] = useState('');
-  const [idCountry, setIdCountry] = useState('');
+  const [idCountry, setIdCountry] = useState('France');
   const [fullNameOnId, setFullNameOnId] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [idDocumentRef, setIdDocumentRef] = useState<string | null>(null);
@@ -315,13 +338,16 @@ export function BecomeSellerPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label className="label text-sm font-semibold mb-1.5">{t('becomeSeller.identity.idCountryLabel')}</label>
-                    <input
+                    <select
                       className="input rounded-xl py-2.5"
-                      placeholder={t('becomeSeller.identity.idCountryPlaceholder')}
                       value={idCountry}
                       onChange={(e) => setIdCountry(e.target.value)}
                       required
-                    />
+                    >
+                      {COUNTRIES.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="label text-sm font-semibold mb-1.5">{t('becomeSeller.identity.dateOfBirthLabel')}</label>
@@ -501,7 +527,7 @@ export function BecomeSellerPage() {
                               </div>
                               <div className="text-left">
                                 <p className="text-xs font-semibold text-ink">{t('becomeSeller.documents.uploadLabel')}</p>
-                                <p className="text-[10px] text-muted">Photo portrait claire</p>
+                                <p className="text-[10px] text-muted">{t('becomeSeller.documents.profilePhotoHelpText')}</p>
                               </div>
                             </>
                           )}

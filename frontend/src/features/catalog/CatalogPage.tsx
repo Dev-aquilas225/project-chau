@@ -8,7 +8,7 @@ import { ProductCard } from '@/components/ProductCard';
 import { Pagination } from '@/components/Pagination';
 import { Spinner } from '@/components/ui/Spinner';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 12;
 
 export function CatalogPage() {
   const { t } = useTranslation('catalog');
@@ -45,62 +45,105 @@ export function CatalogPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const pageTitle = filters.search
+    ? t('catalog.title.results', { search: filters.search })
+    : filters.category
+      ? categories?.find((c) => c.id === filters.category)?.name ?? t('catalog.title.default')
+      : t('catalog.title.default');
+
   return (
-    <div className="container-app py-6">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl">
-          {filters.search ? t('catalog.title.results', { search: filters.search }) : filters.category
-            ? categories?.find((c) => c.id === filters.category)?.name ?? t('catalog.title.default')
-            : t('catalog.title.default')}
-        </h1>
-        <span className="flex items-center gap-1 text-sm text-muted">
-          <SlidersHorizontal className="h-4 w-4" /> {t('catalog.itemsCount', { count: products?.length ?? 0 })}
-        </span>
-      </div>
-
-      {/* Filtres */}
-      <div className="mb-6 flex flex-wrap gap-3">
-        <select className="input max-w-[180px]" value={filters.category ?? ''} onChange={(e) => update('category', e.target.value)} data-testid="filter-category">
-          <option value="">{t('catalog.filters.allCategories')}</option>
-          {categories?.filter((c) => !c.parentId).map((top) => (
-            <optgroup key={top.id} label={top.name}>
-              <option value={top.id}>{top.name}</option>
-              {categories.filter((sub) => sub.parentId === top.id).map((sub) => (
-                <Fragment key={sub.id}>
-                  <option value={sub.id}>{'  '}{sub.name}</option>
-                  {categories.filter((type) => type.parentId === sub.id).map((type) => (
-                    <option key={type.id} value={type.id}>{'    '}{type.name}</option>
-                  ))}
-                </Fragment>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-        <input className="input max-w-[120px]" type="number" placeholder={t('catalog.filters.minPricePlaceholder')} defaultValue={params.get('min') ?? ''} onBlur={(e) => update('min', e.target.value)} data-testid="filter-min" />
-        <input className="input max-w-[120px]" type="number" placeholder={t('catalog.filters.maxPricePlaceholder')} defaultValue={params.get('max') ?? ''} onBlur={(e) => update('max', e.target.value)} data-testid="filter-max" />
-        <select className="input max-w-[180px]" value={filters.sort} onChange={(e) => update('sort', e.target.value)} data-testid="filter-sort">
-          <option value="recent">{t('catalog.sort.recent')}</option>
-          <option value="price-asc">{t('catalog.sort.priceAsc')}</option>
-          <option value="price-desc">{t('catalog.sort.priceDesc')}</option>
-        </select>
-      </div>
-
-      {isLoading ? (
-        <div className="flex justify-center py-16"><Spinner className="h-8 w-8" /></div>
-      ) : isError ? (
-        <p role="alert" className="py-16 text-center text-sale">{t('catalog.error')}</p>
-      ) : products && products.length > 0 ? (
-        <>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {paginatedProducts?.map((p) => <ProductCard key={p.id} product={p} />)}
-          </div>
-          <Pagination page={page} totalPages={totalPages} onChange={changePage} />
-        </>
-      ) : (
-        <div className="py-16 text-center text-muted">
-          <p>{t('catalog.empty')}</p>
+    <div className="bg-white">
+      {/* Page header */}
+      <div className="bg-luxury-beige border-b border-luxury-gold/10 py-10 md:py-14">
+        <div className="container-custom text-center">
+          <h1 className="text-3xl md:text-4xl font-serif mb-2">{pageTitle}</h1>
+          {!filters.search && (
+            <p className="text-luxury-muted text-xs uppercase tracking-[0.2em] mt-2">
+              {t('catalog.itemsCount', { count: products?.length ?? 0 })}
+            </p>
+          )}
         </div>
-      )}
+      </div>
+
+      <div className="container-custom py-8">
+        {/* Filters bar */}
+        <div className="flex flex-wrap items-center gap-3 mb-8 pb-6 border-b border-line">
+          <span className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-luxury-muted font-medium mr-2">
+            <SlidersHorizontal className="h-4 w-4" />
+            Filtrer
+          </span>
+
+          <select
+            className="border border-line bg-white px-3 py-2 text-xs uppercase tracking-wider text-luxury-dark outline-none focus:border-luxury-dark transition-colors cursor-pointer"
+            value={filters.category ?? ''}
+            onChange={(e) => update('category', e.target.value)}
+            data-testid="filter-category"
+          >
+            <option value="">{t('catalog.filters.allCategories')}</option>
+            {categories?.filter((c) => !c.parentId).map((top) => (
+              <optgroup key={top.id} label={top.name}>
+                <option value={top.id}>{top.name}</option>
+                {categories.filter((sub) => sub.parentId === top.id).map((sub) => (
+                  <Fragment key={sub.id}>
+                    <option value={sub.id}>{'  '}{sub.name}</option>
+                    {categories.filter((type) => type.parentId === sub.id).map((type) => (
+                      <option key={type.id} value={type.id}>{'    '}{type.name}</option>
+                    ))}
+                  </Fragment>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+
+          <input
+            className="border border-line bg-white px-3 py-2 text-xs w-28 outline-none focus:border-luxury-dark transition-colors"
+            type="number"
+            placeholder={t('catalog.filters.minPricePlaceholder')}
+            defaultValue={params.get('min') ?? ''}
+            onBlur={(e) => update('min', e.target.value)}
+            data-testid="filter-min"
+          />
+          <input
+            className="border border-line bg-white px-3 py-2 text-xs w-28 outline-none focus:border-luxury-dark transition-colors"
+            type="number"
+            placeholder={t('catalog.filters.maxPricePlaceholder')}
+            defaultValue={params.get('max') ?? ''}
+            onBlur={(e) => update('max', e.target.value)}
+            data-testid="filter-max"
+          />
+
+          <select
+            className="border border-line bg-white px-3 py-2 text-xs uppercase tracking-wider text-luxury-dark outline-none focus:border-luxury-dark transition-colors cursor-pointer ml-auto"
+            value={filters.sort}
+            onChange={(e) => update('sort', e.target.value)}
+            data-testid="filter-sort"
+          >
+            <option value="recent">{t('catalog.sort.recent')}</option>
+            <option value="price-asc">{t('catalog.sort.priceAsc')}</option>
+            <option value="price-desc">{t('catalog.sort.priceDesc')}</option>
+          </select>
+        </div>
+
+        {/* Products grid */}
+        {isLoading ? (
+          <div className="flex justify-center py-24"><Spinner className="h-8 w-8" /></div>
+        ) : isError ? (
+          <p role="alert" className="py-24 text-center text-sale">{t('catalog.error')}</p>
+        ) : products && products.length > 0 ? (
+          <>
+            <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 md:gap-8">
+              {paginatedProducts?.map((p) => <ProductCard key={p.id} product={p} />)}
+            </div>
+            <div className="mt-12">
+              <Pagination page={page} totalPages={totalPages} onChange={changePage} />
+            </div>
+          </>
+        ) : (
+          <div className="py-24 text-center">
+            <p className="text-luxury-muted text-sm uppercase tracking-widest">{t('catalog.empty')}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
