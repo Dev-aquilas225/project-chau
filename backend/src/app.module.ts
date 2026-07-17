@@ -48,6 +48,8 @@ import { PayoutRequest } from './payouts/entities/payout-request.entity';
         entities: [User, Product, Category, Order, Review, UserReview, Favorite, PromoCode, PlatformConfig, Offer, PayoutRequest],
         synchronize: false,
         autoLoadEntities: true,
+        migrationsRun: true,
+        migrations: [__dirname + '/migrations/*{.ts,.js}'],
       }),
     }),
     AuthModule,

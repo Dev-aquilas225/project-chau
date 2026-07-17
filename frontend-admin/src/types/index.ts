@@ -234,3 +234,19 @@ export interface Notification {
   read: boolean;
   createdAt: string;
 }
+
+export interface PayoutRequest {
+  id: string;
+  userId: string;
+  user?: {
+    id: string;
+    displayName: string;
+    email: string;
+    sellerProfile?: SellerProfile;
+  };
+  amount: number;
+  status: 'pending' | 'processing' | 'paid' | 'rejected';
+  reviewNote: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

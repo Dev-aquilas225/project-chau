@@ -18,6 +18,7 @@ const SellerDetailPage = lazy(() => import('@/features/sellers/SellerDetailPage'
 const PlatformConfigPage = lazy(() => import('@/features/platformConfig/PlatformConfigPage'));
 const RoleListPage = lazy(() => import('@/features/roles/RoleListPage'));
 const ProfilePage = lazy(() => import('@/features/profile/ProfilePage'));
+const PayoutListPage = lazy(() => import('@/features/payouts/PayoutListPage'));
 
 function PageFallback() {
   return (
@@ -126,6 +127,14 @@ export default function App() {
             element={
               <Suspense fallback={<PageFallback />}>
                 <PlatformConfigPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="retraits"
+            element={
+              <Suspense fallback={<PageFallback />}>
+                <PayoutListPage />
               </Suspense>
             }
           />

@@ -28,6 +28,7 @@ import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettin
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import MenuIcon from '@mui/icons-material/Menu';
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { usePermission } from '@/features/auth/usePermission';
 import { logout } from '@/features/auth/api';
@@ -54,6 +55,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Codes promo', to: '/codes-promo', icon: <LocalOfferOutlinedIcon />, resource: 'promoCodes' },
   { label: 'Vendeurs', to: '/vendeurs', icon: <StorefrontOutlinedIcon />, resource: 'sellers' },
   { label: 'Paramètres', to: '/parametres', icon: <SettingsOutlinedIcon />, resource: 'platformConfig' },
+  { label: 'Retraits', to: '/retraits', icon: <AccountBalanceWalletOutlinedIcon />, adminOnly: true },
   { label: 'Rôles', to: '/roles', icon: <AdminPanelSettingsOutlinedIcon />, adminOnly: true },
 ];
 
