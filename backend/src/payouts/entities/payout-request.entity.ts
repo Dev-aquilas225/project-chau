@@ -24,7 +24,7 @@ export class PayoutRequest {
   @Column({ type: 'varchar', default: 'pending' })
   status: PayoutRequestStatus;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   reviewNote: string | null;
 
   @CreateDateColumn()
