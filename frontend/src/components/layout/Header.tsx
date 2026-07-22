@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronDown, User } from 'lucide-react';
+import { Search, ShoppingBag, Heart, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCartStore } from '@/stores/cartStore';
 import { useFavoritesStore } from '@/stores/favoritesStore';
@@ -19,29 +19,16 @@ export function Header() {
   const favoritesCount = useFavoritesStore((s) => s.ids.length);
   const { data: categories } = useCategories();
   const { user, sellerStatus } = useAuth();
-  const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
-  const [expandedTopId, setExpandedTopId] = useState<string | null>(null);
   const [hoveredTopId, setHoveredTopId] = useState<string | null>(null);
 
   const sellerLink = sellerStatus === 'approved' ? '/espace-vendeur' : '/devenir-vendeur';
   const topCategories = categories?.filter((c) => !c.parentId) ?? [];
   const childrenOf = (id: string) => categories?.filter((c) => c.parentId === id) ?? [];
 
-  useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [open]);
-
-  const closeMenu = () => {
-    setOpen(false);
-    setExpandedTopId(null);
-  };
-
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     navigate(`/catalogue?search=${encodeURIComponent(q)}`);
-    closeMenu();
   };
 
   return (
@@ -73,7 +60,7 @@ export function Header() {
       <div className="container-custom py-5">
         <div className="flex items-center justify-between gap-4">
 
-          {/* Left: search (desktop) or hamburger (mobile) */}
+          {/* Left: search (desktop only) */}
           <div className="flex-1 hidden lg:flex">
             <form onSubmit={submitSearch} className="relative w-64">
               <input
@@ -89,24 +76,14 @@ export function Header() {
             </form>
           </div>
 
-          {/* Mobile: hamburger */}
-          <button
-            className="shrink-0 lg:hidden"
-            aria-label={t('header.menu')}
-            onClick={() => setOpen((v) => !v)}
-          >
-            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
-
           {/* Center: logo */}
           <div className="flex-1 text-center">
             <Link to="/" className="inline-block">
-              <span className="font-serif text-xl md:text-2xl lg:text-3xl tracking-tight text-luxury-dark">
-                OCCASION DE LUXE
-              </span>
-              <span className="block text-[9px] font-sans tracking-[0.4em] mt-0.5 text-luxury-muted uppercase">
-                PJ International
-              </span>
+              <img
+                src="/logo.png"
+                alt="PJ International — Occasion de Luxe"
+                className="mx-auto h-12 w-auto md:h-14 lg:h-16"
+              />
             </Link>
           </div>
 
@@ -237,124 +214,6 @@ export function Header() {
         )}
       </nav>
 
-      {/* ── Mobile full-screen menu ──────────────────────────────────── */}
-      {open && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-white lg:hidden">
-          {/* Mobile header */}
-          <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4">
-            <Link to="/" onClick={closeMenu} className="font-serif text-lg tracking-tight">
-              OCCASION DE LUXE
-            </Link>
-            <button type="button" aria-label={t('header.close')} onClick={closeMenu}>
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-
-          {/* Mobile search */}
-          <form onSubmit={submitSearch} className="border-b border-gray-100 p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-luxury-muted" />
-              <input
-                className="w-full bg-luxury-beige py-3 pl-9 pr-3 text-sm outline-none placeholder:text-luxury-muted"
-                placeholder={t('header.searchPlaceholderMobile')}
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-              />
-            </div>
-          </form>
-
-          {/* Mobile nav links */}
-          <nav className="flex-1 overflow-y-auto">
-            <Link
-              to="/catalogue"
-              onClick={closeMenu}
-              className="flex items-center justify-between border-b border-gray-100 px-4 py-4 text-sm uppercase tracking-widest font-medium"
-            >
-              {t('header.all')}
-            </Link>
-            {topCategories.map((top) => {
-              const subs = childrenOf(top.id);
-              const isTopExpanded = expandedTopId === top.id;
-              return (
-                <div key={top.id} className="border-b border-gray-100">
-                  {subs.length > 0 ? (
-                    <button
-                      type="button"
-                      className="flex w-full items-center justify-between px-4 py-4 text-left text-sm uppercase tracking-widest font-medium"
-                      onClick={() => setExpandedTopId(isTopExpanded ? null : top.id)}
-                    >
-                      {top.name}
-                      <ChevronDown className={cn('h-4 w-4 text-luxury-muted transition-transform duration-200', isTopExpanded && 'rotate-180')} />
-                    </button>
-                  ) : (
-                    <Link
-                      to={`/catalogue?category=${top.id}`}
-                      onClick={closeMenu}
-                      className="flex items-center justify-between px-4 py-4 text-sm uppercase tracking-widest font-medium"
-                    >
-                      {top.name}
-                    </Link>
-                  )}
-                  {isTopExpanded && (
-                    <div className="bg-luxury-beige/50 pb-2">
-                      <Link
-                        to={`/catalogue?category=${top.id}`}
-                        onClick={closeMenu}
-                        className="block px-6 py-2.5 text-xs font-semibold uppercase tracking-widest text-luxury-gold"
-                      >
-                        Voir tout — {top.name}
-                      </Link>
-                      {subs.map((sub) => (
-                        <Link
-                          key={sub.id}
-                          to={`/catalogue?category=${sub.id}`}
-                          onClick={closeMenu}
-                          className="block px-6 py-2.5 text-sm text-luxury-muted hover:text-luxury-dark"
-                        >
-                          {sub.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </nav>
-
-          {/* Mobile footer actions */}
-          <div className="border-t border-gray-100 p-4 space-y-3">
-            {!user ? (
-              <div className="flex gap-3">
-                <Link
-                  to="/login"
-                  onClick={closeMenu}
-                  className="btn-outline flex-1 justify-center py-3 text-xs"
-                >
-                  {t('header.login')}
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={closeMenu}
-                  className="btn-primary flex-1 justify-center py-3 text-xs"
-                >
-                  {t('header.register')}
-                </Link>
-              </div>
-            ) : null}
-            <Link
-              to={sellerLink}
-              onClick={closeMenu}
-              className="btn-primary w-full justify-center py-3 text-xs"
-            >
-              {t('header.sell')}
-            </Link>
-            <div className="flex justify-between items-center pt-2">
-              <LanguageSelector />
-              <CurrencySelector />
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 }

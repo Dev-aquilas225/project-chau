@@ -49,9 +49,7 @@ export default function LoginPage() {
       <Paper elevation={0} sx={{ p: 5, width: 400, border: '1px solid', borderColor: 'divider' }}>
         <Stack spacing={3}>
           <Box textAlign="center">
-            <Typography variant="h4" sx={{ mb: 0.5 }}>
-              Aquilas
-            </Typography>
+            <Box component="img" src="/logo.png" alt="PJ International" sx={{ height: 72, width: 'auto', mb: 1 }} />
             <Typography variant="body2" color="text.secondary">
               Back-office administrateur
             </Typography>

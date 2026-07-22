@@ -87,9 +87,7 @@ function DrawerContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Toolbar sx={{ px: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, letterSpacing: '-0.02em' }}>
-          Aquilas
-        </Typography>
+        <Box component="img" src="/logo-mark.png" alt="PJ International" sx={{ height: 44, width: 'auto' }} />
       </Toolbar>
       <Divider sx={{ borderColor: 'rgba(255,255,255,0.12)' }} />
       <List sx={{ px: 1.5, py: 2, flex: 1 }}>

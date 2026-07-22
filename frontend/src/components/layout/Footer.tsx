@@ -60,9 +60,7 @@ export function Footer() {
 
           {/* Brand column */}
           <div>
-            <div className="font-serif text-xl mb-6 tracking-tight">
-              OCCASION DE LUXE PJ
-            </div>
+            <img src="/logo.png" alt="PJ International — Occasion de Luxe" className="h-16 w-auto mb-6" />
             <p className="text-gray-400 text-xs leading-loose tracking-wide">
               Votre destination de confiance pour le luxe de seconde main.
               Authenticité garantie, passion partagée.
