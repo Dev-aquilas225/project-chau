@@ -65,7 +65,7 @@ function fillStoreStepAndNext(storeName = 'Ma Boutique') {
 // Étape 1 (Identité) -> remplit et passe à l'étape 2 (Documents).
 function fillIdentityStepAndNext() {
   fireEvent.change(getFieldByLabelText('Numéro de la pièce *'), { target: { value: 'ID123456' } });
-  fireEvent.change(getFieldByLabelText('Pays de délivrance *'), { target: { value: 'France' } });
+  fireEvent.change(getFieldByLabelText('Pays de délivrance *'), { target: { value: 'FR' } });
   fireEvent.change(getFieldByLabelText('Date de naissance *'), { target: { value: '1990-01-01' } });
   fireEvent.change(getFieldByLabelText("Nom complet (tel qu'indiqué sur la pièce) *"), { target: { value: 'Jean Dupont' } });
   clickNext();
@@ -172,7 +172,7 @@ describe('BecomeSellerPage', () => {
       bio: undefined,
       idType: 'national_id',
       idNumber: 'ID123456',
-      idCountry: 'France',
+      idCountry: 'FR',
       fullNameOnId: 'Jean Dupont',
       dateOfBirth: '1990-01-01',
       idDocumentRef: 'user-1-id-document-1.png',

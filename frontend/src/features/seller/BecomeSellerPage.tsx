@@ -9,27 +9,28 @@ import { uploadIdentityDocument } from './api';
 import { FullPageSpinner } from '@/components/ui/Spinner';
 import { cn } from '@/lib/utils';
 
+// value = code ISO 3166-1 alpha-2 attendu par l'API (idCountry), label = affichage
 const COUNTRIES = [
-  'France',
-  'Allemagne',
-  'Autriche',
-  'Belgique',
-  'Canada',
-  'Danemark',
-  'Espagne',
-  'États-Unis',
-  'Finlande',
-  'Grèce',
-  'Irlande',
-  'Italie',
-  'Luxembourg',
-  'Norvège',
-  'Pays-Bas',
-  'Pologne',
-  'Portugal',
-  'Royaume-Uni',
-  'Suède',
-  'Suisse'
+  { code: 'FR', label: 'France' },
+  { code: 'DE', label: 'Allemagne' },
+  { code: 'AT', label: 'Autriche' },
+  { code: 'BE', label: 'Belgique' },
+  { code: 'CA', label: 'Canada' },
+  { code: 'DK', label: 'Danemark' },
+  { code: 'ES', label: 'Espagne' },
+  { code: 'US', label: 'États-Unis' },
+  { code: 'FI', label: 'Finlande' },
+  { code: 'GR', label: 'Grèce' },
+  { code: 'IE', label: 'Irlande' },
+  { code: 'IT', label: 'Italie' },
+  { code: 'LU', label: 'Luxembourg' },
+  { code: 'NO', label: 'Norvège' },
+  { code: 'NL', label: 'Pays-Bas' },
+  { code: 'PL', label: 'Pologne' },
+  { code: 'PT', label: 'Portugal' },
+  { code: 'GB', label: 'Royaume-Uni' },
+  { code: 'SE', label: 'Suède' },
+  { code: 'CH', label: 'Suisse' },
 ];
 
 export function BecomeSellerPage() {
@@ -52,7 +53,7 @@ export function BecomeSellerPage() {
   const [bio, setBio] = useState('');
   const [idType, setIdType] = useState<'national_id' | 'passport'>('national_id');
   const [idNumber, setIdNumber] = useState('');
-  const [idCountry, setIdCountry] = useState('France');
+  const [idCountry, setIdCountry] = useState('FR');
   const [fullNameOnId, setFullNameOnId] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [idDocumentRef, setIdDocumentRef] = useState<string | null>(null);
@@ -345,7 +346,7 @@ export function BecomeSellerPage() {
                       required
                     >
                       {COUNTRIES.map((c) => (
-                        <option key={c} value={c}>{c}</option>
+                        <option key={c.code} value={c.code}>{c.label}</option>
                       ))}
                     </select>
                   </div>
@@ -576,7 +577,9 @@ export function BecomeSellerPage() {
                       <dt className="text-muted">{t('becomeSeller.recap.idNumber')}</dt>
                       <dd className="font-semibold text-ink">{idNumber}</dd>
                       <dt className="text-muted">{t('becomeSeller.recap.idCountry')}</dt>
-                      <dd className="font-semibold text-ink">{idCountry}</dd>
+                      <dd className="font-semibold text-ink">
+                        {COUNTRIES.find((c) => c.code === idCountry)?.label ?? idCountry}
+                      </dd>
                       <dt className="text-muted">{t('becomeSeller.recap.dateOfBirth')}</dt>
                       <dd className="font-semibold text-ink">{dateOfBirth}</dd>
                       <dt className="text-muted">{t('becomeSeller.recap.fullName')}</dt>
