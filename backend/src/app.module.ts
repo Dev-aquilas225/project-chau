@@ -23,13 +23,16 @@ import { User } from './users/entities/user.entity';
 import { Product } from './products/entities/product.entity';
 import { Category } from './categories/entities/category.entity';
 import { Order } from './orders/entities/order.entity';
+import { OrderStatusHistory } from './orders/entities/order-status-history.entity';
 import { Review } from './reviews/entities/review.entity';
 import { UserReview } from './reviews/entities/user-review.entity';
 import { Favorite } from './favorites/entities/favorite.entity';
 import { PromoCode } from './promo-codes/entities/promo-code.entity';
 import { PlatformConfig } from './platform-config/entities/platform-config.entity';
+import { Role } from './roles/entities/role.entity';
 import { Offer } from './offers/entities/offer.entity';
 import { PayoutRequest } from './payouts/entities/payout-request.entity';
+import { Notification } from './notifications/entities/notification.entity';
 
 
 @Module({
@@ -45,7 +48,7 @@ import { PayoutRequest } from './payouts/entities/payout-request.entity';
         username: config.get<string>('DB_USERNAME', 'postgres'),
         password: config.get<string>('DB_PASSWORD', 'postgres'),
         database: config.get<string>('DB_NAME', 'aquilas'),
-        entities: [User, Product, Category, Order, Review, UserReview, Favorite, PromoCode, PlatformConfig, Offer, PayoutRequest],
+        entities: [User, Product, Category, Order, OrderStatusHistory, Review, UserReview, Favorite, PromoCode, PlatformConfig, Role, Offer, PayoutRequest, Notification],
         synchronize: false,
         autoLoadEntities: true,
         migrationsRun: true,
