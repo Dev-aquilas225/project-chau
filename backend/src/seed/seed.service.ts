@@ -19,19 +19,23 @@ export class SeedService implements OnModuleInit {
 
   /** Crée l'utilisateur admin par défaut s'il n'existe pas déjà (idempotent). */
   async seedAdmin() {
-    const existing = await this.usersRepo.findOne({ where: { email: ADMIN_EMAIL } });
-    if (existing) {
-      return;
+    try {
+      const existing = await this.usersRepo.findOne({ where: { email: ADMIN_EMAIL } });
+      if (existing) {
+        return;
+      }
+      const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+      const admin = this.usersRepo.create({
+        email: ADMIN_EMAIL,
+        displayName: 'Administrateur',
+        passwordHash,
+        role: 'admin',
+        addresses: [],
+      });
+      await this.usersRepo.save(admin);
+      this.logger.log(`Admin par défaut créé : ${ADMIN_EMAIL}`);
+    } catch (err) {
+      this.logger.error('Failed to seed admin', err);
     }
-    const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
-    const admin = this.usersRepo.create({
-      email: ADMIN_EMAIL,
-      displayName: 'Administrateur',
-      passwordHash,
-      role: 'admin',
-      addresses: [],
-    });
-    await this.usersRepo.save(admin);
-    this.logger.log(`Admin par défaut créé : ${ADMIN_EMAIL}`);
   }
 }
