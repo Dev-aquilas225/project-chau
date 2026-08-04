@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/entities/user.entity';
 
-const ADMIN_EMAIL = 'admin@gmail.com';
-const ADMIN_PASSWORD = 'admin1234';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@occasiondeluxepjinternational.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin123!';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
