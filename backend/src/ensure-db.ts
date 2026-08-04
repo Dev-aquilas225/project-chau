@@ -1,4 +1,4 @@
-import { Client } from 'pg';
+const { Client } = require('pg');
 
 async function ensureDb() {
   const host = process.env.DB_HOST || 'postgres';
@@ -28,7 +28,7 @@ async function ensureDb() {
 
   // Fallback: connect as postgres superuser to setup role and database
   const adminPasswords = [targetPass, 'postgres', ''];
-  let adminClient: Client | null = null;
+  let adminClient: any = null;
 
   for (const pass of adminPasswords) {
     const c = new Client({
