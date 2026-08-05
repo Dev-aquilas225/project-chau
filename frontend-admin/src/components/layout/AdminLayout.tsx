@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState, useEffect, type ReactNode } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   AppBar,
@@ -29,10 +29,12 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { usePermission } from '@/features/auth/usePermission';
 import { logout } from '@/features/auth/api';
 import NotificationBell from '@/features/notifications/NotificationBell';
+import AdminTourModal from '@/components/tour/AdminTourModal';
 import { resolveImageUrl } from '@/lib/media';
 import type { ResourceKey } from '@/types';
 
@@ -124,6 +126,17 @@ export default function AdminLayout(): ReactNode {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [tourOpen, setTourOpen] = useState(false);
+
+  // Vérifier au chargement si le tour guidé doit être affiché
+  useEffect(() => {
+    if (user?.id) {
+      const seen = localStorage.getItem(`aquilas_admin_tour_seen_${user.id}`);
+      if (!seen) {
+        setTourOpen(true);
+      }
+    }
+  }, [user?.id]);
 
   const handleLogout = () => {
     setAnchorEl(null);
@@ -134,6 +147,8 @@ export default function AdminLayout(): ReactNode {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      <AdminTourModal open={tourOpen} onClose={() => setTourOpen(false)} />
+
       <Drawer
         variant="permanent"
         sx={{
@@ -195,6 +210,12 @@ export default function AdminLayout(): ReactNode {
                   <PersonOutlineIcon fontSize="small" />
                 </ListItemIcon>
                 Mon profil
+              </MenuItem>
+              <MenuItem onClick={() => { setAnchorEl(null); setTourOpen(true); }}>
+                <ListItemIcon>
+                  <HelpOutlineIcon fontSize="small" color="primary" />
+                </ListItemIcon>
+                Guide interactif
               </MenuItem>
               <MenuItem onClick={handleLogout}>
                 <ListItemIcon>
