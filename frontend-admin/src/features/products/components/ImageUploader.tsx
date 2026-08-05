@@ -16,9 +16,11 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
+      let currentImages = [...images];
       for (const file of acceptedFiles) {
         const result = await uploadMutation.mutateAsync(file);
-        onChange([...images, result.url]);
+        currentImages = [...currentImages, result.url];
+        onChange(currentImages);
       }
     },
     [images, onChange],

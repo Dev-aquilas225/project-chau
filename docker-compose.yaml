@@ -32,6 +32,8 @@ services:
       PORT: 3000
     ports:
       - "3000"
+    volumes:
+      - uploads-data:/app/uploads
     labels:
       - "coolify.managed=true"
 
@@ -77,3 +79,4 @@ services:
 volumes:
   pgdata:
   pgadmin-data:
+  uploads-data:

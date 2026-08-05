@@ -36,6 +36,18 @@ export function productImageFilename(_req: unknown, file: Express.Multer.File, c
   cb(null, `${unique}${extname(file.originalname)}`);
 }
 
+export function productDestination(_req: unknown, _file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) {
+  const dir = join(process.cwd(), 'uploads', 'products');
+  mkdirSync(dir, { recursive: true });
+  cb(null, dir);
+}
+
+export function avatarDestination(_req: unknown, _file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) {
+  const dir = join(process.cwd(), 'uploads', 'avatars');
+  mkdirSync(dir, { recursive: true });
+  cb(null, dir);
+}
+
 export function identityDestination(_req: unknown, _file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) {
   mkdirSync(IDENTITY_UPLOAD_DIR, { recursive: true });
   cb(null, IDENTITY_UPLOAD_DIR);
@@ -63,7 +75,7 @@ export class UploadsController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads/products',
+        destination: productDestination,
         filename: productImageFilename,
       }),
       limits: { fileSize: 5 * 1024 * 1024 },
@@ -71,6 +83,9 @@ export class UploadsController {
     }),
   )
   uploadProductImage(@CurrentUser() user: JwtPayload, @UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('Aucun fichier transmis ou format/taille non valide');
+    }
     if (user.role !== 'admin' && user.sellerStatus !== 'approved') {
       throw new ForbiddenException('Compte vendeur approuvé ou rôle admin requis');
     }
@@ -81,7 +96,7 @@ export class UploadsController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads/avatars',
+        destination: avatarDestination,
         filename: productImageFilename,
       }),
       limits: { fileSize: 5 * 1024 * 1024 },
@@ -89,6 +104,9 @@ export class UploadsController {
     }),
   )
   uploadAvatar(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('Aucun fichier transmis ou format/taille non valide');
+    }
     return { url: `/uploads/avatars/${file.filename}` };
   }
 
