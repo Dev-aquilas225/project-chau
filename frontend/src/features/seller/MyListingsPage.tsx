@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { useMyListings, useDeleteListing } from './hooks';
 import { formatPrice, cn } from '@/lib/utils';
 
+import { resolveImageUrl } from '@/lib/media';
+
 const STATUS_COLOR: Record<string, string> = {
   active: 'bg-green-100 text-green-700',
   draft: 'bg-gray-100 text-gray-600',
@@ -49,7 +51,7 @@ export function MyListingsPage() {
           {listings.map((listing) => (
             <div key={listing.id} className="card overflow-hidden p-0">
               {listing.images[0] ? (
-                <img src={listing.images[0]} alt={listing.name} className="aspect-[3/2] w-full object-cover" />
+                <img src={resolveImageUrl(listing.images[0])} alt={listing.name} className="aspect-[3/2] w-full object-cover" />
               ) : (
                 <div className="aspect-[3/2] w-full bg-gray-100" />
               )}

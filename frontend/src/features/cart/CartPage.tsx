@@ -4,6 +4,8 @@ import { Trash2, ShoppingBag, Minus, Plus } from 'lucide-react';
 import { useCartStore } from '@/stores/cartStore';
 import { formatPrice } from '@/lib/utils';
 
+import { resolveImageUrl } from '@/lib/media';
+
 export function CartPage() {
   const navigate = useNavigate();
   const { t } = useTranslation('cart');
@@ -27,7 +29,7 @@ export function CartPage() {
           {items.map((i) => (
             <li key={i.productId} className="flex gap-4 py-4" data-testid="cart-item">
               <Link to={`/produit/${i.productId}`} className="h-28 w-20 shrink-0 overflow-hidden bg-gray-100">
-                {i.image && <img src={i.image} alt={i.name} className="h-full w-full object-cover" />}
+                {i.image && <img src={resolveImageUrl(i.image)} alt={i.name} className="h-full w-full object-cover" />}
               </Link>
               <div className="flex flex-1 flex-col">
                 <p className="text-sm font-bold uppercase">{i.brand}</p>

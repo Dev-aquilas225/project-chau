@@ -9,6 +9,7 @@ import { useMyOrders, useOrder } from './hooks';
 import { OrderTimeline } from './components/OrderTimeline';
 import { Spinner } from '@/components/ui/Spinner';
 import { cn, formatPrice, formatDate } from '@/lib/utils';
+import { resolveImageUrl } from '@/lib/media';
 import type { OrderStatus } from '@/types';
 
 const STATUS_STEPS: OrderStatus[] = ['pending', 'paid', 'shipped', 'delivered'];
@@ -123,7 +124,7 @@ export function OrdersPage() {
                 {o.items.map((i) => (
                   <li key={i.productId} className="flex shrink-0 items-center gap-2 text-sm">
                     <div className="h-14 w-11 overflow-hidden bg-gray-100">
-                      {i.image && <img src={i.image} alt={i.name} className="h-full w-full object-cover" />}
+                      {i.image && <img src={resolveImageUrl(i.image)} alt={i.name} className="h-full w-full object-cover" />}
                     </div>
                     <span className="text-muted">×{i.qty}</span>
                   </li>

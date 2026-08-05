@@ -12,6 +12,8 @@ import { useFavoritesStore } from '@/stores/favoritesStore';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { ProductReviews } from '@/features/reviews/ProductReviews';
 
+import { resolveImageUrl } from '@/lib/media';
+
 export function ProductDetailPage() {
   const { t } = useTranslation('catalog');
   const { id = '' } = useParams();
@@ -73,14 +75,14 @@ export function ProductDetailPage() {
         <div>
           <div className="aspect-[3/4] overflow-hidden bg-gray-100">
             {product.images[active] && (
-              <img src={product.images[active]} alt={`${product.brand} ${product.name}`} className="h-full w-full object-cover" />
+              <img src={resolveImageUrl(product.images[active])} alt={`${product.brand} ${product.name}`} className="h-full w-full object-cover" />
             )}
           </div>
           {product.images.length > 1 && (
             <div className="mt-2 flex gap-2">
               {product.images.map((img, i) => (
                 <button key={i} onClick={() => setActive(i)} className={cn('h-20 w-16 overflow-hidden border', i === active ? 'border-ink' : 'border-line')}>
-                  <img src={img} alt="" className="h-full w-full object-cover" />
+                  <img src={resolveImageUrl(img)} alt="" className="h-full w-full object-cover" />
                 </button>
               ))}
             </div>

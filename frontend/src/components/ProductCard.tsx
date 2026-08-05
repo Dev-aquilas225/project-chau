@@ -6,6 +6,7 @@ import type { Product } from '@/types';
 import { cn, formatPrice } from '@/lib/utils';
 import { useFavoritesStore } from '@/stores/favoritesStore';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { resolveImageUrl } from '@/lib/media';
 
 export const ProductCard = memo(function ProductCard({ product }: { product: Product }) {
   const { t } = useTranslation('common');
@@ -32,7 +33,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
         <div className="relative aspect-[3/4] overflow-hidden bg-luxury-beige mb-4">
           {product.images[0] ? (
             <img
-              src={product.images[0]}
+              src={resolveImageUrl(product.images[0])}
               alt={`${product.brand} ${product.name}`}
               loading="lazy"
               className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
