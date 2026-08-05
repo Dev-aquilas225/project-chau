@@ -1,4 +1,15 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+export function getApiUrl(): string {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
+    return envUrl;
+  }
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return 'https://api.occasiondeluxepjinternational.com/api';
+  }
+  return 'http://localhost:3000/api';
+}
+
+export const API_URL = getApiUrl();
 const TOKEN_KEY = 'auth_token';
 
 export function getToken(): string | null {

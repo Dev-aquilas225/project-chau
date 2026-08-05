@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { apiFetch } from '@/lib/http';
+import { API_URL, apiFetch } from '@/lib/http';
 import { formatPrice } from '@/lib/utils';
 import { Tag, ArrowUpRight, ArrowDownLeft, Clock, CheckCircle2, XCircle, ChevronRight, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
@@ -155,7 +155,7 @@ export function OffersPage() {
                 <div className="flex items-center gap-4 min-w-0">
                   <div className="w-16 h-16 shrink-0 rounded-xl overflow-hidden border border-line bg-gray-50">
                     <img 
-                      src={o.product.images?.[0] ? `${import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api'}/uploads/${o.product.images[0]}` : '/placeholder.jpg'} 
+                      src={o.product.images?.[0] ? `${API_URL}/uploads/${o.product.images[0]}` : '/placeholder.jpg'} 
                       alt="" 
                       className="w-full h-full object-cover" 
                     />
@@ -206,7 +206,7 @@ export function OffersPage() {
                 <div className="flex items-center gap-4 min-w-0">
                   <div className="w-16 h-16 shrink-0 rounded-xl overflow-hidden border border-line bg-gray-50">
                     <img 
-                      src={o.product.images?.[0] ? `${import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api'}/uploads/${o.product.images[0]}` : '/placeholder.jpg'} 
+                      src={o.product.images?.[0] ? `${API_URL}/uploads/${o.product.images[0]}` : '/placeholder.jpg'} 
                       alt="" 
                       className="w-full h-full object-cover" 
                     />

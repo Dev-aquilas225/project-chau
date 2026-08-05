@@ -1,4 +1,4 @@
-import { apiFetch, getToken } from '@/lib/http';
+import { API_URL, apiFetch, getToken } from '@/lib/http';
 import type { UserProfile, Product, Order } from '@/types';
 
 export interface ApplySellerInput {
@@ -81,7 +81,7 @@ export async function uploadIdentityDocument(
   const formData = new FormData();
   formData.append('file', file);
   const token = getToken();
-  const base = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
+  const base = API_URL;
   const res = await fetch(`${base}/uploads/identity/${kind}`, {
     method: 'POST',
     headers: token ? { Authorization: `Bearer ${token}` } : {},

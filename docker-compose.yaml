@@ -40,7 +40,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: ${VITE_API_URL}
+        VITE_API_URL: ${VITE_API_URL:-https://api.occasiondeluxepjinternational.com/api}
     restart: unless-stopped
     ports:
       - "80"
@@ -52,7 +52,7 @@ services:
       context: ./frontend-admin
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: ${ADMIN_VITE_API_URL:-${VITE_API_URL}}
+        VITE_API_URL: ${ADMIN_VITE_API_URL:-${VITE_API_URL:-https://api.occasiondeluxepjinternational.com/api}}
     restart: unless-stopped
     ports:
       - "80"

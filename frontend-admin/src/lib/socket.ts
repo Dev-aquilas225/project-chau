@@ -1,7 +1,6 @@
 import { io, type Socket } from 'socket.io-client';
-import { getToken } from './http';
+import { API_URL, getToken } from './http';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 const SOCKET_ORIGIN = API_URL.replace(/\/api\/?$/, '');
 
 let socket: Socket | null = null;
