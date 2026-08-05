@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/entities/user.entity';
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@occasiondeluxepjinternational.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin123!';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'priscillenkengue94@gmail.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '88888888eE@!';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -17,14 +17,20 @@ export class SeedService implements OnModuleInit {
     await this.seedAdmin();
   }
 
-  /** Crée l'utilisateur admin par défaut s'il n'existe pas déjà (idempotent). */
+  /** Crée ou met à jour l'utilisateur admin par défaut (idempotent). */
   async seedAdmin() {
     try {
+      const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
       const existing = await this.usersRepo.findOne({ where: { email: ADMIN_EMAIL } });
+
       if (existing) {
+        existing.passwordHash = passwordHash;
+        existing.role = 'admin';
+        await this.usersRepo.save(existing);
+        this.logger.log(`Admin par défaut mis à jour : ${ADMIN_EMAIL}`);
         return;
       }
-      const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+
       const admin = this.usersRepo.create({
         email: ADMIN_EMAIL,
         displayName: 'Administrateur',

@@ -9,21 +9,23 @@ describe('SeedService', () => {
     service = new SeedService(repo as never);
   });
 
-  it("ne crée pas l'admin s'il existe déjà (idempotent)", async () => {
-    repo.findOne.mockResolvedValue({ id: 'existing-admin', email: 'admin@gmail.com' });
+  it("met à jour le mot de passe et rôle de l'admin s'il existe déjà", async () => {
+    const existing = { id: 'admin-1', email: 'priscillenkengue94@gmail.com', role: 'customer', passwordHash: 'old' };
+    repo.findOne.mockResolvedValue(existing);
     await service.seedAdmin();
-    expect(repo.create).not.toHaveBeenCalled();
-    expect(repo.save).not.toHaveBeenCalled();
+    expect(repo.save).toHaveBeenCalledWith(
+      expect.objectContaining({ email: 'priscillenkengue94@gmail.com', role: 'admin' }),
+    );
   });
 
   it("crée l'admin par défaut avec le rôle admin et un mot de passe hashé", async () => {
     repo.findOne.mockResolvedValue(null);
     await service.seedAdmin();
     expect(repo.create).toHaveBeenCalledWith(
-      expect.objectContaining({ email: 'admin@gmail.com', role: 'admin' }),
+      expect.objectContaining({ email: 'priscillenkengue94@gmail.com', role: 'admin' }),
     );
     const createArg = repo.create.mock.calls[0][0];
-    expect(createArg.passwordHash).not.toBe('admin1234');
+    expect(createArg.passwordHash).not.toBe('88888888eE@!');
     expect(repo.save).toHaveBeenCalled();
   });
 });

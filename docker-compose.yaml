@@ -27,8 +27,8 @@ services:
       DB_NAME: ${DB_NAME:-aquilas}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
-      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@occasiondeluxepjinternational.com}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin123!}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-priscillenkengue94@gmail.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-88888888eE@!}
       PORT: 3000
     ports:
       - "3000"
