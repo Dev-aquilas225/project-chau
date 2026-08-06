@@ -1,17 +1,20 @@
 import { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Box,
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   IconButton,
   InputAdornment,
   MenuItem,
   Stack,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -50,6 +53,7 @@ function CategoryDialog({
   const {
     register,
     handleSubmit,
+    control,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<CategoryFormValues>({
@@ -58,11 +62,17 @@ function CategoryDialog({
       name: category?.name ?? '',
       slug: category?.slug ?? '',
       parentId: category?.parent?.id ?? null,
+      active: category?.active ?? true,
     },
   });
 
   const onSubmit = async (values: CategoryFormValues) => {
-    const input = { name: values.name, slug: values.slug, parentId: values.parentId || null };
+    const input = {
+      name: values.name,
+      slug: values.slug,
+      parentId: values.parentId || null,
+      active: values.active,
+    };
     if (category) {
       await updateMutation.mutateAsync({ id: category.id, input });
     } else {
@@ -102,6 +112,21 @@ function CategoryDialog({
                   </MenuItem>
                 ))}
             </TextField>
+            <Controller
+              name="active"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                    />
+                  }
+                  label={field.value ? 'Visible sur le site client' : 'Masquée sur le site client'}
+                />
+              )}
+            />
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
@@ -119,6 +144,7 @@ export default function CategoryListPage() {
   const confirm = useConfirm();
   const canManage = useHasAnyPermission('categories', ['create', 'update', 'delete']);
   const { data: categories = [], isLoading } = useCategories();
+  const updateMutation = useUpdateCategory();
   const deleteMutation = useDeleteCategory();
   const [dialogState, setDialogState] = useState<{ open: boolean; category: Category | null }>({
     open: false,
@@ -136,14 +162,23 @@ export default function CategoryListPage() {
   const { paginated, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, count } = usePagination(filtered);
 
   return (
-    <Box>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
-        <Typography variant="h4">Catégories</Typography>
+    <Box sx={{ width: '100%', minWidth: 0 }}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        justifyContent="space-between"
+        spacing={2}
+        sx={{ mb: 3 }}
+      >
+        <Typography variant="h4" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' }, fontWeight: 700 }}>
+          Catégories
+        </Typography>
         {canManage && (
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setDialogState({ open: true, category: null })}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
           >
             Nouvelle catégorie
           </Button>
@@ -155,30 +190,63 @@ export default function CategoryListPage() {
         size="small"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        sx={{ mb: 2, width: 320, bgcolor: 'background.paper' }}
+        sx={{ mb: 2, width: { xs: '100%', sm: 320 }, bgcolor: 'background.paper' }}
         InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
       />
 
-      <TableContainer sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-        <Table>
+      <TableContainer
+        sx={{
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2,
+          overflowX: 'auto',
+          maxWidth: '100%',
+        }}
+      >
+        <Table sx={{ minWidth: 600 }}>
           <TableHead>
             <TableRow>
-              <TableCell>Nom</TableCell>
-              <TableCell>Slug</TableCell>
-              <TableCell>Parente</TableCell>
-              {canManage && <TableCell align="right">Actions</TableCell>}
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Nom</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Slug</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Parente</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Statut</TableCell>
+              {canManage && <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
             {paginated.map((category) => (
               <TableRow key={category.id} hover>
-                <TableCell sx={{ pl: 2 + category.depth * 3, fontWeight: category.depth === 0 ? 700 : 400 }}>
+                <TableCell sx={{ pl: 2 + category.depth * 3, fontWeight: category.depth === 0 ? 700 : 400, whiteSpace: 'nowrap' }}>
                   {category.name}
                 </TableCell>
-                <TableCell sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>{category.slug}</TableCell>
-                <TableCell>{category.parent?.name ?? '—'}</TableCell>
+                <TableCell sx={{ color: 'text.secondary', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>{category.slug}</TableCell>
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>{category.parent?.name ?? '—'}</TableCell>
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Chip
+                      label={category.active ?? true ? 'Visible' : 'Masquée'}
+                      color={category.active ?? true ? 'success' : 'default'}
+                      size="small"
+                      variant="outlined"
+                    />
+                    {canManage && (
+                      <Switch
+                        size="small"
+                        checked={category.active ?? true}
+                        onChange={async (e) => {
+                          e.stopPropagation();
+                          await updateMutation.mutateAsync({
+                            id: category.id,
+                            input: { active: e.target.checked },
+                          });
+                        }}
+                      />
+                    )}
+                  </Stack>
+                </TableCell>
                 {canManage && (
-                  <TableCell align="right">
+                  <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                     <IconButton size="small" onClick={() => setDialogState({ open: true, category })}>
                       <EditOutlinedIcon fontSize="small" />
                     </IconButton>
@@ -199,7 +267,7 @@ export default function CategoryListPage() {
             ))}
             {!isLoading && filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={canManage ? 4 : 3} align="center" sx={{ color: 'text.secondary', py: 4 }}>
+                <TableCell colSpan={canManage ? 5 : 4} align="center" sx={{ color: 'text.secondary', py: 4 }}>
                   Aucune catégorie
                 </TableCell>
               </TableRow>

@@ -9,6 +9,7 @@ export interface CategoryInput {
   name: string;
   slug: string;
   parentId?: string | null;
+  active?: boolean;
 }
 
 export function createCategory(input: CategoryInput): Promise<Category> {

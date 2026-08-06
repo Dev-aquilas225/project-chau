@@ -175,16 +175,24 @@ export default function AdminLayout(): ReactNode {
         <DrawerContent onNavigate={() => setMobileOpen(false)} />
       </Drawer>
 
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflowX: 'hidden' }}>
         <AppBar position="sticky" elevation={0} sx={{ width: '100%' }}>
-          <Toolbar sx={{ gap: 1.5 }}>
+          <Toolbar sx={{ gap: 1.5, px: { xs: 1.5, sm: 3 } }}>
             <IconButton
               edge="start"
+              color="inherit"
               sx={{ display: { xs: 'inline-flex', md: 'none' } }}
               onClick={() => setMobileOpen(true)}
+              aria-label="Ouvrir le menu"
             >
               <MenuIcon />
             </IconButton>
+            <Box
+              component="img"
+              src="/logo-mark.png"
+              alt="PJ International"
+              sx={{ height: 32, width: 'auto', display: { xs: 'block', md: 'none' } }}
+            />
             <Box sx={{ flexGrow: 1 }} />
             <NotificationBell />
             <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} size="small">
@@ -227,7 +235,7 @@ export default function AdminLayout(): ReactNode {
           </Toolbar>
         </AppBar>
 
-        <Box component="main" sx={{ flex: 1, bgcolor: 'background.default', p: { xs: 2, md: 4 } }}>
+        <Box component="main" sx={{ flex: 1, bgcolor: 'background.default', p: { xs: 1.5, sm: 2.5, md: 3.5 }, minWidth: 0 }}>
           <Outlet />
         </Box>
       </Box>

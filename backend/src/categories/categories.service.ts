@@ -8,7 +8,10 @@ import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 export class CategoriesService {
   constructor(@InjectRepository(Category) private categoriesRepo: Repository<Category>) {}
 
-  findAll() {
+  findAll(onlyActive?: boolean) {
+    if (onlyActive) {
+      return this.categoriesRepo.find({ where: { active: true }, relations: ['parent'] });
+    }
     return this.categoriesRepo.find({ relations: ['parent'] });
   }
 
@@ -22,6 +25,7 @@ export class CategoriesService {
     const category = this.categoriesRepo.create({
       name: dto.name,
       slug: dto.slug,
+      active: dto.active ?? true,
       parent: dto.parentId ? ({ id: dto.parentId } as Category) : null,
     });
     return this.categoriesRepo.save(category);
@@ -31,7 +35,10 @@ export class CategoriesService {
     const category = await this.findOne(id);
     if (dto.name !== undefined) category.name = dto.name;
     if (dto.slug !== undefined) category.slug = dto.slug;
-    if (dto.parentId !== undefined) category.parent = { id: dto.parentId } as Category;
+    if (dto.active !== undefined) category.active = dto.active;
+    if (dto.parentId !== undefined) {
+      category.parent = dto.parentId ? ({ id: dto.parentId } as Category) : null;
+    }
     return this.categoriesRepo.save(category);
   }
 

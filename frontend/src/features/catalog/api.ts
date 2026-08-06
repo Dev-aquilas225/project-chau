@@ -32,11 +32,11 @@ export async function getProductsByIds(ids: string[]): Promise<Product[]> {
 }
 
 // L'API renvoie `parent: { id, ... } | null` ; on l'aplatit en `parentId` pour le frontend.
-function mapCategory(c: Category & { parent?: { id: string } | null }): Category {
-  return { ...c, parentId: c.parent?.id ?? undefined };
+function mapCategory(c: Category & { parent?: { id: string } | null; active?: boolean }): Category {
+  return { ...c, active: c.active ?? true, parentId: c.parent?.id ?? undefined };
 }
 
 export async function getCategories(): Promise<Category[]> {
-  const items = await apiFetch<Category[]>('/categories');
-  return items.map(mapCategory);
+  const items = await apiFetch<Category[]>('/categories', { query: { onlyActive: 'true' } });
+  return items.map(mapCategory).filter((c) => c.active !== false);
 }

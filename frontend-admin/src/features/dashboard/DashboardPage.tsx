@@ -121,14 +121,14 @@ export default function DashboardPage() {
               <Typography variant="h6" sx={{ mb: 2 }}>
                 Commandes récentes
               </Typography>
-              <TableContainer>
-                <Table size="small">
+              <TableContainer sx={{ overflowX: 'auto', maxWidth: '100%' }}>
+                <Table size="small" sx={{ minWidth: 450 }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Commande</TableCell>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Statut</TableCell>
-                      <TableCell align="right">Total</TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}>Commande</TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}>Date</TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}>Statut</TableCell>
+                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Total</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -162,8 +162,16 @@ export default function DashboardPage() {
         </Grid>
       </Grid>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-        <Typography variant="h5">Analyse détaillée</Typography>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        justifyContent="space-between"
+        spacing={1.5}
+        sx={{ mb: 2 }}
+      >
+        <Typography variant="h5" sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' }, fontWeight: 700 }}>
+          Analyse détaillée
+        </Typography>
         <ToggleButtonGroup size="small" exclusive value={period} onChange={(_e, v) => v && setPeriod(v)}>
           {(Object.keys(PERIOD_LABELS) as AnalyticsPeriod[]).map((p) => (
             <ToggleButton key={p} value={p}>
@@ -171,7 +179,7 @@ export default function DashboardPage() {
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
-      </Box>
+      </Stack>
 
       {isAnalyticsLoading || !analytics ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>

@@ -12,6 +12,9 @@ export class Category {
   @Column({ unique: true })
   slug: string;
 
+  @Column({ default: true })
+  active: boolean;
+
   @ManyToOne(() => Category, (category) => category.children, { nullable: true, onDelete: 'SET NULL' })
   parent: Category | null;
 

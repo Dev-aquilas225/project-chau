@@ -32,11 +32,24 @@ export default function PromoCodeListPage() {
   const isExpired = (code: PromoCode) => !!code.expiresAt && new Date(code.expiresAt) < new Date();
 
   return (
-    <Box>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
-        <Typography variant="h4">Codes promo</Typography>
+    <Box sx={{ width: '100%', minWidth: 0 }}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        justifyContent="space-between"
+        spacing={2}
+        sx={{ mb: 3 }}
+      >
+        <Typography variant="h4" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' }, fontWeight: 700 }}>
+          Codes promo
+        </Typography>
         {canManage && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setDialogState({ open: true, promoCode: null })}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setDialogState({ open: true, promoCode: null })}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
+          >
             Nouveau code
           </Button>
         )}
@@ -47,20 +60,29 @@ export default function PromoCodeListPage() {
         size="small"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        sx={{ mb: 2, width: 320, bgcolor: 'background.paper' }}
+        sx={{ mb: 2, width: { xs: '100%', sm: 320 }, bgcolor: 'background.paper' }}
         InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
       />
 
-      <TableContainer sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-        <Table>
+      <TableContainer
+        sx={{
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2,
+          overflowX: 'auto',
+          maxWidth: '100%',
+        }}
+      >
+        <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
-              <TableCell>Code</TableCell>
-              <TableCell>Réduction</TableCell>
-              <TableCell>Montant min.</TableCell>
-              <TableCell>Expiration</TableCell>
-              <TableCell>Statut</TableCell>
-              {canManage && <TableCell align="right">Actions</TableCell>}
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Code</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Réduction</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Montant min.</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Expiration</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Statut</TableCell>
+              {canManage && <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>

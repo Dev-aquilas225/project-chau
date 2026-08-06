@@ -7,6 +7,7 @@ export const categorySchema = z.object({
     .min(1, 'Le slug est requis')
     .regex(/^[a-z0-9-]+$/, 'Slug invalide (minuscules, chiffres, tirets)'),
   parentId: z.string().nullable().optional(),
+  active: z.boolean().default(true),
 });
 
 export type CategoryFormValues = z.infer<typeof categorySchema>;

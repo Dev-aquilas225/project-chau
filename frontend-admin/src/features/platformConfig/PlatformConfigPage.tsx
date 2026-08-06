@@ -30,12 +30,12 @@ export default function PlatformConfigPage() {
   };
 
   return (
-    <Box>
-      <Typography variant="h4" sx={{ mb: 3 }}>
+    <Box sx={{ width: '100%', minWidth: 0 }}>
+      <Typography variant="h4" sx={{ mb: 3, fontSize: { xs: '1.5rem', sm: '2.125rem' }, fontWeight: 700 }}>
         Paramètres plateforme
       </Typography>
 
-      <Card sx={{ maxWidth: 480 }}>
+      <Card sx={{ maxWidth: { xs: '100%', sm: 480 } }}>
         <CardContent>
           <Stack spacing={3}>
             <TextField
@@ -60,7 +60,12 @@ export default function PlatformConfigPage() {
               label="Autoriser les nouvelles candidatures vendeur"
             />
             {canManage && (
-              <Button variant="contained" onClick={handleSave} disabled={updateMutation.isPending} sx={{ alignSelf: 'flex-start' }}>
+              <Button
+                variant="contained"
+                onClick={handleSave}
+                disabled={updateMutation.isPending}
+                sx={{ alignSelf: { xs: 'stretch', sm: 'flex-start' } }}
+              >
                 Enregistrer
               </Button>
             )}

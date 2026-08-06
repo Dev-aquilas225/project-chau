@@ -81,16 +81,14 @@ export default function PayoutListPage() {
     .reduce((sum, p) => sum + parseFloat(p.amount as any), 0);
 
   return (
-    <Box>
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box>
-          <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.02em', mb: 0.5 }}>
-            Demandes de retraits
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Gérez et validez les virements vers les comptes bancaires (IBAN) des vendeurs.
-          </Typography>
-        </Box>
+    <Box sx={{ width: '100%', minWidth: 0 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.02em', mb: 0.5, fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
+          Demandes de retraits
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Gérez et validez les virements vers les comptes bancaires (IBAN) des vendeurs.
+        </Typography>
       </Box>
 
       {/* Stats Summary Cards */}
@@ -122,10 +120,13 @@ export default function PayoutListPage() {
         <Tabs
           value={activeTab}
           onChange={(_, val) => setActiveTab(val)}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{
             borderBottom: 1,
             borderColor: 'divider',
-            px: 2,
+            px: { xs: 1, sm: 2 },
             '& .MuiTab-root': { py: 2, fontSize: 13, fontWeight: 600 },
           }}
         >
@@ -136,8 +137,8 @@ export default function PayoutListPage() {
         </Tabs>
 
         {/* Payouts Table */}
-        <TableContainer>
-          <Table>
+        <TableContainer sx={{ overflowX: 'auto', maxWidth: '100%' }}>
+          <Table sx={{ minWidth: 700 }}>
             <TableHead>
               <TableRow>
                 <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>

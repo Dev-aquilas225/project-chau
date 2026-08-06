@@ -39,12 +39,19 @@ export default function SellerListPage() {
   const { paginated, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, count } = usePagination(filtered);
 
   return (
-    <Box>
-      <Typography variant="h4" sx={{ mb: 3 }}>
+    <Box sx={{ width: '100%', minWidth: 0 }}>
+      <Typography variant="h4" sx={{ mb: 3, fontSize: { xs: '1.5rem', sm: '2.125rem' }, fontWeight: 700 }}>
         Vendeurs
       </Typography>
 
-      <Tabs value={tab} onChange={(_e, value) => setTab(value)} sx={{ mb: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+      <Tabs
+        value={tab}
+        onChange={(_e, value) => setTab(value)}
+        variant="scrollable"
+        scrollButtons="auto"
+        allowScrollButtonsMobile
+        sx={{ mb: 2, borderBottom: '1px solid', borderColor: 'divider' }}
+      >
         {TABS.map((t) => (
           <Tab key={t.value} label={t.label} value={t.value} />
         ))}
@@ -55,7 +62,7 @@ export default function SellerListPage() {
         size="small"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        sx={{ mb: 2, width: 320, bgcolor: 'background.paper' }}
+        sx={{ mb: 2, width: { xs: '100%', sm: 320 }, bgcolor: 'background.paper' }}
         InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
       />
 
@@ -64,28 +71,37 @@ export default function SellerListPage() {
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-          <Table>
+        <TableContainer
+          sx={{
+            bgcolor: 'background.paper',
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 2,
+            overflowX: 'auto',
+            maxWidth: '100%',
+          }}
+        >
+          <Table sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
-                <TableCell>Boutique</TableCell>
-                <TableCell>Contact</TableCell>
-                <TableCell>Soumis le</TableCell>
-                <TableCell>Statut</TableCell>
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>Boutique</TableCell>
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>Contact</TableCell>
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>Soumis le</TableCell>
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>Statut</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {paginated.map((seller) => (
                 <TableRow key={seller.id} hover onClick={() => navigate(`/vendeurs/${seller.id}`)} sx={{ cursor: 'pointer' }}>
-                  <TableCell>{seller.sellerProfile.storeName || '—'}</TableCell>
-                  <TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>{seller.sellerProfile.storeName || '—'}</TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>
                     <Typography variant="body2">{seller.displayName}</Typography>
                     <Typography variant="caption" color="text.secondary">
                       {seller.email}
                     </Typography>
                   </TableCell>
-                  <TableCell>{seller.sellerProfile.submittedAt ? formatDateShort(seller.sellerProfile.submittedAt) : '—'}</TableCell>
-                  <TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>{seller.sellerProfile.submittedAt ? formatDateShort(seller.sellerProfile.submittedAt) : '—'}</TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>
                     <Chip size="small" label={seller.sellerStatus} color={STATUS_COLOR[seller.sellerStatus]} sx={{ mr: 0.5 }} />
                     {seller.blocked && <Chip size="small" label="Bloqué" color="error" />}
                   </TableCell>

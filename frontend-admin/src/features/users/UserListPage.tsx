@@ -72,11 +72,24 @@ export default function UserListPage() {
   };
 
   return (
-    <Box>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
-        <Typography variant="h4">Utilisateurs</Typography>
+    <Box sx={{ width: '100%', minWidth: 0 }}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        justifyContent="space-between"
+        spacing={2}
+        sx={{ mb: 3 }}
+      >
+        <Typography variant="h4" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' }, fontWeight: 700 }}>
+          Utilisateurs
+        </Typography>
         {canManageUsers && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setDialogState({ open: true, user: null })}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setDialogState({ open: true, user: null })}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
+          >
             Nouvel utilisateur
           </Button>
         )}
@@ -87,20 +100,29 @@ export default function UserListPage() {
         size="small"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        sx={{ mb: 2, width: 320, bgcolor: 'background.paper' }}
+        sx={{ mb: 2, width: { xs: '100%', sm: 320 }, bgcolor: 'background.paper' }}
         InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
       />
 
-      <TableContainer sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-        <Table>
+      <TableContainer
+        sx={{
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2,
+          overflowX: 'auto',
+          maxWidth: '100%',
+        }}
+      >
+        <Table sx={{ minWidth: 700 }}>
           <TableHead>
             <TableRow>
-              <TableCell>Nom</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Vendeur</TableCell>
-              <TableCell>Inscrit le</TableCell>
-              <TableCell>Rôle</TableCell>
-              {canManageUsers && <TableCell align="right">Actions</TableCell>}
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Nom</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Email</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Vendeur</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Inscrit le</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>Rôle</TableCell>
+              {canManageUsers && <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -109,8 +131,8 @@ export default function UserListPage() {
               const isSelf = u.id === currentUser?.id;
               return (
                 <TableRow key={u.id} hover>
-                  <TableCell>{u.displayName}</TableCell>
-                  <TableCell sx={{ color: 'text.secondary' }}>{u.email}</TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>{u.displayName}</TableCell>
+                  <TableCell sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>{u.email}</TableCell>
                   <TableCell>
                     {u.sellerStatus !== 'none' && (
                       <Chip

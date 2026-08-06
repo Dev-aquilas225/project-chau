@@ -103,11 +103,24 @@ export default function ProductListPage() {
   ];
 
   return (
-    <Box>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
-        <Typography variant="h4">Produits</Typography>
+    <Box sx={{ width: '100%', minWidth: 0 }}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        justifyContent="space-between"
+        spacing={2}
+        sx={{ mb: 3 }}
+      >
+        <Typography variant="h4" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' }, fontWeight: 700 }}>
+          Produits
+        </Typography>
         {canManage && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/produits/nouveau')}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => navigate('/produits/nouveau')}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
+          >
             Nouveau produit
           </Button>
         )}
@@ -118,11 +131,20 @@ export default function ProductListPage() {
         size="small"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        sx={{ mb: 2, width: 320, bgcolor: 'background.paper' }}
+        sx={{ mb: 2, width: { xs: '100%', sm: 320 }, bgcolor: 'background.paper' }}
         InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
       />
 
-      <Box sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+      <Box
+        sx={{
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2,
+          overflowX: 'auto',
+          maxWidth: '100%',
+        }}
+      >
         <DataGrid
           rows={filtered}
           columns={columns}
@@ -130,8 +152,8 @@ export default function ProductListPage() {
           autoHeight
           disableRowSelectionOnClick
           pageSizeOptions={[5, 10, 25, 50]}
-          initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
-          sx={{ border: 'none' }}
+          initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+          sx={{ border: 'none', minWidth: 650 }}
         />
       </Box>
     </Box>
