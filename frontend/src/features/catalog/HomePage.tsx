@@ -116,7 +116,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ── Le Journal ─────────────────────────────────────────────── */}
+      {/* ── Le Journal ───────────────────────────────────────────────
       <section className="py-20 md:py-24">
         <div className="container-custom">
           <h2 className="section-title text-center mb-12">{t('home.journal.title')}</h2>
@@ -144,6 +144,7 @@ export function HomePage() {
           </div>
         </div>
       </section>
+      ───────────────────────────────────────────────────────────────── */}
 
     </div>
   );
