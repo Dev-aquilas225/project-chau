@@ -9,6 +9,13 @@ export function getLoginSchema(t: TFunction) {
 }
 export type LoginInput = z.infer<ReturnType<typeof getLoginSchema>>;
 
+export function getMagicLinkSchema(t: TFunction) {
+  return z.object({
+    email: z.string().email(t('errors.emailInvalid')),
+  });
+}
+export type MagicLinkInput = z.infer<ReturnType<typeof getMagicLinkSchema>>;
+
 export function getRegisterSchema(t: TFunction) {
   return z.object({
     displayName: z.string().min(2, t('errors.nameTooShort')),

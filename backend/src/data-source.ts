@@ -15,6 +15,7 @@ import { Role } from './roles/entities/role.entity';
 import { Offer } from './offers/entities/offer.entity';
 import { PayoutRequest } from './payouts/entities/payout-request.entity';
 import { Notification } from './notifications/entities/notification.entity';
+import { MagicLinkToken } from './auth/entities/magic-link-token.entity';
 
 config();
 
@@ -25,7 +26,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'aquilas',
-  entities: [User, Product, Category, Order, OrderStatusHistory, Review, UserReview, Favorite, PromoCode, PlatformConfig, Role, Offer, PayoutRequest, Notification],
+  entities: [User, Product, Category, Order, OrderStatusHistory, Review, UserReview, Favorite, PromoCode, PlatformConfig, Role, Offer, PayoutRequest, Notification, MagicLinkToken],
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
   synchronize: false,
 });

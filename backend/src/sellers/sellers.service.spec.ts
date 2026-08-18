@@ -17,6 +17,7 @@ describe('SellersService', () => {
   let repo: { findOne: jest.Mock; save: jest.Mock; createQueryBuilder: jest.Mock };
   let authService: { signToken: jest.Mock };
   let notificationsService: { create: jest.Mock; notifyAdmins: jest.Mock };
+  let mailService: { send: jest.Mock };
   const existsSyncSpy = existsSync as jest.Mock;
 
   const baseUser = (overrides: Partial<User> = {}): User =>
@@ -53,7 +54,8 @@ describe('SellersService', () => {
     };
     authService = { signToken: jest.fn().mockReturnValue('signed-jwt-token') };
     notificationsService = { create: jest.fn(), notifyAdmins: jest.fn() };
-    service = new SellersService(repo as never, authService as never, notificationsService as never);
+    mailService = { send: jest.fn().mockResolvedValue(undefined) };
+    service = new SellersService(repo as never, authService as never, notificationsService as never, mailService as never);
     existsSyncSpy.mockReset();
   });
 

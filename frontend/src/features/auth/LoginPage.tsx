@@ -47,6 +47,10 @@ export function LoginPage() {
         <button className="btn-primary w-full" disabled={busy} data-testid="submit-login">{t('login.submit')}</button>
       </form>
 
+      <p className="mt-4 text-center text-sm">
+        <Link to="/connexion-lien" className="font-medium text-ink underline">{t('magicLink.loginLink')}</Link>
+      </p>
+
       <p className="mt-6 text-center text-sm text-muted">
         {t('login.noAccount')}{' '}
         <Link to="/register" className="font-medium text-ink underline">{t('login.createAccount')}</Link>

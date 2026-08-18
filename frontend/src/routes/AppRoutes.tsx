@@ -13,6 +13,8 @@ import { OrdersPage } from '@/features/orders/OrdersPage';
 import { ProfilePage } from '@/features/account/ProfilePage';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { RegisterPage } from '@/features/auth/RegisterPage';
+import { MagicLinkRequestPage } from '@/features/auth/MagicLinkRequestPage';
+import { MagicLinkVerifyPage } from '@/features/auth/MagicLinkVerifyPage';
 import { BecomeSellerPage } from '@/features/seller/BecomeSellerPage';
 import { SellerDashboardPage } from '@/features/seller/SellerDashboardPage';
 import { MyListingsPage } from '@/features/seller/MyListingsPage';
@@ -34,6 +36,8 @@ export function AppRoutes() {
         <Route path="panier" element={<CartPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="connexion-lien" element={<MagicLinkRequestPage />} />
+        <Route path="connexion-lien/:token" element={<MagicLinkVerifyPage />} />
         <Route path="checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
         <Route path="commandes" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
         <Route path="compte" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />

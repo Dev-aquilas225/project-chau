@@ -1,13 +1,18 @@
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 
 describe('ReviewsService', () => {
   let service: ReviewsService;
-  let reviewsRepo: { find: jest.Mock; create: jest.Mock; save: jest.Mock };
+  let reviewsRepo: { find: jest.Mock; findOne: jest.Mock; create: jest.Mock; save: jest.Mock };
   let productsRepo: { findOne: jest.Mock };
 
   beforeEach(() => {
-    reviewsRepo = { find: jest.fn(), create: jest.fn((d) => d), save: jest.fn(async (d) => ({ id: 'rev-1', ...d })) };
+    reviewsRepo = {
+      find: jest.fn(),
+      findOne: jest.fn().mockResolvedValue(null),
+      create: jest.fn((d) => d),
+      save: jest.fn(async (d) => ({ id: 'rev-1', ...d })),
+    };
     productsRepo = { findOne: jest.fn() };
     service = new ReviewsService(reviewsRepo as never, productsRepo as never);
   });
@@ -42,6 +47,13 @@ describe('ReviewsService', () => {
       const result = await service.create('u1', 'prod-1', { rating: 5 });
       expect(reviewsRepo.create).toHaveBeenCalledWith({ userId: 'u1', productId: 'prod-1', rating: 5, comment: '' });
       expect(result.id).toBe('rev-1');
+    });
+
+    it('refuse un second avis du même utilisateur sur le même produit', async () => {
+      productsRepo.findOne.mockResolvedValue({ id: 'prod-1' });
+      reviewsRepo.findOne.mockResolvedValue({ id: 'existing-review', userId: 'u1', productId: 'prod-1' });
+      await expect(service.create('u1', 'prod-1', { rating: 5 })).rejects.toThrow(ConflictException);
+      expect(reviewsRepo.create).not.toHaveBeenCalled();
     });
   });
 });

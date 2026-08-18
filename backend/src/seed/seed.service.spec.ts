@@ -9,13 +9,12 @@ describe('SeedService', () => {
     service = new SeedService(repo as never);
   });
 
-  it("met à jour le mot de passe et rôle de l'admin s'il existe déjà", async () => {
+  it("ne touche jamais un admin déjà existant (évite de réinitialiser son mot de passe à chaque redémarrage)", async () => {
     const existing = { id: 'admin-1', email: 'priscillenkengue94@gmail.com', role: 'customer', passwordHash: 'old' };
     repo.findOne.mockResolvedValue(existing);
     await service.seedAdmin();
-    expect(repo.save).toHaveBeenCalledWith(
-      expect.objectContaining({ email: 'priscillenkengue94@gmail.com', role: 'admin' }),
-    );
+    expect(repo.create).not.toHaveBeenCalled();
+    expect(repo.save).not.toHaveBeenCalled();
   });
 
   it("crée l'admin par défaut avec le rôle admin et un mot de passe hashé", async () => {

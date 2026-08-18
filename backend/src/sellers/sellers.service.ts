@@ -6,6 +6,8 @@ import { join } from 'path';
 import { User, SellerStatus } from '../users/entities/user.entity';
 import { AuthService } from '../auth/auth.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { MailService } from '../mail/mail.service';
+import { sellerStatusTemplate } from '../mail/templates';
 import { ApplySellerDto, UpdateSellerBlockDto, UpdateSellerProfileDto, UpdateSellerStatusDto } from './dto/seller.dto';
 
 const IDENTITY_UPLOAD_DIR = join(process.cwd(), 'uploads-private', 'identity');
@@ -16,6 +18,7 @@ export class SellersService {
     @InjectRepository(User) private usersRepo: Repository<User>,
     private authService: AuthService,
     private notificationsService: NotificationsService,
+    private mailService: MailService,
   ) {}
 
   private baseView(user: User) {
@@ -164,6 +167,12 @@ export class SellersService {
       message,
       dto.status === 'approved' ? '/espace-vendeur' : '/devenir-vendeur',
     );
+    const { subject, html } = sellerStatusTemplate({
+      displayName: saved.displayName,
+      approved: dto.status === 'approved',
+      note: dto.note,
+    });
+    await this.mailService.send({ to: saved.email, subject, html });
 
     return this.sanitizeAdmin(saved);
   }

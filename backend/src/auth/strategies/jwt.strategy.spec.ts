@@ -10,7 +10,7 @@ describe('JwtStrategy', () => {
 
   beforeEach(() => {
     repo = { findOne: jest.fn() };
-    config = { get: jest.fn().mockReturnValue('test-secret') } as unknown as ConfigService;
+    config = { get: jest.fn().mockReturnValue('test-secret-for-unit-tests-0123456789') } as unknown as ConfigService;
     strategy = new JwtStrategy(config, repo as never);
   });
 

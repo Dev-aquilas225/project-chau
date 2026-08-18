@@ -21,6 +21,16 @@ export async function loginWithEmail(email: string, password: string): Promise<U
   return res.user;
 }
 
+export async function requestMagicLink(email: string): Promise<{ message: string }> {
+  return apiFetch<{ message: string }>('/auth/magic-link/request', { method: 'POST', body: { email } });
+}
+
+export async function verifyMagicLink(token: string): Promise<UserProfile> {
+  const res = await apiFetch<AuthResponse>('/auth/magic-link/verify', { method: 'POST', body: { token } });
+  setToken(res.accessToken);
+  return res.user;
+}
+
 export async function getMe(): Promise<UserProfile> {
   return apiFetch<UserProfile>('/auth/me');
 }

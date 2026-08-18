@@ -34,6 +34,15 @@ export class StripeService implements OnModuleInit {
         this.isMockMode = true;
       }
     } else {
+      if (mode === 'prod') {
+        // Ne jamais retomber silencieusement en mode MOCK en production : ce mode
+        // permet de confirmer un paiement (et de faire passer une commande "paid")
+        // sans jamais avoir réellement payé — cf. audit sécurité.
+        throw new Error(
+          'STRIPE_MODE=prod mais STRIPE_SECRET_KEY_PROD est absente/invalide. ' +
+            'Démarrage refusé pour éviter un repli silencieux en mode MOCK en production.',
+        );
+      }
       this.logger.warn('Aucune clé Stripe valide fournie. Le système fonctionnera en mode MOCK.');
       this.isMockMode = true;
     }

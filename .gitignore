@@ -48,5 +48,8 @@ ui-debug.log
 # Documents d'identité vendeurs — jamais commités
 backend/uploads-private/
 
+# Fichiers uploadés par les utilisateurs (produits, avatars) — données runtime, pas du code
+backend/uploads/
+
 # Notes de travail personnelles
 thinking.md

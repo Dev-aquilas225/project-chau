@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -19,7 +21,9 @@ import { RolesModule } from './roles/roles.module';
 import { StripeModule } from './stripe/stripe.module';
 import { OffersModule } from './offers/offers.module';
 import { PayoutsModule } from './payouts/payouts.module';
+import { MailModule } from './mail/mail.module';
 import { User } from './users/entities/user.entity';
+import { MagicLinkToken } from './auth/entities/magic-link-token.entity';
 import { Product } from './products/entities/product.entity';
 import { Category } from './categories/entities/category.entity';
 import { Order } from './orders/entities/order.entity';
@@ -38,6 +42,10 @@ import { Notification } from './notifications/entities/notification.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    // Limite globale par défaut (générale) ; des limites plus strictes sont appliquées
+    // via @Throttle() sur les routes sensibles (login/register) pour contrer le brute-force.
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
+    MailModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -48,7 +56,7 @@ import { Notification } from './notifications/entities/notification.entity';
         username: config.get<string>('DB_USERNAME', 'postgres'),
         password: config.get<string>('DB_PASSWORD', 'postgres'),
         database: config.get<string>('DB_NAME', 'aquilas'),
-        entities: [User, Product, Category, Order, OrderStatusHistory, Review, UserReview, Favorite, PromoCode, PlatformConfig, Role, Offer, PayoutRequest, Notification],
+        entities: [User, Product, Category, Order, OrderStatusHistory, Review, UserReview, Favorite, PromoCode, PlatformConfig, Role, Offer, PayoutRequest, Notification, MagicLinkToken],
         synchronize: false,
         autoLoadEntities: true,
         migrationsRun: true,
@@ -74,5 +82,6 @@ import { Notification } from './notifications/entities/notification.entity';
     OffersModule,
     PayoutsModule,
   ],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

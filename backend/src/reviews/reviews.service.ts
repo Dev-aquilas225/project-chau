@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Review } from './entities/review.entity';
@@ -35,6 +35,11 @@ export class ReviewsService {
   async create(userId: string, productId: string, dto: CreateReviewDto) {
     const product = await this.productsRepo.findOne({ where: { id: productId } });
     if (!product) throw new NotFoundException('Produit introuvable');
+
+    // Un seul avis par utilisateur et par produit (cf. audit sécurité : sans cette
+    // vérification, un compte pouvait spammer un nombre illimité d'avis).
+    const existing = await this.reviewsRepo.findOne({ where: { userId, productId } });
+    if (existing) throw new ConflictException('Vous avez déjà laissé un avis pour ce produit');
 
     const review = this.reviewsRepo.create({
       userId,

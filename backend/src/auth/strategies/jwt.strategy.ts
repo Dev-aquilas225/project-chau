@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import type { Role, SellerStatus } from '../../users/entities/user.entity';
 import type { PermissionAction, ResourceKey } from '../../roles/entities/role.entity';
+import { requireJwtSecret } from '../jwt-secret';
 
 export interface JwtPayload {
   sub: string;
@@ -26,7 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: config.get<string>('JWT_SECRET') || 'change-me-in-production',
+      secretOrKey: requireJwtSecret(config),
     });
   }
 

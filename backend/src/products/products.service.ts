@@ -85,8 +85,18 @@ export class ProductsService {
   async update(id: string, dto: UpdateProductDto, caller: JwtPayload) {
     const product = await this.findOne(id);
     this.assertOwnerOrAdmin(product, caller, 'update');
+
+    const patch = { ...dto };
+    if (!hasPermission(caller, 'products', 'update')) {
+      // Un vendeur (propriétaire, pas staff) ne doit pas pouvoir republier un produit
+      // désactivé par la modération admin, ni s'auto-attribuer le badge éditorial
+      // "coup de cœur" — cf. audit sécurité.
+      delete patch.active;
+      delete patch.weLove;
+    }
+
     const wasOutOfStock = product.stock === 0;
-    Object.assign(product, dto);
+    Object.assign(product, patch);
     const saved = await this.productsRepo.save(product);
     if (dto.stock === 0 && !wasOutOfStock) {
       await this.notificationsService.notifyAdmins(

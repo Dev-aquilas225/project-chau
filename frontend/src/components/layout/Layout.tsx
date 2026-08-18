@@ -1,4 +1,5 @@
 import { Header } from './Header';
+import { ShippingNoticeBanner } from './ShippingNoticeBanner';
 import { BottomNav } from './BottomNav';
 import { Footer } from './Footer';
 import { PageTransition } from './PageTransition';
@@ -9,6 +10,7 @@ export function Layout() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
+      <ShippingNoticeBanner />
       <main className="flex-1 pb-20 md:pb-0">
         <PageTransition />
       </main>

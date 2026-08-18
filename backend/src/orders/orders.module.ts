@@ -10,6 +10,7 @@ import { PlatformConfigModule } from '../platform-config/platform-config.module'
 import { NotificationsModule } from '../notifications/notifications.module';
 import { StripeModule } from '../stripe/stripe.module';
 import { Offer } from '../offers/entities/offer.entity';
+import { PromoCodesModule } from '../promo-codes/promo-codes.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { Offer } from '../offers/entities/offer.entity';
     PlatformConfigModule,
     NotificationsModule,
     forwardRef(() => StripeModule),
+    PromoCodesModule,
   ],
   providers: [OrdersService],
   controllers: [OrdersController],

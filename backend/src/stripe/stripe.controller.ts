@@ -1,7 +1,10 @@
-import { Controller, Post, Headers, Req, Res, HttpStatus, Param, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Headers, Req, Res, HttpStatus, Param, BadRequestException, ForbiddenException, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { StripeService } from './stripe.service';
 import { OrdersService } from '../orders/orders.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { JwtPayload } from '../auth/strategies/jwt.strategy';
 
 @Controller('stripe')
 export class StripeController {
@@ -47,10 +50,19 @@ export class StripeController {
     res.status(HttpStatus.OK).json({ received: true });
   }
 
+  // Réservé à l'acheteur de la commande (ou un admin) — audit sécurité : cette route
+  // n'avait aucun guard et permettait à n'importe quel appelant anonyme de faire passer
+  // n'importe quelle commande à "paid" tant que le mode MOCK était actif.
+  @UseGuards(JwtAuthGuard)
   @Post('mock-confirm/:orderId')
-  async mockConfirm(@Param('orderId') orderId: string) {
+  async mockConfirm(@CurrentUser() user: JwtPayload, @Param('orderId') orderId: string) {
     if (!this.stripeService.getIsMockMode()) {
       throw new BadRequestException('La confirmation simulée n\'est disponible qu\'en mode MOCK (dev).');
+    }
+
+    const order = await this.ordersService.findOne(orderId);
+    if (order.userId !== user.sub && user.role !== 'admin') {
+      throw new ForbiddenException('Vous n\'êtes pas l\'acheteur de cette commande');
     }
 
     try {

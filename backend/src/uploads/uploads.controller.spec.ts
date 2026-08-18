@@ -1,20 +1,26 @@
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import type { Response } from 'express';
-import {
-  UploadsController,
-  mimeFileFilter,
-  productImageFilename,
-  identityDestination,
-  identityFilenameFor,
-} from './uploads.controller';
+import { UploadsController, mimeFileFilter } from './uploads.controller';
 import type { JwtPayload } from '../auth/strategies/jwt.strategy';
 
 jest.mock('fs', () => ({
   existsSync: jest.fn(),
   mkdirSync: jest.fn(),
 }));
+jest.mock('fs/promises', () => ({
+  writeFile: jest.fn().mockResolvedValue(undefined),
+}));
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import { existsSync } from 'fs';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+import { writeFile } from 'fs/promises';
+
+const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d]);
+const NOT_AN_IMAGE = Buffer.from('<script>alert(1)</script>');
+
+function makeFile(buffer: Buffer): Express.Multer.File {
+  return { buffer, originalname: 'whatever.jpg', mimetype: 'image/png' } as Express.Multer.File;
+}
 
 describe('UploadsController', () => {
   let controller: UploadsController;
@@ -41,6 +47,7 @@ describe('UploadsController', () => {
     controller = new UploadsController();
     res = { sendFile: jest.fn() };
     (existsSync as jest.Mock).mockReset();
+    (writeFile as jest.Mock).mockClear();
   });
 
   describe('GET /uploads/identity/:filename', () => {
@@ -83,7 +90,6 @@ describe('UploadsController', () => {
         controller.getIdentityFile(customerToken('user-1'), '../../etc/passwd', res as unknown as Response),
       ).toThrow(ForbiddenException);
       expect(res.sendFile).not.toHaveBeenCalled();
-      // La vérification échoue avant même de toucher le disque
       expect(existsSync).not.toHaveBeenCalled();
     });
 
@@ -96,63 +102,63 @@ describe('UploadsController', () => {
   });
 
   describe('POST /uploads/identity/id-document et /profile-photo', () => {
-    it("renvoie la référence du fichier téléversé pour la pièce d'identité", () => {
-      const file = { filename: 'user-1-id-document-123.jpg' } as Express.Multer.File;
-      expect(controller.uploadIdDocument(file)).toEqual({ ref: 'user-1-id-document-123.jpg' });
+    it("renvoie la référence du fichier téléversé pour la pièce d'identité, préfixée par userId", async () => {
+      const result = await controller.uploadIdDocument(customerToken('user-1'), makeFile(PNG_SIGNATURE));
+      expect(result.ref).toMatch(/^user-1-id-document-\d+-\d+\.png$/);
+      expect(writeFile).toHaveBeenCalled();
     });
 
-    it('renvoie la référence du fichier téléversé pour la photo de profil', () => {
-      const file = { filename: 'user-1-profile-photo-456.jpg' } as Express.Multer.File;
-      expect(controller.uploadProfilePhoto(file)).toEqual({ ref: 'user-1-profile-photo-456.jpg' });
+    it('renvoie la référence du fichier téléversé pour la photo de profil', async () => {
+      const result = await controller.uploadProfilePhoto(customerToken('user-1'), makeFile(PNG_SIGNATURE));
+      expect(result.ref).toMatch(/^user-1-profile-photo-\d+-\d+\.png$/);
     });
 
-    it("renvoie la référence du fichier téléversé pour le verso de la pièce d'identité", () => {
-      const file = { filename: 'user-1-id-document-back-789.jpg' } as Express.Multer.File;
-      expect(controller.uploadIdDocumentBack(file)).toEqual({ ref: 'user-1-id-document-back-789.jpg' });
+    it("renvoie la référence du fichier téléversé pour le verso de la pièce d'identité", async () => {
+      const result = await controller.uploadIdDocumentBack(customerToken('user-1'), makeFile(PNG_SIGNATURE));
+      expect(result.ref).toMatch(/^user-1-id-document-back-\d+-\d+\.png$/);
+    });
+
+    it('rejette un fichier dont le contenu réel ne correspond à aucun format image (magic bytes)', async () => {
+      await expect(controller.uploadIdDocument(customerToken('user-1'), makeFile(NOT_AN_IMAGE))).rejects.toThrow(BadRequestException);
+      expect(writeFile).not.toHaveBeenCalled();
     });
   });
 
-  describe('POST /uploads/product-image (non-régression)', () => {
-    it('refuse un customer qui n\'est pas vendeur approuvé', () => {
-      const user: JwtPayload = {
-        sub: 'user-1',
-        email: 'x@test.com',
-        role: 'customer',
-        sellerStatus: 'pending',
-        blocked: false,
-        customRole: null,
-      };
-      const file = { filename: 'abc.jpg' } as Express.Multer.File;
-      expect(() => controller.uploadProductImage(user, file)).toThrow(ForbiddenException);
+  describe('POST /uploads/product-image', () => {
+    it("refuse (403) un customer qui n'est pas vendeur approuvé, sans écrire de fichier", async () => {
+      const user: JwtPayload = { sub: 'user-1', email: 'x@test.com', role: 'customer', sellerStatus: 'pending', blocked: false, customRole: null };
+      await expect(controller.uploadProductImage(user, makeFile(PNG_SIGNATURE))).rejects.toThrow(ForbiddenException);
+      // L'autorisation est vérifiée avant toute écriture sur disque.
+      expect(writeFile).not.toHaveBeenCalled();
     });
 
-    it('autorise un vendeur approuvé', () => {
-      const user: JwtPayload = {
-        sub: 'user-1',
-        email: 'x@test.com',
-        role: 'customer',
-        sellerStatus: 'approved',
-        blocked: false,
-        customRole: null,
-      };
-      const file = { filename: 'abc.jpg' } as Express.Multer.File;
-      expect(controller.uploadProductImage(user, file)).toEqual({ url: '/uploads/products/abc.jpg' });
+    it('autorise un vendeur approuvé et écrit le fichier validé', async () => {
+      const user: JwtPayload = { sub: 'user-1', email: 'x@test.com', role: 'customer', sellerStatus: 'approved', blocked: false, customRole: null };
+      const result = await controller.uploadProductImage(user, makeFile(PNG_SIGNATURE));
+      expect(result.url).toMatch(/^\/uploads\/products\/\d+-\d+\.png$/);
+      expect(writeFile).toHaveBeenCalledTimes(1);
     });
 
-    it("autorise un admin même sans statut vendeur approuvé", () => {
-      const file = { filename: 'abc.jpg' } as Express.Multer.File;
-      expect(controller.uploadProductImage(adminToken, file)).toEqual({ url: '/uploads/products/abc.jpg' });
+    it('autorise un admin même sans statut vendeur approuvé', async () => {
+      const result = await controller.uploadProductImage(adminToken, makeFile(PNG_SIGNATURE));
+      expect(result.url).toMatch(/^\/uploads\/products\/\d+-\d+\.png$/);
+    });
+
+    it("rejette (400) un fichier dont le contenu réel n'est pas une image, même avec un mimetype/extension usurpés", async () => {
+      const user: JwtPayload = { sub: 'user-1', email: 'x@test.com', role: 'customer', sellerStatus: 'approved', blocked: false, customRole: null };
+      await expect(controller.uploadProductImage(user, makeFile(NOT_AN_IMAGE))).rejects.toThrow(BadRequestException);
+      expect(writeFile).not.toHaveBeenCalled();
     });
   });
 
   describe('POST /uploads/avatar', () => {
-    it('accepte un simple customer (aucune restriction de rôle)', () => {
-      const file = { filename: 'abc.jpg' } as Express.Multer.File;
-      expect(controller.uploadAvatar(file)).toEqual({ url: '/uploads/avatars/abc.jpg' });
+    it('accepte un simple customer (aucune restriction de rôle)', async () => {
+      const result = await controller.uploadAvatar(makeFile(PNG_SIGNATURE));
+      expect(result.url).toMatch(/^\/uploads\/avatars\/\d+-\d+\.png$/);
     });
   });
 
-  describe('mimeFileFilter (config Multer)', () => {
+  describe('mimeFileFilter (config Multer — première ligne de filtrage, non suffisante seule)', () => {
     it('accepte un type MIME autorisé (image/png)', () => {
       const cb = jest.fn();
       mimeFileFilter({}, { mimetype: 'image/png' } as Express.Multer.File, cb);
@@ -163,43 +169,6 @@ describe('UploadsController', () => {
       const cb = jest.fn();
       mimeFileFilter({}, { mimetype: 'application/pdf' } as Express.Multer.File, cb);
       expect(cb).toHaveBeenCalledWith(expect.any(BadRequestException), false);
-    });
-  });
-
-  describe('productImageFilename (config Multer)', () => {
-    it('génère un nom de fichier unique en conservant l\'extension', () => {
-      const cb = jest.fn();
-      productImageFilename({}, { originalname: 'photo.png' } as Express.Multer.File, cb);
-      expect(cb).toHaveBeenCalledWith(null, expect.stringMatching(/^\d+-\d+\.png$/));
-    });
-  });
-
-  describe('identityDestination / identityFilenameFor (config Multer)', () => {
-    it('crée le dossier privé et pointe dessus', () => {
-      const cb = jest.fn();
-      identityDestination({}, {} as Express.Multer.File, cb);
-      expect(cb).toHaveBeenCalledWith(null, expect.stringContaining('uploads-private'));
-    });
-
-    it('préfixe le nom de fichier avec userId et le type de document (id-document)', () => {
-      const cb = jest.fn();
-      const req = { user: { sub: 'user-42' } };
-      identityFilenameFor('id-document')(req, { originalname: 'piece.jpg' } as Express.Multer.File, cb);
-      expect(cb).toHaveBeenCalledWith(null, expect.stringMatching(/^user-42-id-document-\d+-\d+\.jpg$/));
-    });
-
-    it('préfixe le nom de fichier avec userId et le type de document (profile-photo)', () => {
-      const cb = jest.fn();
-      const req = { user: { sub: 'user-42' } };
-      identityFilenameFor('profile-photo')(req, { originalname: 'selfie.png' } as Express.Multer.File, cb);
-      expect(cb).toHaveBeenCalledWith(null, expect.stringMatching(/^user-42-profile-photo-\d+-\d+\.png$/));
-    });
-
-    it('préfixe le nom de fichier avec userId et le type de document (id-document-back)', () => {
-      const cb = jest.fn();
-      const req = { user: { sub: 'user-42' } };
-      identityFilenameFor('id-document-back')(req, { originalname: 'piece-verso.jpg' } as Express.Multer.File, cb);
-      expect(cb).toHaveBeenCalledWith(null, expect.stringMatching(/^user-42-id-document-back-\d+-\d+\.jpg$/));
     });
   });
 });

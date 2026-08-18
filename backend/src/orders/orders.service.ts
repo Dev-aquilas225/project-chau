@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, Inject, forwardRef, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Order, OrderStatus } from './entities/order.entity';
+import { Order, OrderItem, OrderStatus } from './entities/order.entity';
 import { OrderStatusHistory } from './entities/order-status-history.entity';
 import { Product } from '../products/entities/product.entity';
 import { User } from '../users/entities/user.entity';
@@ -9,6 +9,9 @@ import { Offer } from '../offers/entities/offer.entity';
 import { PlatformConfigService } from '../platform-config/platform-config.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { StripeService } from '../stripe/stripe.service';
+import { PromoCodesService } from '../promo-codes/promo-codes.service';
+import { MailService } from '../mail/mail.service';
+import { orderConfirmationTemplate, orderStatusTemplate } from '../mail/templates';
 import { CreateOrderDto, CreateCheckoutSessionDto } from './dto/order.dto';
 
 const STATUS_LABEL_FR: Record<OrderStatus, string> = {
@@ -30,25 +33,75 @@ export class OrdersService {
     @Inject(forwardRef(() => StripeService)) private stripeService: StripeService,
     private platformConfig: PlatformConfigService,
     private notificationsService: NotificationsService,
+    private promoCodesService: PromoCodesService,
+    private mailService: MailService,
   ) {}
+
+  /**
+   * Recharge chaque produit en base et reconstruit les lignes de commande à partir de
+   * `product.price` (jamais du `unitPrice` envoyé par le client — cf. audit sécurité :
+   * un client pouvait auparavant fixer n'importe quel prix). Vérifie aussi disponibilité
+   * et stock, et décrémente ce dernier.
+   */
+  private async resolveItems(
+    items: { productId: string; qty: number }[],
+    priceOverrides?: Map<string, number>,
+  ): Promise<{ resolvedItems: OrderItem[]; subtotal: number; sellerId: string | null }> {
+    if (!items || items.length === 0) {
+      throw new BadRequestException('La commande doit contenir au moins un article');
+    }
+    let sellerId: string | null = null;
+    let subtotal = 0;
+    const resolvedItems: OrderItem[] = [];
+    for (const item of items) {
+      const product = await this.productsRepo.findOne({ where: { id: item.productId } });
+      if (!product) throw new BadRequestException(`Produit introuvable : ${item.productId}`);
+      if (!product.active) throw new BadRequestException(`Produit indisponible : ${product.name}`);
+      if (product.stock < item.qty) throw new BadRequestException(`Stock insuffisant pour : ${product.name}`);
+
+      const unitPrice = priceOverrides?.get(product.id) ?? Number(product.price);
+      subtotal += unitPrice * item.qty;
+      resolvedItems.push({
+        productId: product.id,
+        name: product.name,
+        brand: product.brand,
+        image: product.images?.[0] ?? '',
+        unitPrice,
+        qty: item.qty,
+      });
+      if (sellerId === null) sellerId = product.sellerId ?? null;
+
+      product.stock -= item.qty;
+      await this.productsRepo.save(product);
+    }
+    return { resolvedItems, subtotal: Math.round(subtotal * 100) / 100, sellerId };
+  }
+
+  /** Revalide le code promo côté serveur (source de vérité : PromoCodesService), jamais la remise envoyée par le client. */
+  private async resolveDiscount(promoCode: string | undefined, subtotal: number): Promise<number> {
+    if (!promoCode) return 0;
+    const result = await this.promoCodesService.validate({ code: promoCode, subtotal });
+    return result.discount;
+  }
 
   async create(userId: string, dto: CreateOrderDto) {
     const commissionRate = await this.platformConfig.getValue('commissionRate');
 
-    // Extract sellerId from the first product in the order
-    let sellerId: string | null = null;
-    if (dto.items.length > 0) {
-      const firstProduct = await this.productsRepo.findOne({ where: { id: dto.items[0].productId } });
-      sellerId = firstProduct?.sellerId ?? null;
-    }
+    const { resolvedItems, subtotal, sellerId } = await this.resolveItems(dto.items);
+    const discount = await this.resolveDiscount(dto.promoCode, subtotal);
+    const total = Math.max(0, Math.round((subtotal - discount) * 100) / 100);
 
-    const total = dto.total;
     const platformFee = sellerId ? Math.round((total * commissionRate) / 100 * 100) / 100 : 0;
     const sellerPayout = sellerId ? Math.round((total - platformFee) * 100) / 100 : 0;
 
     const order = this.ordersRepo.create({
-      ...dto,
-      discount: dto.discount ?? 0,
+      items: resolvedItems,
+      subtotal,
+      discount,
+      total,
+      promoCode: dto.promoCode,
+      shippingAddress: dto.shippingAddress,
+      paymentMethod: dto.paymentMethod,
       userId,
       sellerId,
       platformFee,
@@ -64,6 +117,18 @@ export class OrdersService {
       `Commande de ${total.toFixed(2)} € reçue`,
       `/commandes/${saved.id}`,
     );
+
+    const buyer = await this.usersRepo.findOne({ where: { id: userId } });
+    if (buyer) {
+      const { subject, html } = orderConfirmationTemplate({
+        displayName: buyer.displayName,
+        orderId: saved.id,
+        total,
+        items: resolvedItems,
+      });
+      await this.mailService.send({ to: buyer.email, subject, html });
+    }
+
     return saved;
   }
 
@@ -108,41 +173,45 @@ export class OrdersService {
       `Votre commande est maintenant : ${STATUS_LABEL_FR[status]}`,
       '/commandes',
     );
+
+    const buyer = await this.usersRepo.findOne({ where: { id: order.userId } });
+    if (buyer) {
+      const { subject, html } = orderStatusTemplate({ displayName: buyer.displayName, orderId: id, status });
+      await this.mailService.send({ to: buyer.email, subject, html });
+    }
+
     return saved;
   }
 
   async createCheckoutSession(userId: string, dto: CreateCheckoutSessionDto) {
     const commissionRate = await this.platformConfig.getValue('commissionRate');
 
-    // Override price if there is an accepted offer
+    // Une offre négociée acceptée par le vendeur écrase le prix du produit concerné —
+    // uniquement si elle appartient bien à l'acheteur courant et est réellement acceptée.
+    let priceOverrides: Map<string, number> | undefined;
     if (dto.offerId) {
       const offer = await this.offersRepo.findOne({ where: { id: dto.offerId } });
       if (offer && offer.buyerId === userId && offer.status === 'accepted') {
-        const item = dto.items.find((i) => i.productId === offer.productId);
-        if (item) {
-          item.unitPrice = parseFloat(offer.suggestedPrice as any);
-        }
+        priceOverrides = new Map([[offer.productId, parseFloat(offer.suggestedPrice as any)]]);
       }
     }
 
-    let sellerId: string | null = null;
-    if (dto.items.length > 0) {
-      const firstProduct = await this.productsRepo.findOne({ where: { id: dto.items[0].productId } });
-      sellerId = firstProduct?.sellerId ?? null;
-    }
-
-    // Recalculate subtotal using potentially overridden item unitPrices
-    const subtotal = dto.items.reduce((sum, i) => sum + i.unitPrice * i.qty, 0);
-    const discount = dto.discount ?? 0;
+    const { resolvedItems, subtotal, sellerId } = await this.resolveItems(dto.items, priceOverrides);
+    const discount = await this.resolveDiscount(dto.promoCode, subtotal);
     const shippingFee = dto.shippingFee ?? 0;
-    const totalEur = Math.max(0, subtotal - discount + shippingFee);
+    const totalEur = Math.max(0, Math.round((subtotal - discount + shippingFee) * 100) / 100);
 
     const platformFee = sellerId ? Math.round((totalEur * commissionRate) / 100 * 100) / 100 : 0;
     const sellerPayout = sellerId ? Math.round((totalEur - platformFee) * 100) / 100 : 0;
 
     const order = this.ordersRepo.create({
-      ...dto,
+      items: resolvedItems,
+      subtotal,
       discount,
+      total: totalEur,
+      promoCode: dto.promoCode,
+      shippingAddress: dto.shippingAddress,
+      paymentMethod: dto.paymentMethod,
       userId,
       sellerId,
       platformFee,

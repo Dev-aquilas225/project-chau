@@ -17,20 +17,29 @@ export class SeedService implements OnModuleInit {
     await this.seedAdmin();
   }
 
-  /** Crée ou met à jour l'utilisateur admin par défaut (idempotent). */
+  /**
+   * Crée l'utilisateur admin par défaut une seule fois, à la toute première
+   * initialisation (idempotent). Ne touche plus jamais un compte déjà existant :
+   * réécrire passwordHash/role à chaque redémarrage réinitialiserait silencieusement
+   * le mot de passe d'un admin qui l'aurait changé depuis, vers une valeur connue
+   * et présente dans le code source.
+   */
   async seedAdmin() {
     try {
-      const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
       const existing = await this.usersRepo.findOne({ where: { email: ADMIN_EMAIL } });
-
       if (existing) {
-        existing.passwordHash = passwordHash;
-        existing.role = 'admin';
-        await this.usersRepo.save(existing);
-        this.logger.log(`Admin par défaut mis à jour : ${ADMIN_EMAIL}`);
         return;
       }
 
+      if (!process.env.ADMIN_PASSWORD) {
+        this.logger.warn(
+          `ADMIN_PASSWORD non défini — création de l'admin par défaut avec le mot de passe de convenance ` +
+            `documenté dans le repo. À changer immédiatement après la première connexion, ou à définir ` +
+            `explicitement via la variable d'environnement ADMIN_PASSWORD avant le premier démarrage.`,
+        );
+      }
+
+      const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
       const admin = this.usersRepo.create({
         email: ADMIN_EMAIL,
         displayName: 'Administrateur',
