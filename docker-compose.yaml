@@ -30,6 +30,21 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-priscillenkengue94@gmail.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-88888888eE@!}
       PORT: 3000
+      # Origines autorisées en CORS (liste séparée par des virgules, ex: https://mondomaine.com,https://admin.mondomaine.com).
+      # Sans cette variable, le backend retombe sur des origines de dev (localhost) et
+      # bloquera les appels du frontend de production — à définir explicitement sur Coolify.
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      # SMTP (emails transactionnels : bienvenue, commande, statut, décision vendeur).
+      # Laissés vides par défaut : le backend journalise sans envoyer tant qu'ils ne
+      # sont pas positionnés explicitement sur Coolify.
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM:-no-reply@occasiondeluxepjinternational.com}
+      # URL du site client, utilisée dans les liens des emails (bouton "voir ma commande", lien magique, etc.)
+      FRONTEND_URL: ${FRONTEND_URL:-https://occasiondeluxepjinternational.com}
     ports:
       - "3000"
     volumes:
