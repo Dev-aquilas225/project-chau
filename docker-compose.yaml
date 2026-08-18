@@ -30,6 +30,15 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-priscillenkengue94@gmail.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-88888888eE@!}
       PORT: 3000
+      # Stripe (paiement réel). STRIPE_MODE=dev tant que STRIPE_SECRET_KEY_PROD n'est pas
+      # définie : le système fonctionne alors en mode simulation (aucun paiement réel).
+      # Passer STRIPE_MODE=prod sur Coolify sans clé prod valide fait échouer le démarrage
+      # volontairement plutôt que d'accepter silencieusement de faux paiements.
+      STRIPE_MODE: ${STRIPE_MODE:-dev}
+      STRIPE_SECRET_KEY_DEV: ${STRIPE_SECRET_KEY_DEV:-sk_test_mock}
+      STRIPE_SECRET_KEY_PROD: ${STRIPE_SECRET_KEY_PROD}
+      STRIPE_WEBHOOK_SECRET_DEV: ${STRIPE_WEBHOOK_SECRET_DEV:-whsec_mock}
+      STRIPE_WEBHOOK_SECRET_PROD: ${STRIPE_WEBHOOK_SECRET_PROD}
       # Origines autorisées en CORS (liste séparée par des virgules, ex: https://mondomaine.com,https://admin.mondomaine.com).
       # Sans cette variable, le backend retombe sur des origines de dev (localhost) et
       # bloquera les appels du frontend de production — à définir explicitement sur Coolify.
