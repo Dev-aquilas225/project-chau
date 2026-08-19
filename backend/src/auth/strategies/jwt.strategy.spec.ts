@@ -1,5 +1,6 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type { Request } from 'express';
 import { JwtStrategy } from './jwt.strategy';
 import { User } from '../../users/entities/user.entity';
 
@@ -7,6 +8,9 @@ describe('JwtStrategy', () => {
   let strategy: JwtStrategy;
   let repo: { findOne: jest.Mock };
   let config: ConfigService;
+
+  const reqWithApp = (app?: string): Request =>
+    ({ headers: app ? { 'x-client-app': app } : {} }) as unknown as Request;
 
   beforeEach(() => {
     repo = { findOne: jest.fn() };
@@ -35,9 +39,10 @@ describe('JwtStrategy', () => {
       sellerStatus: 'pending' as const,
       blocked: false,
       customRole: null,
+      aud: 'client' as const,
     };
 
-    const result = await strategy.validate(stalePayload);
+    const result = await strategy.validate(reqWithApp('client'), stalePayload);
 
     expect(result).toEqual({
       sub: 'user-1',
@@ -46,6 +51,7 @@ describe('JwtStrategy', () => {
       sellerStatus: 'approved',
       blocked: false,
       customRole: null,
+      aud: 'client',
     });
   });
 
@@ -67,9 +73,10 @@ describe('JwtStrategy', () => {
       sellerStatus: 'none' as const,
       blocked: false,
       customRole: null,
+      aud: 'admin' as const,
     };
 
-    const result = await strategy.validate(stalePayload);
+    const result = await strategy.validate(reqWithApp('admin'), stalePayload);
 
     expect(result.role).toBe('admin');
   });
@@ -83,9 +90,10 @@ describe('JwtStrategy', () => {
       sellerStatus: 'none' as const,
       blocked: false,
       customRole: null,
+      aud: 'client' as const,
     };
 
-    await expect(strategy.validate(payload)).rejects.toThrow(UnauthorizedException);
+    await expect(strategy.validate(reqWithApp('client'), payload)).rejects.toThrow(UnauthorizedException);
   });
 
   it('rejette avec UnauthorizedException si le compte est bloqué', async () => {
@@ -105,8 +113,53 @@ describe('JwtStrategy', () => {
       sellerStatus: 'approved' as const,
       blocked: false,
       customRole: null,
+      aud: 'client' as const,
     };
 
-    await expect(strategy.validate(payload)).rejects.toThrow(UnauthorizedException);
+    await expect(strategy.validate(reqWithApp('client'), payload)).rejects.toThrow(UnauthorizedException);
+  });
+
+  describe('séparation client / admin (claim aud)', () => {
+    const dbUser = {
+      id: 'user-1',
+      email: 'admin@test.com',
+      role: 'admin',
+      sellerStatus: 'none',
+      blocked: false,
+      customRole: null,
+    } as User;
+
+    it("rejette un token émis pour le client quand l'appelant se déclare admin (X-Client-App: admin)", async () => {
+      repo.findOne.mockResolvedValue(dbUser);
+      const clientPayload = {
+        sub: 'user-1', email: 'admin@test.com', role: 'admin' as const, sellerStatus: 'none' as const,
+        blocked: false, customRole: null, aud: 'client' as const,
+      };
+
+      await expect(strategy.validate(reqWithApp('admin'), clientPayload)).rejects.toThrow(UnauthorizedException);
+    });
+
+    it("rejette un token émis pour l'admin quand l'appelant se déclare client (X-Client-App: client)", async () => {
+      repo.findOne.mockResolvedValue(dbUser);
+      const adminPayload = {
+        sub: 'user-1', email: 'admin@test.com', role: 'admin' as const, sellerStatus: 'none' as const,
+        blocked: false, customRole: null, aud: 'admin' as const,
+      };
+
+      await expect(strategy.validate(reqWithApp('client'), adminPayload)).rejects.toThrow(UnauthorizedException);
+    });
+
+    it("rejette un token client quand l'en-tête X-Client-App est absent (traité comme 'client' par défaut, donc accepté ici) — cas de contrôle", async () => {
+      repo.findOne.mockResolvedValue(dbUser);
+      const clientPayload = {
+        sub: 'user-1', email: 'admin@test.com', role: 'admin' as const, sellerStatus: 'none' as const,
+        blocked: false, customRole: null, aud: 'client' as const,
+      };
+
+      // Sans en-tête, resolveAudience retombe sur 'client' : un token 'client' passe,
+      // mais un token 'admin' serait rejeté (comportement le moins permissif par défaut).
+      const result = await strategy.validate(reqWithApp(undefined), clientPayload);
+      expect(result.sub).toBe('user-1');
+    });
   });
 });

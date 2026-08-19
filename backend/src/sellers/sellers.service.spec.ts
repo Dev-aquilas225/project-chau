@@ -86,7 +86,7 @@ describe('SellersService', () => {
       expect(savedUser.sellerProfile.verifiedAt).toBeUndefined();
 
       // signToken doit recevoir l'utilisateur sauvegardé (statut pending)
-      expect(authService.signToken).toHaveBeenCalledWith(savedUser);
+      expect(authService.signToken).toHaveBeenCalledWith(savedUser, 'client');
       expect(result.accessToken).toBe('signed-jwt-token');
 
       // Non-régression sécurité : aucun champ PII brut ne doit fuiter dans la réponse

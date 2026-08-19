@@ -47,7 +47,7 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     if (qs) url += `?${qs}`;
   }
 
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = { 'X-Client-App': 'client' };
   const token = getToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (body !== undefined) headers['Content-Type'] = 'application/json';

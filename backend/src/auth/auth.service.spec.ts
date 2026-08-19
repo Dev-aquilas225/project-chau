@@ -34,10 +34,11 @@ describe('AuthService', () => {
     it('crée un utilisateur avec le rôle customer et hash le mot de passe', async () => {
       repo.findOne.mockResolvedValue(null);
 
-      const result = await service.register({ displayName: 'Alice', email: 'alice@test.com', password: 'password123' });
+      const result = await service.register({ displayName: 'Alice', email: 'alice@test.com', password: 'password123' }, 'client');
 
       expect(result.user.role).toBe('customer');
       expect(result.accessToken).toBeDefined();
+      expect((jwt.decode(result.accessToken) as { aud: string }).aud).toBe('client');
       const createArg = repo.create.mock.calls[0][0];
       expect(createArg.role).toBe('customer');
       expect(createArg.passwordHash).not.toBe('password123');
@@ -49,7 +50,7 @@ describe('AuthService', () => {
       repo.findOne.mockResolvedValue({ id: 'existing' });
 
       await expect(
-        service.register({ displayName: 'Alice', email: 'alice@test.com', password: 'password123' }),
+        service.register({ displayName: 'Alice', email: 'alice@test.com', password: 'password123' }, 'client'),
       ).rejects.toThrow(ConflictException);
     });
   });
@@ -63,7 +64,7 @@ describe('AuthService', () => {
         getOne: jest.fn().mockResolvedValue(null),
       });
 
-      await expect(service.login({ email: 'nobody@test.com', password: 'password123' })).rejects.toThrow(
+      await expect(service.login({ email: 'nobody@test.com', password: 'password123' }, 'client')).rejects.toThrow(
         UnauthorizedException,
       );
     });
@@ -77,7 +78,7 @@ describe('AuthService', () => {
         getOne: jest.fn().mockResolvedValue({ id: 'user-1', email: 'alice@test.com', passwordHash, role: 'customer' }),
       });
 
-      await expect(service.login({ email: 'alice@test.com', password: 'wrong-password' })).rejects.toThrow(
+      await expect(service.login({ email: 'alice@test.com', password: 'wrong-password' }, 'client')).rejects.toThrow(
         UnauthorizedException,
       );
     });
@@ -99,9 +100,24 @@ describe('AuthService', () => {
         }),
       });
 
-      const result = await service.login({ email: 'alice@test.com', password: 'correct-password' });
+      const result = await service.login({ email: 'alice@test.com', password: 'correct-password' }, 'client');
       expect(result.accessToken).toBeDefined();
       expect(result.user.email).toBe('alice@test.com');
+    });
+
+    it("émet un token d'audience 'admin' quand l'appelant est l'app admin", async () => {
+      const passwordHash = await bcrypt.hash('correct-password', 10);
+      repo.createQueryBuilder.mockReturnValue({
+        addSelect: jest.fn().mockReturnThis(),
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        getOne: jest.fn().mockResolvedValue({
+          id: 'admin-1', email: 'admin@test.com', displayName: 'Admin', passwordHash, role: 'admin', addresses: [], createdAt: new Date(),
+        }),
+      });
+
+      const result = await service.login({ email: 'admin@test.com', password: 'correct-password' }, 'admin');
+      expect((jwt.decode(result.accessToken) as { aud: string }).aud).toBe('admin');
     });
   });
 
@@ -155,6 +171,8 @@ describe('AuthService', () => {
       expect(magicLinkRepo.save).toHaveBeenCalledWith(expect.objectContaining({ usedAt: expect.any(Date) }));
       expect(result.accessToken).toBeDefined();
       expect(result.user.email).toBe('alice@test.com');
+      // Le lien magique n'émet jamais que des tokens d'audience 'client' (fonctionnalité client uniquement).
+      expect((jwt.decode(result.accessToken) as { aud: string }).aud).toBe('client');
       // Compte déjà existant : pas de nouvel email de bienvenue.
       expect(mailService.send).not.toHaveBeenCalled();
     });

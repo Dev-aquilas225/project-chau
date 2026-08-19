@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -7,6 +7,7 @@ import { RequestMagicLinkDto, VerifyMagicLinkDto } from './dto/magic-link.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import type { JwtPayload } from './strategies/jwt.strategy';
+import { CLIENT_APP_HEADER, resolveAudience } from './jwt-audience';
 
 // Limite stricte par IP pour contrer le brute-force / credential stuffing sur ces
 // deux routes (aucun rate limiting n'existait auparavant — cf. audit sécurité).
@@ -18,14 +19,14 @@ export class AuthController {
 
   @Throttle(AUTH_THROTTLE)
   @Post('register')
-  register(@Body() dto: RegisterDto) {
-    return this.authService.register(dto);
+  register(@Body() dto: RegisterDto, @Headers(CLIENT_APP_HEADER) clientApp?: string) {
+    return this.authService.register(dto, resolveAudience(clientApp));
   }
 
   @Throttle(AUTH_THROTTLE)
   @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+  login(@Body() dto: LoginDto, @Headers(CLIENT_APP_HEADER) clientApp?: string) {
+    return this.authService.login(dto, resolveAudience(clientApp));
   }
 
   @Throttle(AUTH_THROTTLE)

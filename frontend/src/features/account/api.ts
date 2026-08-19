@@ -12,7 +12,7 @@ export async function uploadAvatar(file: File): Promise<{ url: string }> {
   const base = API_URL;
   const res = await fetch(`${base}/uploads/avatar`, {
     method: 'POST',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    headers: { 'X-Client-App': 'client', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     body: formData,
   });
   if (!res.ok) throw new Error('Échec upload');

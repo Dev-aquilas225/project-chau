@@ -67,7 +67,7 @@ export async function uploadListingImage(file: File): Promise<{ url: string }> {
   const base = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
   const res = await fetch(`${base}/uploads/product-image`, {
     method: 'POST',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    headers: { 'X-Client-App': 'client', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     body: formData,
   });
   if (!res.ok) throw new Error('Échec upload');
@@ -84,7 +84,7 @@ export async function uploadIdentityDocument(
   const base = API_URL;
   const res = await fetch(`${base}/uploads/identity/${kind}`, {
     method: 'POST',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    headers: { 'X-Client-App': 'client', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     body: formData,
   });
   if (!res.ok) throw new Error('Échec upload');

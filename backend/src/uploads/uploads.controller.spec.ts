@@ -33,6 +33,7 @@ describe('UploadsController', () => {
     sellerStatus: 'approved',
     blocked: false,
     customRole: null,
+    aud: 'client',
   });
   const adminToken: JwtPayload = {
     sub: 'admin-1',
@@ -41,6 +42,7 @@ describe('UploadsController', () => {
     sellerStatus: 'none',
     blocked: false,
     customRole: null,
+    aud: 'admin',
   };
 
   beforeEach(() => {
@@ -126,14 +128,14 @@ describe('UploadsController', () => {
 
   describe('POST /uploads/product-image', () => {
     it("refuse (403) un customer qui n'est pas vendeur approuvé, sans écrire de fichier", async () => {
-      const user: JwtPayload = { sub: 'user-1', email: 'x@test.com', role: 'customer', sellerStatus: 'pending', blocked: false, customRole: null };
+      const user: JwtPayload = { sub: 'user-1', email: 'x@test.com', role: 'customer', sellerStatus: 'pending', blocked: false, customRole: null, aud: 'client' };
       await expect(controller.uploadProductImage(user, makeFile(PNG_SIGNATURE))).rejects.toThrow(ForbiddenException);
       // L'autorisation est vérifiée avant toute écriture sur disque.
       expect(writeFile).not.toHaveBeenCalled();
     });
 
     it('autorise un vendeur approuvé et écrit le fichier validé', async () => {
-      const user: JwtPayload = { sub: 'user-1', email: 'x@test.com', role: 'customer', sellerStatus: 'approved', blocked: false, customRole: null };
+      const user: JwtPayload = { sub: 'user-1', email: 'x@test.com', role: 'customer', sellerStatus: 'approved', blocked: false, customRole: null, aud: 'client' };
       const result = await controller.uploadProductImage(user, makeFile(PNG_SIGNATURE));
       expect(result.url).toMatch(/^\/uploads\/products\/\d+-\d+\.png$/);
       expect(writeFile).toHaveBeenCalledTimes(1);
@@ -145,7 +147,7 @@ describe('UploadsController', () => {
     });
 
     it("rejette (400) un fichier dont le contenu réel n'est pas une image, même avec un mimetype/extension usurpés", async () => {
-      const user: JwtPayload = { sub: 'user-1', email: 'x@test.com', role: 'customer', sellerStatus: 'approved', blocked: false, customRole: null };
+      const user: JwtPayload = { sub: 'user-1', email: 'x@test.com', role: 'customer', sellerStatus: 'approved', blocked: false, customRole: null, aud: 'client' };
       await expect(controller.uploadProductImage(user, makeFile(NOT_AN_IMAGE))).rejects.toThrow(BadRequestException);
       expect(writeFile).not.toHaveBeenCalled();
     });

@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -11,6 +11,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { MailService } from '../mail/mail.service';
 import { welcomeTemplate, magicLinkTemplate } from '../mail/templates';
+import type { JwtAudience } from './jwt-audience';
 
 const MAGIC_LINK_TTL_MS = 15 * 60 * 1000;
 // Réponse générique systématique (aucune fuite d'existence de compte), cohérente avec
@@ -19,6 +20,8 @@ const MAGIC_LINK_GENERIC_RESPONSE = { message: 'Si cette adresse est valide, un 
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @InjectRepository(User) private usersRepo: Repository<User>,
     @InjectRepository(MagicLinkToken) private magicLinkRepo: Repository<MagicLinkToken>,
@@ -46,18 +49,20 @@ export class AuthService {
     };
   }
 
-  signToken(user: User) {
+  signToken(user: User, audience: JwtAudience) {
     return this.jwtService.sign({
       sub: user.id,
       email: user.email,
       role: user.role,
       sellerStatus: user.sellerStatus,
+      aud: audience,
     });
   }
 
-  async register(dto: RegisterDto) {
+  async register(dto: RegisterDto, audience: JwtAudience) {
     const existing = await this.usersRepo.findOne({ where: { email: dto.email } });
     if (existing) {
+      this.logger.warn(`register refusé (email déjà utilisé) email=${dto.email} aud=${audience}`);
       throw new ConflictException('Un compte existe déjà avec cet email');
     }
     const passwordHash = await bcrypt.hash(dto.password, 10);
@@ -71,10 +76,11 @@ export class AuthService {
     const saved = await this.usersRepo.save(user);
     const { subject, html } = welcomeTemplate(saved.displayName);
     await this.mailService.send({ to: saved.email, subject, html });
-    return { accessToken: this.signToken(saved), user: this.sanitize(saved) };
+    this.logger.log(`register réussi email=${saved.email} aud=${audience}`);
+    return { accessToken: this.signToken(saved, audience), user: this.sanitize(saved) };
   }
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto, audience: JwtAudience) {
     const user = await this.usersRepo
       .createQueryBuilder('user')
       .addSelect('user.passwordHash')
@@ -82,14 +88,26 @@ export class AuthService {
       .where('user.email = :email', { email: dto.email })
       .getOne();
 
-    if (!user) throw new UnauthorizedException('Identifiants invalides');
+    // Jamais le mot de passe dans les logs — seulement l'email et la raison de l'échec,
+    // pour pouvoir diagnostiquer un blocage de connexion sans exposer de secret.
+    if (!user) {
+      this.logger.warn(`login refusé (email inconnu) email=${dto.email} aud=${audience}`);
+      throw new UnauthorizedException('Identifiants invalides');
+    }
 
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
-    if (!valid) throw new UnauthorizedException('Identifiants invalides');
+    if (!valid) {
+      this.logger.warn(`login refusé (mot de passe incorrect) email=${dto.email} aud=${audience}`);
+      throw new UnauthorizedException('Identifiants invalides');
+    }
 
-    if (user.blocked) throw new UnauthorizedException('Compte bloqué');
+    if (user.blocked) {
+      this.logger.warn(`login refusé (compte bloqué) email=${dto.email} aud=${audience}`);
+      throw new UnauthorizedException('Compte bloqué');
+    }
 
-    return { accessToken: this.signToken(user), user: this.sanitize(user) };
+    this.logger.log(`login réussi email=${user.email} role=${user.role} aud=${audience}`);
+    return { accessToken: this.signToken(user, audience), user: this.sanitize(user) };
   }
 
   private hashToken(rawToken: string): string {
@@ -111,6 +129,7 @@ export class AuthService {
     const { subject, html } = magicLinkTemplate(link);
     await this.mailService.send({ to: normalizedEmail, subject, html });
 
+    this.logger.log(`magic-link demandé email=${normalizedEmail}`);
     return MAGIC_LINK_GENERIC_RESPONSE;
   }
 
@@ -118,6 +137,7 @@ export class AuthService {
     const tokenHash = this.hashToken(rawToken);
     const record = await this.magicLinkRepo.findOne({ where: { tokenHash } });
     if (!record || record.usedAt || record.expiresAt.getTime() < Date.now()) {
+      this.logger.warn(`magic-link refusé (jeton invalide/expiré/déjà utilisé) tokenHash=${tokenHash.slice(0, 12)}…`);
       throw new UnauthorizedException('Lien de connexion invalide ou expiré');
     }
     // Jeton à usage unique : marqué consommé avant même de créer/relire l'utilisateur,
@@ -143,9 +163,16 @@ export class AuthService {
       await this.mailService.send({ to: user.email, subject, html });
     }
 
-    if (user.blocked) throw new UnauthorizedException('Compte bloqué');
+    if (user.blocked) {
+      this.logger.warn(`magic-link refusé (compte bloqué) email=${user.email}`);
+      throw new UnauthorizedException('Compte bloqué');
+    }
 
-    return { accessToken: this.signToken(user), user: this.sanitize(user) };
+    this.logger.log(`magic-link connexion réussie email=${user.email} role=${user.role}`);
+    // Le lien magique n'est proposé que sur le site client — même si l'appelant
+    // envoyait un en-tête X-Client-App: admin, on ignore volontairement cette
+    // déclaration ici pour ne jamais délivrer un token d'audience admin par ce biais.
+    return { accessToken: this.signToken(user, 'client'), user: this.sanitize(user) };
   }
 
   async me(userId: string) {

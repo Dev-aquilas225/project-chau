@@ -115,7 +115,8 @@ export class SellersService {
       `${dto.storeName} a soumis une demande de vérification`,
       `/vendeurs/${saved.id}`,
     );
-    return { accessToken: this.authService.signToken(saved), user: this.sanitizeSelf(saved) };
+    // La candidature vendeur est un flux exclusivement client (espace vendeur = frontend/, jamais l'admin).
+    return { accessToken: this.authService.signToken(saved, 'client'), user: this.sanitizeSelf(saved) };
   }
 
   async getMyProfile(userId: string) {

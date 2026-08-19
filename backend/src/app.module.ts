@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
@@ -37,6 +37,7 @@ import { Role } from './roles/entities/role.entity';
 import { Offer } from './offers/entities/offer.entity';
 import { PayoutRequest } from './payouts/entities/payout-request.entity';
 import { Notification } from './notifications/entities/notification.entity';
+import { HttpLoggerMiddleware } from './common/http-logger.middleware';
 
 
 @Module({
@@ -84,4 +85,8 @@ import { Notification } from './notifications/entities/notification.entity';
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(HttpLoggerMiddleware).forRoutes('*');
+  }
+}

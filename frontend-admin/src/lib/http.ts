@@ -47,7 +47,7 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     if (qs) url += `?${qs}`;
   }
 
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = { 'X-Client-App': 'admin' };
   const token = getToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (body !== undefined) headers['Content-Type'] = 'application/json';
@@ -80,7 +80,7 @@ export async function apiUpload<T>(path: string, file: File): Promise<T> {
   const formData = new FormData();
   formData.append('file', file);
 
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = { 'X-Client-App': 'admin' };
   const token = getToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
@@ -101,7 +101,7 @@ export async function apiUpload<T>(path: string, file: File): Promise<T> {
 
 /** Récupère un fichier protégé par JWT (ex. document KYC) sous forme d'URL d'objet local à révoquer après usage. */
 export async function apiFetchBlobUrl(path: string): Promise<string> {
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = { 'X-Client-App': 'admin' };
   const token = getToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
