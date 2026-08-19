@@ -9,8 +9,8 @@ export function Layout() {
   useFavoritesSync();
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
       <ShippingNoticeBanner />
+      <Header />
       <main className="flex-1 pb-20 md:pb-0">
         <PageTransition />
       </main>

@@ -67,7 +67,10 @@
       "text": "Tutti i servizi di verifica dell'autenticità e i controlli di qualità sono effettuati in modo indipendente da Occasion de luxe PJ international. Gli acquisti di articoli non autentici vengono rimborsati integralmente."
     },
     "seller": {
-      "viewAllListings": "Vedi tutti i suoi annunci"
+      "viewAllListings": "Vedi tutti i suoi annunci",
+      "official": "Negozio ufficiale",
+      "partner": "Venditore partner",
+      "disclaimer": "Questo prodotto è pubblicato da un venditore partner del marketplace. Né Occasion de luxe PJ international né la piattaforma sono responsabili della qualità di questo prodotto o dei tempi di consegna indicati nel carrello."
     },
     "backToCatalog": "← Torna al catalogo"
   }

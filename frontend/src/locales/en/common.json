@@ -53,7 +53,9 @@
     "noImage": "No image",
     "sold": "Sold",
     "addToFavorites": "Add to favorites",
-    "removeFromFavorites": "Remove from favorites"
+    "removeFromFavorites": "Remove from favorites",
+    "officialBadge": "Official store",
+    "sellerBadge": "Partner seller"
   },
   "loading": "Loading",
   "notFound": "Page not found.",

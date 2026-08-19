@@ -53,7 +53,9 @@
     "noImage": "Pas d'image",
     "sold": "Vendu",
     "addToFavorites": "Ajouter aux favoris",
-    "removeFromFavorites": "Retirer des favoris"
+    "removeFromFavorites": "Retirer des favoris",
+    "officialBadge": "Boutique officielle",
+    "sellerBadge": "Vendeur partenaire"
   },
   "loading": "Chargement",
   "notFound": "Page introuvable.",

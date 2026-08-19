@@ -67,7 +67,10 @@
       "text": "All authenticity verification services and quality checks are carried out independently by Occasion de luxe PJ international. Purchases of non-authentic items are fully refunded."
     },
     "seller": {
-      "viewAllListings": "View all their listings"
+      "viewAllListings": "View all their listings",
+      "official": "Official store",
+      "partner": "Partner seller",
+      "disclaimer": "This product is listed by a marketplace partner seller. Neither Occasion de luxe PJ international nor the platform is responsible for the quality of this product or the delivery time shown at checkout."
     },
     "backToCatalog": "← Back to catalog"
   }

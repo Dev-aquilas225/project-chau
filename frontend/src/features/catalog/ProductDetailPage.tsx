@@ -206,18 +206,31 @@ export function ProductDetailPage() {
           </div>
 
           {/* Carte vendeur */}
-          {product.seller && (
-            <div className="mt-6 flex items-center gap-3 rounded-lg border border-line p-4">
-              <Store className="h-5 w-5 shrink-0 text-muted" />
-              <div>
-                <p className="font-medium">{product.seller.sellerProfile?.storeName ?? product.seller.displayName}</p>
-                <Link
-                  to={`/catalogue?sellerId=${product.seller.id}`}
-                  className="text-xs text-muted underline"
-                >
-                  {t('productDetail.seller.viewAllListings')}
-                </Link>
+          {product.seller ? (
+            <div className="mt-6 rounded-lg border border-line p-4">
+              <div className="flex items-center gap-3">
+                <Store className="h-5 w-5 shrink-0 text-muted" />
+                <div>
+                  <p className="font-medium">
+                    {product.seller.sellerProfile?.storeName ?? product.seller.displayName}
+                    <span className="ml-2 rounded-full bg-luxury-beige px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-luxury-dark">
+                      {t('productDetail.seller.partner')}
+                    </span>
+                  </p>
+                  <Link
+                    to={`/catalogue?sellerId=${product.seller.id}`}
+                    className="text-xs text-muted underline"
+                  >
+                    {t('productDetail.seller.viewAllListings')}
+                  </Link>
+                </div>
               </div>
+              <p className="mt-3 text-xs leading-relaxed text-muted">{t('productDetail.seller.disclaimer')}</p>
+            </div>
+          ) : (
+            <div className="mt-6 flex items-center gap-3 rounded-lg border border-line p-4">
+              <Store className="h-5 w-5 shrink-0 text-luxury-gold" />
+              <p className="font-medium">{t('productDetail.seller.official')}</p>
             </div>
           )}
 

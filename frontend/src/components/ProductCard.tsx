@@ -51,6 +51,14 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
           {product.condition && !product.weLove && (
             <span className="badge absolute left-4 top-4">{product.condition}</span>
           )}
+          <span
+            className={cn(
+              'absolute right-4 top-4 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide',
+              product.sellerId ? 'bg-white/90 text-luxury-dark' : 'bg-luxury-gold text-luxury-dark'
+            )}
+          >
+            {product.sellerId ? t('productCard.sellerBadge') : t('productCard.officialBadge')}
+          </span>
           {product.stock === 0 && (
             <span className="absolute inset-x-0 bottom-0 bg-luxury-dark/80 py-1.5 text-center text-[11px] font-medium text-white uppercase tracking-widest">
               {t('productCard.sold')}
