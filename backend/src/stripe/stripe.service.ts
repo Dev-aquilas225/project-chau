@@ -20,7 +20,7 @@ export class StripeService implements OnModuleInit {
       ? this.configService.get<string>('STRIPE_WEBHOOK_SECRET_PROD', '')
       : this.configService.get<string>('STRIPE_WEBHOOK_SECRET_DEV', '');
 
-    if (secretKey && secretKey !== 'sk_test_mock' && secretKey.startsWith('sk_')) {
+    if (secretKey && secretKey !== 'sk_test_mock' && (secretKey.startsWith('sk_') || secretKey.startsWith('rk_'))) {
       try {
         // Dynamically import Stripe to prevent crash if not fully installed yet
         const Stripe = require('stripe');
