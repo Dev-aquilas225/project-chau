@@ -8,7 +8,10 @@ import { AppModule } from './app.module';
 function resolveCorsOrigins(): string[] {
   const configured = process.env.CORS_ORIGINS;
   if (configured && configured.trim() !== '') {
-    return configured.split(',').map((o) => o.trim()).filter(Boolean);
+    return configured
+      .split(',')
+      .map((o) => o.trim().replace(/\/+$/, '')) // le header Origin du navigateur n'a jamais de slash final
+      .filter(Boolean);
   }
   // Défaut restrictif (dev uniquement) : les ports Vite des deux SPA locales.
   // En production, CORS_ORIGINS doit toujours être positionné explicitement.
