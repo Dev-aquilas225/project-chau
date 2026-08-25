@@ -65,12 +65,15 @@ export function CheckoutPage() {
     }
   }, [offerId]);
 
-  // Override item price in checkout if there is an accepted offer
+  // Override item price in checkout if there is an accepted offer. Coerce unitPrice to
+  // a real number in all cases : les paniers persistés avant le correctif du cartStore
+  // peuvent encore contenir un unitPrice sous forme de chaîne ("70.00"), ce que l'API
+  // rejette (@IsNumber()).
   const itemsToProcess = items.map((item) => {
     if (negotiatedOffer && item.productId === negotiatedOffer.productId) {
       return { ...item, unitPrice: parseFloat(negotiatedOffer.suggestedPrice) };
     }
-    return item;
+    return { ...item, unitPrice: Number(item.unitPrice) };
   });
 
   // Carrier selection

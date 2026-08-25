@@ -31,7 +31,10 @@ export const useCartStore = create<CartState>()(
             name: product.name,
             brand: product.brand,
             image: product.images[0] ?? '',
-            unitPrice: product.price,
+            // Les colonnes `numeric` Postgres/TypeORM sont sérialisées en chaîne
+            // ("70.00") pour préserver la précision — il faut la reconvertir en
+            // nombre ici, sinon l'API rejette la commande (@IsNumber() sur unitPrice).
+            unitPrice: Number(product.price),
             qty,
             size: product.size,
           };
