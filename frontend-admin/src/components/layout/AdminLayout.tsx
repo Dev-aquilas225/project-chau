@@ -29,6 +29,7 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { usePermission } from '@/features/auth/usePermission';
@@ -58,6 +59,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Vendeurs', to: '/vendeurs', icon: <StorefrontOutlinedIcon />, resource: 'sellers' },
   { label: 'Paramètres', to: '/parametres', icon: <SettingsOutlinedIcon />, resource: 'platformConfig' },
   { label: 'Retraits', to: '/retraits', icon: <AccountBalanceWalletOutlinedIcon />, adminOnly: true },
+  { label: 'Livraison', to: '/zones-livraison', icon: <LocalShippingOutlinedIcon />, adminOnly: true },
   { label: 'Rôles', to: '/roles', icon: <AdminPanelSettingsOutlinedIcon />, adminOnly: true },
 ];
 

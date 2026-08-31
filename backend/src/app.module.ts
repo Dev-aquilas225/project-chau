@@ -22,6 +22,8 @@ import { StripeModule } from './stripe/stripe.module';
 import { OffersModule } from './offers/offers.module';
 import { PayoutsModule } from './payouts/payouts.module';
 import { MailModule } from './mail/mail.module';
+import { ShippingZonesModule } from './shipping-zones/shipping-zones.module';
+import { ShippingZone } from './shipping-zones/entities/shipping-zone.entity';
 import { User } from './users/entities/user.entity';
 import { MagicLinkToken } from './auth/entities/magic-link-token.entity';
 import { Product } from './products/entities/product.entity';
@@ -57,7 +59,7 @@ import { HttpLoggerMiddleware } from './common/http-logger.middleware';
         username: config.get<string>('DB_USERNAME', 'postgres'),
         password: config.get<string>('DB_PASSWORD', 'postgres'),
         database: config.get<string>('DB_NAME', 'aquilas'),
-        entities: [User, Product, Category, Order, OrderStatusHistory, Review, UserReview, Favorite, PromoCode, PlatformConfig, Role, Offer, PayoutRequest, Notification, MagicLinkToken],
+        entities: [User, Product, Category, Order, OrderStatusHistory, Review, UserReview, Favorite, PromoCode, PlatformConfig, Role, Offer, PayoutRequest, Notification, MagicLinkToken, ShippingZone],
         synchronize: false,
         autoLoadEntities: true,
         migrationsRun: true,
@@ -82,6 +84,7 @@ import { HttpLoggerMiddleware } from './common/http-logger.middleware';
     StripeModule,
     OffersModule,
     PayoutsModule,
+    ShippingZonesModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
